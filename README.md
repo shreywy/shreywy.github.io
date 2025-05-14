@@ -1,6 +1,6 @@
 # Shrey Mistry - Portfolio Website
 
-![Portfolio Screenshot]([images/screenshot.png](https://imgur.com/76f7a5d1-a499-4373-a26c-593b0eb9ec5d))
+![Portfolio Screenshot](https://i.imgur.com/gKooiyK.png)
 
 A responsive personal portfolio website showcasing my projects, experience, and skills as a Computer Science student and developer.
 

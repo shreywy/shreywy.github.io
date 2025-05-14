@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Portfolio" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/fa62c117c7.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="styles.css" />
+  <title>Shrey's Portfolio</title>
+  <link rel="icon" href="images/icon.png" type="image/png">
+</head>
+
+<body class="light" id="top">
+  <header class="header center">
+    <h3><a href="#" class="link">SM.</a></h3>
+    <nav class="nav center">
+      <ul class="nav__list center">
+        <li class="nav__list-item"><a class="link link--nav" href="#projects">Projects</a></li>
+        <li class="nav__list-item"><a class="link link--nav" href="#experience">Experience</a></li>
+        <li class="nav__list-item"><a class="link link--nav" href="#skills">Skills</a></li>
+        <li class="nav__list-item"><a class="link link--nav" href="#contact">Contact</a></li>
+      </ul>
+      <button type="button" aria-label="toggle theme" class="btn btn--icon">
+        <i aria-hidden="true" id="btn-theme" class="fas fa-moon"></i>
+      </button>
+      <button type="button" aria-label="cycle color themes" class="btn btn--icon" id="btn-theme-cycle">
+        <i aria-hidden="true" class="fas fa-palette"></i>
+      </button>
+      <button type="button" aria-label="toggle navigation" class="btn btn--icon nav__hamburger">
+        <i aria-hidden="true" class="fas fa-bars"></i>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="about center">
+      <h1>Hi, I'm <span class="about__name">Shrey Mistry.</span></h1>
+      <h2 class="about__role">A Computer Science Student & Developer.</h2>
+      <p class="about__desc">
+        I'm a Computer Science student at Toronto Metropolitan University with experience in full-stack development,
+        database systems, and performance analysis. I enjoy building tools that improve workflow efficiency and user
+        experience.
+      </p>
+      <div class="about__contact center">
+        <a href="https://drive.google.com/file/d/1RPct-cbQ1c7fub1g7dJUH-DDCWdCzB0p/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+          <span class="btn btn--outline">Resume</span>
+        </a>
+        
+        <a href="https://github.com/shreywy" target="_blank" rel="noopener noreferrer" aria-label="github" class="link link--icon">
+          <i aria-hidden="true" class="fab fa-github"></i>
+        </a>
+        
+        <a href="https://linkedin.com/in/shreymistry" target="_blank" rel="noopener noreferrer" aria-label="linkedin" class="link link--icon">
+          <i aria-hidden="true" class="fab fa-linkedin"></i>
+        </a>
+      </div>
+    </div>
+
+    <section class="section experience" id="experience">
+      <h2 class="section__title">Experience</h2>
+      <div class="timeline">
+        <div class="timeline-component timeline-left">
+          <div class="timeline-content">
+            <h3 class="timeline-role">Project Management Intern</h3>
+            <h4 class="timeline-company">Geotab · Oakville, Ontario</h4>
+            <p>Currently working with the Expandability team in Solutions Delivery Management, supporting project coordination and internal systems.</p>
+          </div>
+        </div>
+        <div class="timeline-middle">
+          <div class="timeline-circle"></div>
+          <div class="timeline-date-left">May 2025 – Present</div>
+        </div>
+        <div class="timeline-empty"></div>
+        <div class="timeline-empty"></div>
+        <div class="timeline-middle">
+          <div class="timeline-circle"></div>
+          <div class="timeline-date-right">Jan 2024 – Aug 2024</div>
+        </div>
+        <div class="timeline-component timeline-right">
+          <div class="timeline-content">
+            <h3 class="timeline-role">Automation Engineering Intern</h3>
+            <h4 class="timeline-company">AMD · Markham, Ontario</h4>
+            <p>Automated GPU benchmarking with Python, integrated SQL for data analysis, and built internal CLI tools for engineering and marketing teams.</p>
+          </div>
+        </div>
+        <div class="timeline-component timeline-left">
+          <div class="timeline-content">
+            <h3 class="timeline-role">Automation & Data Tools Intern</h3>
+            <h4 class="timeline-company">Bombardier · Toronto, Ontario</h4>
+            <p>Built dashboards and automated reporting tools for supplier KPI tracking, improving data workflows and reducing manual processes.</p>
+          </div>
+        </div>
+        <div class="timeline-middle">
+          <div class="timeline-circle"></div>
+          <div class="timeline-date-left">May 2023 – Aug 2023</div>
+        </div>
+        <div class="timeline-empty"></div>
+        <div class="timeline-empty"></div>
+        <div class="timeline-middle">
+          <div class="timeline-circle"></div>
+          <div class="timeline-date-right">Jul 2022 – Aug 2022</div>
+        </div>
+        <div class="timeline-component timeline-right">
+          <div class="timeline-content">
+            <h3 class="timeline-role">Coding Camp Instructor</h3>
+            <h4 class="timeline-company">Peel District School Board · Brampton, Ontario</h4>
+            <p>Taught Python and Turtle to middle schoolers, helping them build logic through hands-on coding projects and group exercises.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" class="section projects">
+      <h2 class="section__title">Projects</h2>
+      <div class="projects__grid">
+        <div class="project">
+          <h3>Media Store DBMS</h3>
+          <img src="images/dbms.png" alt="Media Store DBMS screenshot" class="project__image">
+          <p class="project__description">Built a GUI-based Python application for managing a music and movie database using Oracle SQL and CustomTkinter.</p>
+          <ul class="project__stack">
+            <li class="project__stack-item">Python</li>
+            <li class="project__stack-item">Oracle SQL</li>
+            <li class="project__stack-item">CustomTkinter</li>
+          </ul>
+          <a href="https://github.com/shreywy/Movie-And-Music-Store-DBMS" class="link link--icon"><i class="fab fa-github"></i></a>
+        </div>
+        <div class="project">
+          <h3>URL Shortener</h3>
+          <img src="images/urlshortener.png" alt="URL Shortener screenshot" class="project__image">
+          <p class="project__description">Developed and deployed a scalable full-stack URL shortening service using React, Flask, and Firebase.</p>
+          <ul class="project__stack">
+            <li class="project__stack-item">React</li>
+            <li class="project__stack-item">Flask</li>
+            <li class="project__stack-item">Firebase</li>
+            <li class="project__stack-item">Docker</li>
+          </ul>
+          <a href="https://github.com/shreywy/cuttt" class="link link--icon"><i class="fab fa-github"></i></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section skills" id="skills">
+      <h2 class="section__title">Skills</h2>
+      <div class="skills__categories">
+        <div class="skills__category">
+          <h3 class="skills__category-title">Languages & Front End</h3>
+          <ul class="skills__list">
+            <li class="skills__list-item btn btn--plain">Python</li>
+            <li class="skills__list-item btn btn--plain">JavaScript</li>
+            <li class="skills__list-item btn btn--plain">TypeScript</li>
+            <li class="skills__list-item btn btn--plain">Java</li>
+            <li class="skills__list-item btn btn--plain">C/C++</li>
+            <li class="skills__list-item btn btn--plain">SQL</li>
+            <li class="skills__list-item btn btn--plain">HTML/CSS</li>
+            <li class="skills__list-item btn btn--plain">React</li>
+            <li class="skills__list-item btn btn--plain">Bootstrap</li>
+          </ul>
+        </div>
+        <div class="skills__category">
+          <h3 class="skills__category-title">Back End & Data</h3>
+          <ul class="skills__list">
+            <li class="skills__list-item btn btn--plain">Node.js</li>
+            <li class="skills__list-item btn btn--plain">Flask</li>
+            <li class="skills__list-item btn btn--plain">Firebase</li>
+            <li class="skills__list-item btn btn--plain">Oracle SQL</li>
+            <li class="skills__list-item btn btn--plain">Pandas</li>
+            <li class="skills__list-item btn btn--plain">NumPy</li>
+            <li class="skills__list-item btn btn--plain">Matplotlib</li>
+            <li class="skills__list-item btn btn--plain">CustomTkinter</li>
+          </ul>
+        </div>
+        <div class="skills__category">
+          <h3 class="skills__category-title">Tools & Platforms</h3>
+          <ul class="skills__list">
+            <li class="skills__list-item btn btn--plain">Docker</li>
+            <li class="skills__list-item btn btn--plain">Git</li>
+            <li class="skills__list-item btn btn--plain">Azure</li>
+            <li class="skills__list-item btn btn--plain">VS Code</li>
+            <li class="skills__list-item btn btn--plain">npm</li>
+            <li class="skills__list-item btn btn--plain">Excel Macros</li>
+            <li class="skills__list-item btn btn--plain">Linux</li>
+            <li class="skills__list-item btn btn--plain">Microsoft Office</li>
+            <li class="skills__list-item btn btn--plain">Google Suite</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section contact center" id="contact">
+      <h2 class="section__title">Contact</h2>
+      <div class="contact__content center">
+        <a href="mailto:shrey.d.mistry@gmail.com" class="btn btn--outline">Email me</a>
+        <div class="contact__links center">
+          <a href="https://github.com/shreywy" aria-label="github" class="link link--icon"><i aria-hidden="true" class="fab fa-github"></i></a>
+          <a href="https://linkedin.com/in/shreymistry" aria-label="linkedin" class="link link--icon"><i aria-hidden="true" class="fab fa-linkedin"></i></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a href="https://github.com/shreywy" class="link footer__link">Created by Shrey Mistry</a>
+  </footer>
+
+  <div class="scroll-container">
+    <div class="scroll-top">
+      <a aria-label="Scroll up" href="#top"><i aria-hidden="true" class="fas fa-arrow-up"></i></a>
+    </div>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>

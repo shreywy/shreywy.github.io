@@ -156,3 +156,45 @@ document.addEventListener('scroll', scrollUp);
 initializeTheme();
 
 
+document.body.classList.add('loaded');
+
+function toggleTheme() {
+  document.body.style.transition = 'none'; // Disable transition during change
+  const currentTheme = document.body.classList.contains('dark') ? 'dark' : 'light';
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  
+  // Apply new theme
+  document.body.classList.remove(currentTheme);
+  document.body.classList.add(newTheme);
+  
+  // Force synchronous layout calculation
+  document.body.offsetHeight; // This triggers reflow
+  
+  // Re-enable transitions
+  document.body.style.transition = '';
+  
+  // Update other elements
+  applyThemePair(localStorage.getItem('themePair') || 'default');
+  localStorage.setItem('portfolio-theme', newTheme);
+}
+
+// Smooth header height animation on scroll
+const header = document.querySelector('.header');
+const maxHeight = 8; // em units (initial height)
+const minHeight = 3; // em units (scrolled height)
+const scrollRange = 200; // Pixels over which to animate
+
+window.addEventListener('scroll', () => {
+  const scrollPosition = Math.min(window.scrollY, scrollRange);
+  const heightPercent = scrollPosition / scrollRange;
+  const newHeight = maxHeight - (heightPercent * (maxHeight - minHeight));
+  
+  header.style.height = `${newHeight}em`;
+});
+
+// Reset on load/refresh
+window.addEventListener('load', () => {
+  if (window.scrollY === 0) {
+    header.style.height = `${maxHeight}em`;
+  }
+});

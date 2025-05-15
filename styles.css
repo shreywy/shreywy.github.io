@@ -51,6 +51,7 @@ body {
 
 
 
+
 ::-moz-selection {
   background: var(--clr-primary);
   color: var(--clr-bg);
@@ -771,4 +772,54 @@ main {
 .timeline-content p {
   position: relative;
   z-index: 2;
+}
+
+.fade-in {
+  --translate-y: 30px;
+  --hover-scale: 1;
+  --hover-rotate: 0deg;
+  opacity: 0;
+  transform: translateY(var(--translate-y)) scale(var(--hover-scale)) rotate(var(--hover-rotate));
+  transition: 
+    opacity 0.6s ease-out, 
+    transform 0.6s ease-out,
+    box-shadow 0.3s ease,
+    color 0.3s ease;
+  pointer-events: none;
+}
+
+.fade-in.visible {
+  --translate-y: 0;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.skills__list-item {
+  --hover-scale: 1; /* normal size */
+  --hover-rotate: 0deg;
+  color: inherit;
+  transform-origin: center;
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out, color 0.3s ease;
+}
+
+.skills__list-item:hover {
+  --hover-scale: 1.05; /* grow on hover */
+  --translate-y: 0;
+  box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+  transition:
+    transform 0.15s ease-out,
+    box-shadow 0.15s ease-out;
+}
+
+.cursor {
+  display: inline-block;
+  font-weight: 700;
+  color: var(--clr-primary);
+  animation: blink 1s step-end infinite;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  from, to { opacity: 1; }
+  50% { opacity: 0; }
 }

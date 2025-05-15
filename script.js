@@ -198,3 +198,71 @@ window.addEventListener('load', () => {
     header.style.height = `${maxHeight}em`;
   }
 });
+
+
+const fadeIns = document.querySelectorAll('.fade-in');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    } else {
+      entry.target.classList.remove('visible');
+    }
+  });
+}, {
+  threshold: 0.1
+});
+
+fadeIns.forEach(el => observer.observe(el));
+
+
+fadeIns.forEach((el, index) => {
+  el.style.transitionDelay = `${index * 1}ms`;
+});
+
+
+const typedTextSpan = document.getElementById('typed-text');
+
+const roles = [
+  "A Computer Science Student.",
+  "A Software Developer.",
+  "A Full-Stack Engineer.",
+  "An Internship Candidate.",
+  "A Tech Innovator.",
+  "A Problem Solver.",
+  "An Aspiring Software Engineer."
+];
+
+const typingDelay = 50;
+const erasingDelay = 40;
+const newTextDelay = 600; // Delay between current and next text
+
+let roleIndex = 0;
+let charIndex = 0;
+
+function type() {
+  if (charIndex < roles[roleIndex].length) {
+    typedTextSpan.textContent += roles[roleIndex].charAt(charIndex);
+    charIndex++;
+    setTimeout(type, typingDelay);
+  } else {
+    setTimeout(erase, newTextDelay);
+  }
+}
+
+function erase() {
+  if (charIndex > 0) {
+    typedTextSpan.textContent = roles[roleIndex].substring(0, charIndex - 1);
+    charIndex--;
+    setTimeout(erase, erasingDelay);
+  } else {
+    roleIndex++;
+    if (roleIndex >= roles.length) roleIndex = 0;
+    setTimeout(type, typingDelay + 500);
+  }
+}
+
+// Start the typing effect on DOM load
+document.addEventListener("DOMContentLoaded", function () {
+  if (roles.length) setTimeout(type, newTextDelay + 250);
+});

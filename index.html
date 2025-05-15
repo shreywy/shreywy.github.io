@@ -44,7 +44,11 @@
   <main>
     <div class="about center">
       <h1>Hi, I'm <span class="about__name">Shrey Mistry.</span></h1>
-      <h2 class="about__role">A Computer Science Student & Developer.</h2>
+      
+      <h2 class="about__role">
+        <span id="typed-text"></span><span class="cursor">|</span>
+      </h2>
+      
       <p class="about__desc">
         I'm a Computer Science student at Toronto Metropolitan University with experience in full-stack development,
         database systems, and performance analysis. I enjoy building tools that improve workflow efficiency and user
@@ -61,7 +65,7 @@
       <h2 class="section__title">Experience</h2>
       <div class="timeline">
         <div class="timeline-component timeline-left">
-          <div class="timeline-content">
+          <div class="timeline-content fade-in">
             <h3 class="timeline-role">Project Management Intern</h3>
             <h4 class="timeline-company">Geotab · Oakville, Ontario</h4>
             <p>Currently working with the Expandability team in Solutions Delivery Management, supporting project coordination and internal systems.</p>
@@ -78,14 +82,14 @@
           <div class="timeline-date-right">Jan 2024 – Aug 2024</div>
         </div>
         <div class="timeline-component timeline-right">
-          <div class="timeline-content">
+          <div class="timeline-content fade-in">
             <h3 class="timeline-role">Automation Engineering Intern</h3>
             <h4 class="timeline-company">AMD · Markham, Ontario</h4>
             <p>Automated GPU benchmarking with Python, integrated SQL for data analysis, and built internal CLI tools for engineering and marketing teams.</p>
           </div>
         </div>
         <div class="timeline-component timeline-left">
-          <div class="timeline-content">
+          <div class="timeline-content fade-in">
             <h3 class="timeline-role">Automation & Data Tools Intern</h3>
             <h4 class="timeline-company">Bombardier · Toronto, Ontario</h4>
             <p>Built dashboards and automated reporting tools for supplier KPI tracking, improving data workflows and reducing manual processes.</p>
@@ -102,7 +106,7 @@
           <div class="timeline-date-right">Jul 2022 – Aug 2022</div>
         </div>
         <div class="timeline-component timeline-right">
-          <div class="timeline-content">
+          <div class="timeline-content fade-in">
             <h3 class="timeline-role">Coding Camp Instructor</h3>
             <h4 class="timeline-company">Peel District School Board · Brampton, Ontario</h4>
             <p>Taught Python and Turtle to middle schoolers, helping them build logic through hands-on coding projects and group exercises.</p>
@@ -115,7 +119,7 @@
       <h2 class="section__title">Projects</h2>
       <div class="projects__grid">
         
-        <div class="project">
+        <div class="project  fade-in">
           <h3>URL Shortener</h3>
           <img src="images/urlshortener.png" alt="URL Shortener screenshot" class="project__image">
           <p class="project__description">Developed and deployed a scalable full-stack URL shortening service using React, Flask, and Firebase.</p>
@@ -128,7 +132,7 @@
           <a href="https://github.com/shreywy/cuttt" class="link link--icon"><i class="fab fa-github"></i></a>
         </div>
 
-        <div class="project">
+        <div class="project  fade-in">
           <h3>Media Store DBMS</h3>
           <img src="images/dbms.png" alt="Media Store DBMS screenshot" class="project__image">
           <p class="project__description">Built a GUI-based Python application for managing a music and movie database using Oracle SQL and CustomTkinter.</p>
@@ -149,42 +153,42 @@
         <div class="skills__category">
           <h3 class="skills__category-title">Languages & Front End</h3>
           <ul class="skills__list">
-            <li class="skills__list-item btn btn--plain">Python</li>
-            <li class="skills__list-item btn btn--plain">JavaScript</li>
-            <li class="skills__list-item btn btn--plain">TypeScript</li>
-            <li class="skills__list-item btn btn--plain">Java</li>
-            <li class="skills__list-item btn btn--plain">C/C++</li>
-            <li class="skills__list-item btn btn--plain">SQL</li>
-            <li class="skills__list-item btn btn--plain">HTML/CSS</li>
-            <li class="skills__list-item btn btn--plain">React</li>
-            <li class="skills__list-item btn btn--plain">Bootstrap</li>
+            <li class="skills__list-item btn btn--plain fade-in">Python</li>
+            <li class="skills__list-item btn btn--plain fade-in">JavaScript</li>
+            <li class="skills__list-item btn btn--plain fade-in">TypeScript</li>
+            <li class="skills__list-item btn btn--plain fade-in">Java</li>
+            <li class="skills__list-item btn btn--plain fade-in">C/C++</li>
+            <li class="skills__list-item btn btn--plain fade-in">SQL</li>
+            <li class="skills__list-item btn btn--plain fade-in">HTML/CSS</li>
+            <li class="skills__list-item btn btn--plain fade-in">React</li>
+            <li class="skills__list-item btn btn--plain fade-in">Bootstrap</li>
           </ul>
         </div>
         <div class="skills__category">
           <h3 class="skills__category-title">Back End & Data</h3>
           <ul class="skills__list">
-            <li class="skills__list-item btn btn--plain">Node.js</li>
-            <li class="skills__list-item btn btn--plain">Flask</li>
-            <li class="skills__list-item btn btn--plain">Firebase</li>
-            <li class="skills__list-item btn btn--plain">Oracle SQL</li>
-            <li class="skills__list-item btn btn--plain">Pandas</li>
-            <li class="skills__list-item btn btn--plain">NumPy</li>
-            <li class="skills__list-item btn btn--plain">Matplotlib</li>
-            <li class="skills__list-item btn btn--plain">CustomTkinter</li>
+            <li class="skills__list-item btn btn--plain fade-in">Node.js</li>
+            <li class="skills__list-item btn btn--plain fade-in">Flask</li>
+            <li class="skills__list-item btn btn--plain fade-in">Firebase</li>
+            <li class="skills__list-item btn btn--plain fade-in">Oracle SQL</li>
+            <li class="skills__list-item btn btn--plain fade-in">Pandas</li>
+            <li class="skills__list-item btn btn--plain fade-in">NumPy</li>
+            <li class="skills__list-item btn btn--plain fade-in">Matplotlib</li>
+            <li class="skills__list-item btn btn--plain fade-in">CustomTkinter</li>
           </ul>
         </div>
         <div class="skills__category">
           <h3 class="skills__category-title">Tools & Platforms</h3>
           <ul class="skills__list">
-            <li class="skills__list-item btn btn--plain">Docker</li>
-            <li class="skills__list-item btn btn--plain">Git</li>
-            <li class="skills__list-item btn btn--plain">Azure</li>
-            <li class="skills__list-item btn btn--plain">VS Code</li>
-            <li class="skills__list-item btn btn--plain">npm</li>
-            <li class="skills__list-item btn btn--plain">Excel Macros</li>
-            <li class="skills__list-item btn btn--plain">Linux</li>
-            <li class="skills__list-item btn btn--plain">Microsoft Office</li>
-            <li class="skills__list-item btn btn--plain">Google Suite</li>
+            <li class="skills__list-item btn btn--plain fade-in">Docker</li>
+            <li class="skills__list-item btn btn--plain fade-in">Git</li>
+            <li class="skills__list-item btn btn--plain fade-in">Azure</li>
+            <li class="skills__list-item btn btn--plain fade-in">VS Code</li>
+            <li class="skills__list-item btn btn--plain fade-in">npm</li>
+            <li class="skills__list-item btn btn--plain fade-in">Excel Macros</li>
+            <li class="skills__list-item btn btn--plain fade-in">Linux</li>
+            <li class="skills__list-item btn btn--plain fade-in">Microsoft Office</li>
+            <li class="skills__list-item btn btn--plain fade-in">Google Suite</li>
           </ul>
         </div>
       </div>

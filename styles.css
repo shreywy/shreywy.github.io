@@ -944,41 +944,54 @@ section[id] {
 
 
 
-
 /* MOBILE */
 @media (max-width: 600px) {
-  /* Keep header height fixed and elements aligned */
+  /* Keep header height small and elements aligned */
   .header {
-    height: 64px;
+    height: 48px; /* reasonable fixed height */
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 1rem;
-    position: fixed;
+    position: static;
     top: 0;
     width: 100%;
     z-index: 1000;
-    background-color: var(--bg); /* Replace with actual color if needed */
+    background-color: var(--bg); /* replace if needed */
     transition: none;
+    margin: 0 !important; /* reset margin */
+    padding-top: 0 !important; /* reset padding top */
+    padding-bottom: 0 !important; /* reset padding bottom */
   }
 
-  /* Vertically center hero content */
+  /* Add margin to main content so it doesn't sit behind header */
+  main {
+    margin-top: 48px; /* same height as header */
+  }
+
+  /* Hero tweaks */
   .hero {
     display: flex;
     align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 4rem 1rem 2rem;
+    justify-content: flex-start; /* move content towards top */
+    flex-direction: column;
+    max-height: calc(100vh - 25vh);
+    padding: 10rem 1rem 2rem; /* add top padding to push content down a bit */
     box-sizing: border-box;
+    position: relative;
   }
+  
 
+  /* About section adjustments */
   .about {
     max-width: 800px;
     width: 100%;
     text-align: center;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
   }
 
-  /* Hide "Aspiring SWE" line (typed text) on mobile */
+  /* Hide "Aspiring SWE" line on mobile */
   .about__role {
     display: none;
   }
@@ -992,31 +1005,7 @@ section[id] {
     margin-top: 1.5rem;
   }
 
-  /* Show experience dates above cards and simplify layout */
-  .timeline-date-left,
-  .timeline-date-right {
-    display: block;
-    position: static;
-    text-align: left;
-    font-weight: 500;
-    color: var(--clr-fg-alt); /* Replace with actual color if needed */
-    margin-bottom: 0.5rem;
-  }
-
-  .timeline-middle {
-    display: none;
-  }
-
-  .timeline-left,
-  .timeline-right {
-    width: 100%;
-  }
-
-  .timeline-component {
-    margin-top: 1rem;
-  }
-
-  /* Fix "Experience" title positioning */
+  /* Experience section title fix and timeline layout */
   .experience {
     display: flex;
     flex-direction: column;
@@ -1035,5 +1024,29 @@ section[id] {
     display: flex;
     flex-direction: column;
     width: 100%;
+  }
+
+  /* Show experience dates above cards and simplify timeline */
+  .timeline-date-left,
+  .timeline-date-right {
+    display: block;
+    position: static;
+    text-align: left;
+    font-weight: 500;
+    color: var(--clr-fg-alt);
+    margin-bottom: 0.5rem;
+  }
+
+  .timeline-middle {
+    display: none;
+  }
+
+  .timeline-left,
+  .timeline-right {
+    width: 100%;
+  }
+
+  .timeline-component {
+    margin-top: 1rem;
   }
 }

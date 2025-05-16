@@ -953,7 +953,7 @@ section[id] {
     align-items: center;
     justify-content: space-between;
     padding: 0 1rem;
-    position: static;
+    position: fixed;
     top: 0;
     width: 100%;
     z-index: 1000;
@@ -966,7 +966,7 @@ section[id] {
 
   /* Add margin to main content so it doesn't sit behind header */
   main {
-    margin-top: 48px; /* same height as header */
+    margin-top: 20vh; /* same height as header */
   }
 
   /* Hero tweaks */

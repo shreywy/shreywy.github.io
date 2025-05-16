@@ -942,6 +942,13 @@ section[id] {
   scroll-margin-top: 7.8em;
 }
 
+.mobile-date {
+  display: none;
+  font-weight: 500;
+  color: var(--clr-fg-alt);
+  margin-top: 0.25rem;
+}
+
 
 
 /* MOBILE */
@@ -1018,6 +1025,27 @@ section[id] {
     text-align: center;
     margin-bottom: 1rem;
     z-index: 2;
+  }
+
+  .timeline-company {
+    font-size: 1rem;
+    margin-bottom: 0;
+  }
+  /* Hide timeline side dates */
+  .timeline-date-left,
+  .timeline-date-right {
+    display: none;
+  }
+
+  /* Show the mobile date inside content */
+  .mobile-date {
+    display: block;
+    font-size: 0.9rem;
+  }
+
+  /* Optional spacing tweaks */
+  .timeline-content p {
+    margin-top: 0.5rem;
   }
 
   .timeline {

@@ -237,3 +237,7 @@ scrollArrow.addEventListener('click', () => {
 // ===================== INITIALIZATION =====================
 initializeTheme();
 document.body.classList.add('loaded');
+
+
+
+

@@ -131,12 +131,15 @@ const displayList = () => {
     btnHamburger.classList.remove('fa-bars');
     btnHamburger.classList.add('fa-times');
     navUl.classList.add('display-nav-list');
+    header.classList.add('menu-open'); // ✅ add solid background
   } else {
     btnHamburger.classList.remove('fa-times');
     btnHamburger.classList.add('fa-bars');
     navUl.classList.remove('display-nav-list');
+    header.classList.remove('menu-open'); // ✅ remove background
   }
 };
+
 
 btnHamburger.addEventListener('click', displayList);
 
@@ -165,13 +168,27 @@ window.addEventListener('scroll', () => {
   const newHeight = maxHeight - (heightPercent * (maxHeight - minHeight));
   
   header.style.height = `${newHeight}em`;
+
+  // ✅ Dynamically adjust menu position
+  const navUl = document.querySelector('.nav__list');
+  if (navUl) {
+    navUl.style.top = `${newHeight - 0.5}em`;
+  }
 });
+
 
 window.addEventListener('load', () => {
   if (window.scrollY === 0) {
     header.style.height = `${maxHeight}em`;
+
+    const navUl = document.querySelector('.nav__list');
+    if (navUl) {
+      navUl.style.top = `${maxHeight - 0.5}em`; // ✅ match scroll behavior
+    }
   }
 });
+
+
 
 // ===================== FADE-IN EFFECTS =====================
 const fadeIns = document.querySelectorAll('.fade-in');

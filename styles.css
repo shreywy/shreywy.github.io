@@ -918,37 +918,36 @@ section[id] {
 @media (max-width: 600px) {
   .nav__list {
     flex-direction: column;
-    position: absolute;
-    top: 84%;                    /* just below header */
-    right: 0rem;                 /* align near top-right of screen */
-    left: auto;                  /* ignore left positioning */
-    width: 35vw;                 /* menu width */
-    max-height: 0;              /* collapsed by default */
+    position: fixed;                /* stick to top */
+    top: 6.5em;                       /* just below navbar (adjust based on actual header height) */
+    left: 0;
+    right: 0;
+    width: 100vw;                   /* full screen width */
+    max-height: 0;                 /* collapsed by default */
     overflow: hidden;
-    background-color: rgba(255, 255, 255, 0); /* fallback */
-
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 0px 0 0 16px;  /* rounded top-left and bottom-left corners */
+    background-color: var(--clr-bg-alt); /* solid background */
     padding: 0;
-    margin: 0;
+    margin: 0 auto;
+    border-radius: 0 0 16px 16px;   /* rounded bottom corners */
     transition:
       max-height 0.4s ease,
       padding 0.4s ease,
       margin 0.4s ease;
     z-index: 999;
+   background-color: transparent;
+    backdrop-filter: blur(20px);
   }
 
   .display-nav-list {
-    max-height: 500px;         /* expanded */
+    max-height: 500px;              /* expanded */
     padding: 1em 0;
-    margin: 0.5em 0;
+    margin: 0.5em auto;
   }
 
   .nav__list-item {
     margin: 0.5em 1.5em;
-    text-align: right;         /* right align text */
-    background: none;          /* remove background */
+    text-align: center;             /* center-align text */
+    background: none;               /* remove background */
   }
 
   .nav__hamburger {
@@ -958,6 +957,7 @@ section[id] {
     z-index: 1100;
   }
 }
+
 
 
 

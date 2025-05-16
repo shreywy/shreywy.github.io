@@ -63,8 +63,8 @@ const themePairs = {
 
 // ===================== THEME FUNCTIONS =====================
 function initializeTheme() {
-  const savedTheme = localStorage.getItem('portfolio-theme') || 'light';
-  const savedThemePair = localStorage.getItem('themePair') || 'default';
+  const savedTheme = localStorage.getItem('portfolio-theme') || 'dark';
+  const savedThemePair = localStorage.getItem('themePair') || 'dracula';
   
   body.classList.add(savedTheme);
   applyThemePair(savedThemePair);

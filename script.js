@@ -3,7 +3,7 @@ const btnTheme = document.querySelector('.fa-moon');
 const btnHamburger = document.querySelector('.fa-bars');
 const themeCycleButton = document.getElementById('btn-theme-cycle');
 
-// Theme pairs configuration
+// ===================== THEME CONFIGURATION =====================
 const themePairs = {
   default: {
     light: {
@@ -61,7 +61,7 @@ const themePairs = {
   }
 };
 
-// Initialize theme
+// ===================== THEME FUNCTIONS =====================
 function initializeTheme() {
   const savedTheme = localStorage.getItem('portfolio-theme') || 'light';
   const savedThemePair = localStorage.getItem('themePair') || 'default';
@@ -69,14 +69,12 @@ function initializeTheme() {
   body.classList.add(savedTheme);
   applyThemePair(savedThemePair);
   
-  // Set moon/sun icon based on theme
   if (savedTheme === 'dark') {
     btnTheme.classList.remove('fa-moon');
     btnTheme.classList.add('fa-sun');
   }
 }
 
-// Apply theme pair
 function applyThemePair(pairName) {
   const isDark = body.classList.contains('dark');
   const theme = isDark ? themePairs[pairName].dark : themePairs[pairName].light;
@@ -88,7 +86,6 @@ function applyThemePair(pairName) {
   localStorage.setItem('themePair', pairName);
 }
 
-// Cycle through theme pairs
 function cycleThemePair() {
   const pairNames = Object.keys(themePairs);
   const currentPair = localStorage.getItem('themePair') || 'default';
@@ -99,7 +96,6 @@ function cycleThemePair() {
   applyThemePair(nextPair);
 }
 
-// Toggle between light/dark mode
 function toggleTheme() {
   const currentTheme = body.classList.contains('dark') ? 'dark' : 'light';
   const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -108,21 +104,18 @@ function toggleTheme() {
   body.classList.remove(currentTheme);
   body.classList.add(newTheme);
   
-  // Toggle icon
   btnTheme.classList.toggle('fa-moon');
   btnTheme.classList.toggle('fa-sun');
   
-  // Re-apply theme pair with new mode
   applyThemePair(currentPair);
-  
   localStorage.setItem('portfolio-theme', newTheme);
 }
 
-// Event listeners
+// ===================== EVENT LISTENERS =====================
 btnTheme.addEventListener('click', toggleTheme);
 themeCycleButton.addEventListener('click', cycleThemePair);
 
-// Hamburger menu functionality
+// ===================== MENU FUNCTIONALITY =====================
 const displayList = () => {
   const navUl = document.querySelector('.nav__list');
 
@@ -139,7 +132,7 @@ const displayList = () => {
 
 btnHamburger.addEventListener('click', displayList);
 
-// Scroll to top functionality
+// ===================== SCROLL FUNCTIONALITY =====================
 const scrollUp = () => {
   const btnScrollTop = document.querySelector('.scroll-top');
 
@@ -152,37 +145,11 @@ const scrollUp = () => {
 
 document.addEventListener('scroll', scrollUp);
 
-// Initialize on load
-initializeTheme();
-
-
-document.body.classList.add('loaded');
-
-function toggleTheme() {
-  document.body.style.transition = 'none'; // Disable transition during change
-  const currentTheme = document.body.classList.contains('dark') ? 'dark' : 'light';
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-  
-  // Apply new theme
-  document.body.classList.remove(currentTheme);
-  document.body.classList.add(newTheme);
-  
-  // Force synchronous layout calculation
-  document.body.offsetHeight; // This triggers reflow
-  
-  // Re-enable transitions
-  document.body.style.transition = '';
-  
-  // Update other elements
-  applyThemePair(localStorage.getItem('themePair') || 'default');
-  localStorage.setItem('portfolio-theme', newTheme);
-}
-
-// Smooth header height animation on scroll
+// ===================== HEADER ANIMATION =====================
 const header = document.querySelector('.header');
-const maxHeight = 8; // em units (initial height)
-const minHeight = 3; // em units (scrolled height)
-const scrollRange = 200; // Pixels over which to animate
+const maxHeight = 8;
+const minHeight = 3;
+const scrollRange = 200;
 
 window.addEventListener('scroll', () => {
   const scrollPosition = Math.min(window.scrollY, scrollRange);
@@ -192,14 +159,13 @@ window.addEventListener('scroll', () => {
   header.style.height = `${newHeight}em`;
 });
 
-// Reset on load/refresh
 window.addEventListener('load', () => {
   if (window.scrollY === 0) {
     header.style.height = `${maxHeight}em`;
   }
 });
 
-
+// ===================== FADE-IN EFFECTS =====================
 const fadeIns = document.querySelectorAll('.fade-in');
 const observer = new IntersectionObserver(entries => {
   entries.forEach(entry => {
@@ -214,55 +180,52 @@ const observer = new IntersectionObserver(entries => {
 });
 
 fadeIns.forEach(el => observer.observe(el));
-
-
 fadeIns.forEach((el, index) => {
   el.style.transitionDelay = `${index * 1}ms`;
 });
 
-
+// ===================== TYPING EFFECT =====================
 const typedTextSpan = document.getElementById('typed-text');
-
-const roles = [
-  "A Computer Science Student.",
-  "A Software Developer.",
-  "A Full-Stack Engineer.",
-  "An Internship Candidate.",
-  "A Tech Innovator.",
-  "A Problem Solver.",
-  "An Aspiring Software Engineer."
-];
-
-const typingDelay = 50;
-const erasingDelay = 40;
-const newTextDelay = 600; // Delay between current and next text
-
-let roleIndex = 0;
+const text = "An Aspiring Software Engineer.";
+const typingDelay = 40;
 let charIndex = 0;
 
 function type() {
-  if (charIndex < roles[roleIndex].length) {
-    typedTextSpan.textContent += roles[roleIndex].charAt(charIndex);
+  if (charIndex < text.length) {
+    typedTextSpan.textContent += text.charAt(charIndex);
     charIndex++;
     setTimeout(type, typingDelay);
-  } else {
-    setTimeout(erase, newTextDelay);
   }
 }
 
-function erase() {
-  if (charIndex > 0) {
-    typedTextSpan.textContent = roles[roleIndex].substring(0, charIndex - 1);
-    charIndex--;
-    setTimeout(erase, erasingDelay);
-  } else {
-    roleIndex++;
-    if (roleIndex >= roles.length) roleIndex = 0;
-    setTimeout(type, typingDelay + 500);
-  }
-}
-
-// Start the typing effect on DOM load
-document.addEventListener("DOMContentLoaded", function () {
-  if (roles.length) setTimeout(type, newTextDelay + 250);
+document.addEventListener("DOMContentLoaded", () => {
+  typedTextSpan.textContent = '';
+  charIndex = 0;
+  type();
 });
+
+// ===================== SCROLL BUTTONS =====================
+const scrollTop = document.querySelector('.scroll-top');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 100) {
+    if (!scrollTop.classList.contains('visible')) {
+      scrollTop.classList.add('visible');
+    }
+  } else {
+    if (scrollTop.classList.contains('visible')) {
+      scrollTop.classList.remove('visible');
+    }
+  }
+});
+
+const scrollArrow = document.querySelector('.scroll-arrow');
+scrollArrow.addEventListener('click', () => {
+  const target = document.querySelector('#experience');
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth' });
+  }
+});
+
+// ===================== INITIALIZATION =====================
+initializeTheme();
+document.body.classList.add('loaded');

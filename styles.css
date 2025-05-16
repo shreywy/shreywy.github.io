@@ -823,3 +823,121 @@ main {
   from, to { opacity: 1; }
   50% { opacity: 0; }
 }
+
+.hero {
+  height: calc(100vh - 9em); /* Account for navbar */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+/* Raise the text blob a bit higher on the screen */
+.about.center {
+  max-width: 700px;
+  transform: translateY(-4em); /* raise content */
+}
+
+/* Scroll arrow styles */
+.scroll-arrow {
+  position: absolute;
+  bottom: 2rem;
+  font-size: 2rem;
+  color: var(--clr-font);
+  animation: bounce 1.5s infinite; 
+  opacity: 1;
+  transition: opacity 0.5s ease, transform 0.3s ease;
+  z-index: 10;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.scroll-arrow {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.scroll-arrow:hover {
+  transform: scale(1.1);
+}
+
+
+.scroll-arrow.fade-out {
+  opacity: 0;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(8px);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+
+.scroll-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  font-size: 2.5rem; /* slightly bigger */
+  color: var(--clr-fg-alt);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  transition: 
+    opacity 0.5s ease, 
+    visibility 0.5s ease,
+    transform 0.5s ease,
+    box-shadow 0.3s ease;
+  animation: bounce-small 2s infinite;
+  animation-play-state: paused;
+  transform: translateY(0) scale(1);
+  z-index: 1000;
+}
+
+.scroll-top.visible {
+  opacity: 1;
+  visibility: visible;
+  animation-play-state: running;
+}
+
+/* On hover, scale up and stop bouncing */
+.scroll-top:hover {
+  scale: 1.1;
+}
+
+@keyframes bounce-small {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-6px) scale(1);
+  }
+}
+
+.scroll-arrow i {
+  display: inline-block;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.scroll-arrow:hover i {
+  transform: scale(1.2);
+}
+
+section[id] {
+  scroll-margin-top: 7.8em;
+}

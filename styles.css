@@ -963,6 +963,25 @@ section[id] {
     background: none;               /* remove background */
   }
 
+  .nav__list-item {
+    position: relative;
+    margin: 0;
+    text-align: center;
+    background: none;
+  }
+  
+  .nav__list-item:not(:last-child)::after {
+    content: '';
+    display: block;
+    margin: 0.4em auto;
+    width: 120px; /* Fixed width for all lines */
+    height: 1px;
+    background-color: var(--clr-fg);
+    opacity: 0.3;
+  }
+  
+  
+
   .nav__hamburger {
     display: flex;
     margin-left: 0.8em;

@@ -1,3 +1,12 @@
+<!--
+ THINGS TO UPDATE WHEN UPDATING SITE
+  - Update the resume pdf
+  - Update the projects section with new projects
+  - Update the skills section with new skills
+  - Update the experience section with new experiences
+  - Update the contact section with new contact information
+-->
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -25,7 +34,18 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 
+<!-- Resume Modal -->
+<div id="resumeModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close">
+      <span class="close-icon">&times;</span>
+    </span>    
+    <iframe src="images/resume.pdf" frameborder="0" width="100%" height="500px"></iframe>
+  </div>
+</div>
+
 <body class="light" id="top">
+<div id="site-wrapper">
   <!-- ===================== HEADER & NAVIGATION ===================== -->
   <header class="header center">
     <h3><a href="#" class="link">SM.</a></h3>
@@ -65,10 +85,9 @@
           experience.
         </p>
         <div class="about__contact center">
-          <a href="https://drive.google.com/file/d/1RPct-cbQ1c7fub1g7dJUH-DDCWdCzB0p/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <span class="btn btn--outline">my Resume</span>
-          </a>
+          <a id="openResume" class="btn btn--outline" href="#">My Resume</a>
         </div>
+        
       </div>
       <div class="scroll-arrow">
         <i class="fas fa-chevron-down"></i>
@@ -244,5 +263,6 @@
 
   <!-- ===================== SCRIPTS ===================== -->
   <script src="./script.js"></script>
+</div>
 </body>
 </html>

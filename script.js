@@ -251,6 +251,69 @@ scrollArrow.addEventListener('click', () => {
   }
 });
 
+// ===================== RESUME PDF MODAL FUNCTIONALITY =====================
+
+const modal = document.getElementById('resumeModal');
+const openBtn = document.getElementById('openResume');
+const closeBtn = modal.querySelector('.modal-close');
+
+function openModal() {
+  modal.style.display = 'flex';
+  modal.classList.remove('show');
+  setTimeout(() => {
+    modal.classList.add('show');
+  }, 20);
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  modal.classList.remove('show');
+  setTimeout(() => {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }, 300);
+}
+
+openBtn.addEventListener('click', openModal);
+closeBtn.addEventListener('click', closeModal);
+
+window.addEventListener('click', (e) => {
+  if (e.target === modal) {
+    closeModal();
+  }
+});
+
+// ===================== RESUME PDF MODAL FUNCTIONALITY =====================
+
+const siteWrapper = document.getElementById('site-wrapper');
+
+function openModal() {
+  modal.style.display = 'flex';
+  modal.classList.remove('show');
+  setTimeout(() => {
+    modal.classList.add('show');
+  }, 10);
+  document.body.style.overflow = 'hidden';
+  siteWrapper.classList.add('blurred'); // add blur
+}
+
+function closeModal() {
+  modal.classList.remove('show');
+  setTimeout(() => {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }, 300);
+  siteWrapper.classList.remove('blurred'); // remove blur
+}
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && modal.style.display === 'flex') {
+    closeModal();
+  }
+});
+
+
+
 // ===================== INITIALIZATION =====================
 initializeTheme();
 document.body.classList.add('loaded');

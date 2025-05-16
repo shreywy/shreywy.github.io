@@ -555,7 +555,7 @@ main {
   FOOTER
 ===============*/
 .footer {
-  padding: 3em 0;
+  padding: 0.5em 0;
   margin-top: 4em;
   text-align: center;
 }
@@ -940,4 +940,100 @@ main {
 
 section[id] {
   scroll-margin-top: 7.8em;
+}
+
+
+
+
+/* MOBILE */
+@media (max-width: 600px) {
+  /* Keep header height fixed and elements aligned */
+  .header {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: var(--bg); /* Replace with actual color if needed */
+    transition: none;
+  }
+
+  /* Vertically center hero content */
+  .hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 4rem 1rem 2rem;
+    box-sizing: border-box;
+  }
+
+  .about {
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Hide "Aspiring SWE" line (typed text) on mobile */
+  .about__role {
+    display: none;
+  }
+
+  /* Center the "My Resume" button */
+  .about__contact {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 1.5rem;
+  }
+
+  /* Show experience dates above cards and simplify layout */
+  .timeline-date-left,
+  .timeline-date-right {
+    display: block;
+    position: static;
+    text-align: left;
+    font-weight: 500;
+    color: var(--clr-fg-alt); /* Replace with actual color if needed */
+    margin-bottom: 0.5rem;
+  }
+
+  .timeline-middle {
+    display: none;
+  }
+
+  .timeline-left,
+  .timeline-right {
+    width: 100%;
+  }
+
+  .timeline-component {
+    margin-top: 1rem;
+  }
+
+  /* Fix "Experience" title positioning */
+  .experience {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .experience .section__title {
+    order: -1;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 1rem;
+    z-index: 2;
+  }
+
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
 }

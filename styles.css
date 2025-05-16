@@ -1012,6 +1012,10 @@ section[id] {
     margin-top: 1.5rem;
   }
 
+  .scroll-arrow {
+    display:none;
+  }
+
   /* Experience section title fix and timeline layout */
   .experience {
     display: flex;

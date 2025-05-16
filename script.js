@@ -63,16 +63,24 @@ const themePairs = {
 
 // ===================== THEME FUNCTIONS =====================
 function initializeTheme() {
-  const savedTheme = localStorage.getItem('portfolio-theme') || 'dark';
-  const savedThemePair = localStorage.getItem('themePair') || 'dracula';
-  
-  body.classList.add(savedTheme);
-  applyThemePair(savedThemePair);
-  
-  if (savedTheme === 'dark') {
+  const savedTheme = localStorage.getItem('portfolio-theme');
+  const savedThemePair = localStorage.getItem('themePair');
+
+  const theme = savedTheme || 'dark';
+  const themePair = savedThemePair || 'dracula';
+
+  body.classList.add(theme);
+  applyThemePair(themePair);
+
+  if (theme === 'dark') {
     btnTheme.classList.remove('fa-moon');
     btnTheme.classList.add('fa-sun');
+  } else {
+    btnTheme.classList.remove('fa-sun');
+    btnTheme.classList.add('fa-moon');
   }
+  if (!savedTheme) localStorage.setItem('portfolio-theme', 'dark');
+  if (!savedThemePair) localStorage.setItem('themePair', 'dracula');
 }
 
 function applyThemePair(pairName) {

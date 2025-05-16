@@ -915,7 +915,9 @@ section[id] {
   }
 }
 
+/* MOBILE */
 @media (max-width: 600px) {
+
   .nav__list {
     flex-direction: column;
     position: fixed;                /* stick to top */
@@ -934,17 +936,24 @@ section[id] {
       padding 0.4s ease,
       margin 0.4s ease;
     z-index: 999;
-    background: #a0a0a004; /* I found this color of blur to work for me better*/
-    -webkit-backdrop-filter: blur(20px); /* Add this line first, it fixes blur for Safari*/
-    backdrop-filter: blur(20px);  /* This line activates blur*/
-    position: fixed; /*makes blurred menu fixed on screen when it's scrolled up-down*/
-    z-index: 9;
   }
+
+  .header {
+    background: var(--clr-bg-alt);
+    transition: background 0.4s ease;
+  }
+  
+  .header.menu-open {
+    background: transparent;
+    background-image: linear-gradient(to top, var(--clr-bg-alt), transparent);
+  }
+  
 
   .display-nav-list {
     max-height: 500px;              /* expanded */
     padding: 1em 0;
     margin: 0.5em auto;
+    
   }
 
   .nav__list-item {
@@ -959,13 +968,7 @@ section[id] {
     cursor: pointer;
     z-index: 1100;
   }
-}
 
-
-
-
-/* MOBILE */
-@media (max-width: 600px) {
   /* Keep header height small and elements aligned */
   .header {
     height: 48px; /* reasonable fixed height */
@@ -983,6 +986,7 @@ section[id] {
     padding-top: 0 !important; /* reset padding top */
     padding-bottom: 0 !important; /* reset padding bottom */
   }
+
 
   /* Add margin to main content so it doesn't sit behind header */
   main {

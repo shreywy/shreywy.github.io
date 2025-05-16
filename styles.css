@@ -928,8 +928,7 @@ section[id] {
     background-color: transparent;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    box-shadow: none;
-    border-radius: 0 0 0 16px;  /* only bottom-left corner rounded */
+    border-radius: 0px 0 0 16px;  /* rounded top-left and bottom-left corners */
     padding: 0;
     margin: 0;
     transition:
@@ -937,21 +936,18 @@ section[id] {
       padding 0.4s ease,
       margin 0.4s ease;
     z-index: 999;
-    background-color: rgba(255, 255, 255, 0.001);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    
   }
 
   .display-nav-list {
     max-height: 500px;         /* expanded */
     padding: 1em 0;
     margin: 0.5em 0;
-    
   }
 
   .nav__list-item {
     margin: 0.5em 1.5em;
+    text-align: right;         /* right align text */
+    background: none;          /* remove background */
   }
 
   .nav__hamburger {

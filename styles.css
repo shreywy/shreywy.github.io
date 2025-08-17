@@ -1237,3 +1237,34 @@ section[id] {
 }
 
 
+.project {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%; /* ensures all cards in the grid take same height */
+}
+
+.project__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.link.link--icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px); /* Safari support */
+  border: 0 solid rgba(255, 255, 255, 0.3);
+  border-top-left-radius: 12px;   /* only top-left */
+  border-top-right-radius: 12px;  /* only top-right */
+  color: #fff; /* icon color */
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.link.link--icon:hover {
+  background: rgba(255, 255, 255, 0.048); /* brightens on hover */
+  transform: translateY(-2px);
+}

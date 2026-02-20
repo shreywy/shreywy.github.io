@@ -1,3 +1,5 @@
+// IMPORTANT: After making any changes, run: npm run build && git add -A && git commit -m "message" && git push origin main
+// This ensures the portfolio is built and deployed to GitHub Pages
 const fs = require('fs');
 const path = require('path');
 

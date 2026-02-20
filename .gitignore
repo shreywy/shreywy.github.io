@@ -33,22 +33,27 @@ lerna-debug.log*
 *.swp
 *.swo
 *~
-.code-workspace
 
 # System
 Thumbs.db
 .Spotlight-V100
 .Trashes
 
-# Optional REPL history
-.node_repl_history
-
-# Legacy/Archive
-legacy/
-archive/
-
-# Random documentation files (use main docs instead)
+# Documentation & Reference (keep in local, don't commit)
+AI_CONTEXT.md
+PROJECT_DETAILS.md
+CHANGELOG.md
+GITHUB_PAGES_SETUP.md
+DEPLOYMENT_READY.md
+START_HERE.md
+QUICKREF.md
 FORMSPREE_SETUP.txt
 FORMSPREE_QUICK_START.txt
 IMPLEMENTATION_SUMMARY.txt
 prompt to conitnue work.md
+
+# Folders
+legacy/
+images/
+.github/
+

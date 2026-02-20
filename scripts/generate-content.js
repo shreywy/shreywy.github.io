@@ -105,17 +105,43 @@ function parseProjects(content) {
 }
 
 function parseSkills(content) {
-  const skillsSection = content.split('SKILLS')[1]?.split('================================================================================')[0];
-  if (!skillsSection) return [];
-
-  const skills = skillsSection
-    .split('\n')
-    .filter((line) => {
-      const trimmed = line.trim();
-      return trimmed && !trimmed.startsWith('#') && trimmed !== '';
-    })
-    .map((line) => line.trim());
-
+  // Find SKILLS section
+  const skillsIndex = content.indexOf('SKILLS');
+  if (skillsIndex === -1) return [];
+  
+  // Get content after the SKILLS header and its === underline
+  const afterSkills = content.substring(skillsIndex);
+  const lines = afterSkills.split('\n');
+  
+  // Skip header lines until we find the first category marker (#) or end
+  const skills = [];
+  let foundFirstCategory = false;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    
+    // Skip empty lines and equals lines
+    if (!trimmed || trimmed.startsWith('=')) continue;
+    
+    // Category headers start with #
+    if (trimmed.startsWith('#')) {
+      foundFirstCategory = true;
+      continue;
+    }
+    
+    // If we hit the next section marker, stop
+    if (trimmed === 'NOTES' || trimmed.includes('================')) {
+      break;
+    }
+    
+    // Only collect actual skills (after we've seen at least one category)
+    // Skip instruction lines (they contain spaces and look like sentences)
+    if (foundFirstCategory && trimmed.length > 0) {
+      skills.push(trimmed);
+    }
+  }
+  
   return skills;
 }
 

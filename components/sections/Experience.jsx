@@ -83,7 +83,7 @@ export default function Experience() {
             {experiences.map((exp, index) => {
               const isEven = index % 2 === 0;
               return (
-                <div key={index} className="relative">
+                <div key={`exp-${index}-${exp.company}`} className="relative">
                   {/* Desktop Layout: Alternating left-right */}
                   <div className="hidden lg:grid grid-cols-12 gap-4 items-center relative">
                     {/* Left Column - Card or Date */}

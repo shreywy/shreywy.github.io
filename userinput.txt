@@ -16,8 +16,7 @@ DESCRIPTION: Main description text below the typing animation
 [HERO]
 SUBTITLE: I'm a Computer Science student at Toronto Metropolitan University with experience in full-stack development, database systems, and performance analysis. I enjoy building tools that improve workflow efficiency and user experience.
 TYPING: Computer Science Student & Full-Stack Developer
-DESCRIPTION: Building high-performance, beautiful digital experiences. Specialized in full-stack development, performance optimization, and creating tools that streamline workflows. Currently at Toronto Metropolitan University.
-
+DESCRIPTION: 
 ================================================================================
 EXPERIENCES
 ================================================================================

@@ -113,7 +113,7 @@ export default function Projects() {
           >
             {projects.map((project, index) => (
               <motion.div
-                key={index}
+                key={`proj-${index}-${project.name}`}
                 ref={(el) => el && (cardRefs.current[index] = el)}
                 className="group relative glass-panel overflow-hidden flex flex-col h-full cursor-pointer"
                 variants={cardVariants}

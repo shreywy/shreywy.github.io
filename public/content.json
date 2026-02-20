@@ -99,5 +99,30 @@
       "link": "https://github.com/shreywy/TabStitcher"
     }
   ],
-  "skills": []
+  "skills": [
+    "React",
+    "TypeScript",
+    "JavaScript",
+    "Next.js",
+    "Tailwind CSS",
+    "Node.js",
+    "Flask",
+    "Python",
+    "Java",
+    "PostgreSQL",
+    "Firebase",
+    "SQL",
+    "BigQuery",
+    "Oracle SQL",
+    "Docker",
+    "Git",
+    "AWS",
+    "Linux",
+    "API Design",
+    "System Design",
+    "Performance Tuning",
+    "Data Analysis",
+    "Automation",
+    "C/C++"
+  ]
 }

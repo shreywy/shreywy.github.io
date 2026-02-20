@@ -14,15 +14,18 @@ export default function Hero() {
 
   const typingSpeed = 50;
 
+  // Fetch content
   useEffect(() => {
     const fetchHeroContent = async () => {
       try {
         const response = await fetch('/content.json');
+        if (!response.ok) throw new Error('Failed to fetch content');
         const data = await response.json();
-        setHeroContent(data.hero || {});
-        setLoading(false);
+        setHeroContent(data?.hero || {});
       } catch (error) {
         console.error('Error fetching hero content:', error);
+        setHeroContent({});
+      } finally {
         setLoading(false);
       }
     };
@@ -30,6 +33,7 @@ export default function Hero() {
     fetchHeroContent();
   }, []);
 
+  // Typing animation
   useEffect(() => {
     if (!heroContent?.typing) return;
 
@@ -39,8 +43,22 @@ export default function Hero() {
       index++;
       if (index === heroContent.typing.length) clearInterval(interval);
     }, typingSpeed);
+    
     return () => clearInterval(interval);
-  }, [heroContent]);
+  }, [heroContent?.typing]);
+
+  // Scroll opacity effect
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const maxScroll = 400;
+      const opacity = Math.max(0, 1 - scrollTop / maxScroll);
+      setScrollOpacity(opacity);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -68,18 +86,6 @@ export default function Hero() {
       </section>
     );
   }
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      const maxScroll = 400;
-      const opacity = Math.max(0, 1 - scrollTop / maxScroll);
-      setScrollOpacity(opacity);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <section

@@ -27,22 +27,14 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
-# Folders to exclude
+# Local folders
 legacy/
 images/
+scripts/
 
-# Documentation (keep only README.md)
-AI_CONTEXT.md
-PROJECT_DETAILS.md
-CHANGELOG.md
-GITHUB_PAGES_SETUP.md
-DEPLOYMENT_READY.md
-START_HERE.md
-QUICKREF.md
-FORMSPREE_SETUP.txt
-FORMSPREE_QUICK_START.txt
-IMPLEMENTATION_SUMMARY.txt
-prompt to conitnue work.md
+# All markdown files except README
+*.md
+!README.md
 GITHUB_PAGES_SETUP.md
 DEPLOYMENT_READY.md
 PROJECT_DETAILS.md

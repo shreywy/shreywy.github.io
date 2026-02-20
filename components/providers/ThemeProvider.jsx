@@ -1,19 +1,18 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState('midnight');
-  const [mounted, setMounted] = useState(false);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    // Load theme from localStorage
     const savedTheme = localStorage.getItem('portfolio-theme') || 'midnight';
     setTheme(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
+    setIsReady(true);
   }, []);
 
   const switchTheme = (newTheme) => {
@@ -29,12 +28,8 @@ export function ThemeProvider({ children }) {
     switchTheme(nextTheme);
   };
 
-  if (!mounted) {
-    return null;
-  }
-
   return (
-    <ThemeContext.Provider value={{ theme, switchTheme, cycleTheme }}>
+    <ThemeContext.Provider value={{ theme, switchTheme, cycleTheme, isReady }}>
       {children}
     </ThemeContext.Provider>
   );

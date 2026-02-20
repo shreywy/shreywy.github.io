@@ -1,0 +1,28 @@
+{
+  "name": "shrey-portfolio-2026",
+  "version": "2.0.0",
+  "description": "A modern, reactive portfolio showcasing Shrey Mistry's work",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "next": "^14.0.0",
+    "framer-motion": "^10.16.4",
+    "gsap": "^3.12.2",
+    "lenis": "^1.0.42",
+    "tailwindcss": "^3.4.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.54.0",
+    "eslint-config-next": "^14.0.0"
+  }
+}

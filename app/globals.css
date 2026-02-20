@@ -1,0 +1,373 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: light;
+  
+  /* Midnight Onyx Theme (Dark) */
+  --color-midnight-bg: #0f1419;
+  --color-midnight-bg-alt: #1a1f2e;
+  --color-midnight-fg: #e4e6eb;
+  --color-midnight-fg-alt: #f5f7fa;
+  --color-midnight-primary: #00d9ff;
+  --color-midnight-accent: #ff006e;
+  
+  /* Catppuccin Frappe (2nd Darkest) */
+  --color-frappe-bg: #1e1e2e;
+  --color-frappe-bg-alt: #262637;
+  --color-frappe-fg: #dadaea;
+  --color-frappe-fg-alt: #f5f5fa;
+  --color-frappe-primary: #7b94d4;
+  --color-frappe-accent: #9d7fc4;
+  
+  /* Catppuccin Mocha (Darkest) */
+  --color-mocha-bg: #141414;
+  --color-mocha-bg-alt: #1e1e2e;
+  --color-mocha-fg: #dadaea;
+  --color-mocha-fg-alt: #f5f5fa;
+  --color-mocha-primary: #7b94d4;
+  --color-mocha-accent: #874d93;
+  
+  /* Default Theme (Catppuccin Frappe) */
+  --bg: var(--color-frappe-bg);
+  --bg-alt: var(--color-frappe-bg-alt);
+  --fg: var(--color-frappe-fg);
+  --fg-alt: var(--color-frappe-fg-alt);
+  --primary: var(--color-frappe-primary);
+  --accent: var(--color-frappe-accent);
+  
+  --gradient-start: #7b94d4;
+  --gradient-mid: #9d7fc4;
+  --gradient-end: #6b84c8;
+}
+
+[data-theme="midnight"] {
+  --bg: var(--color-midnight-bg);
+  --bg-alt: var(--color-midnight-bg-alt);
+  --fg: var(--color-midnight-fg);
+  --fg-alt: var(--color-midnight-fg-alt);
+  --primary: var(--color-midnight-primary);
+  --accent: var(--color-midnight-accent);
+  --gradient-start: #00d9ff;
+  --gradient-mid: #bd93f9;
+  --gradient-end: #ff006e;
+}
+
+[data-theme="frappe"] {
+  --bg: var(--color-frappe-bg);
+  --bg-alt: var(--color-frappe-bg-alt);
+  --fg: var(--color-frappe-fg);
+  --fg-alt: var(--color-frappe-fg-alt);
+  --primary: var(--color-frappe-primary);
+  --accent: var(--color-frappe-accent);
+  --gradient-start: #7b94d4;
+  --gradient-mid: #9d7fc4;
+  --gradient-end: #6b84c8;
+}
+
+[data-theme="mocha"] {
+  --bg: var(--color-mocha-bg);
+  --bg-alt: var(--color-mocha-bg-alt);
+  --fg: var(--color-mocha-fg);
+  --fg-alt: var(--color-mocha-fg-alt);
+  --primary: var(--color-mocha-primary);
+  --accent: var(--color-mocha-accent);
+  --gradient-start: #7b94d4;
+  --gradient-mid: #874d93;
+  --gradient-end: #6b84c8;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+/* Selection */
+::selection {
+  background-color: var(--primary);
+  color: var(--bg);
+}
+
+::-moz-selection {
+  background-color: var(--primary);
+  color: var(--bg);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Heading Styles */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--fg-alt);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 10vw, 4.5rem);
+  line-height: 1.1;
+}
+
+h2 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.2;
+}
+
+h3 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+h4 {
+  font-size: 1.25rem;
+}
+
+/* Glass Effect Elements */
+.glass-panel {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  transition: all 0.3s ease;
+}
+
+.glass-panel:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
+}
+
+/* Links */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+/* Buttons */
+button {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+/* Input Fields */
+input, textarea {
+  background-color: var(--bg-alt);
+  color: var(--fg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 16px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Mesh Gradient Background */
+.mesh-gradient {
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-mid) 50%, var(--gradient-end) 100%);
+  position: fixed;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: -1;
+  animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-50px, -50px) scale(1.1);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+/* Animation Delays */
+.animation-delay-2s {
+  animation-delay: 2s;
+}
+
+.animation-delay-4s {
+  animation-delay: 4s;
+}
+/* Utility Classes */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.section-title {
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pill {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.pill:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Animated Gradient Text */
+.gradient-text-animate {
+  background: linear-gradient(
+    90deg,
+    var(--primary),
+    var(--accent),
+    var(--primary)
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s infinite;
+}
+
+/* Glowing Border */
+.glow-border {
+  position: relative;
+  border: 1px solid transparent;
+  background: linear-gradient(var(--bg), var(--bg)) padding-box,
+    linear-gradient(135deg, var(--primary), var(--accent)) border-box;
+  box-shadow: 0 0 20px rgba(140, 170, 238, 0.2);
+  transition: all 0.3s ease;
+}
+
+.glow-border:hover {
+  box-shadow: 0 0 30px rgba(140, 170, 238, 0.4);
+}
+
+/* Floating Animation */
+.float-animate {
+  animation: float 3s ease-in-out infinite;
+}
+
+.float-animate-slow {
+  animation: float 4s ease-in-out infinite;
+}
+
+.float-animate-fast {
+  animation: float 2s ease-in-out infinite;
+}
+
+/* Pulsing Glow */
+.glow-pulse {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.glow-pulse-slow {
+  animation: glow 3s ease-in-out infinite;
+}
+
+/* Soft Pulse Effect */
+.pulse-soft {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+/* Orb Animation - used for floating shapes */
+.orb-animate {
+  animation: orb 6s ease-in-out infinite;
+}
+
+/* Gradient Shift Animation */
+.gradient-shift-animate {
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* Enhanced Mesh Gradient with more dynamic feel */
+.mesh-gradient-enhanced {
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-mid) 50%, var(--gradient-end) 100%);
+  position: fixed;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: -1;
+  animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-50px, -50px) scale(1.1);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}

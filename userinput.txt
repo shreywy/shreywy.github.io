@@ -1,0 +1,143 @@
+================================================================================
+                    PORTFOLIO CONTENT CONFIGURATION
+================================================================================
+This file controls all content displayed on your portfolio site.
+Edit this file to easily update experiences, projects, and skills.
+Format is designed to be forgiving - extra whitespace between entries is fine.
+
+================================================================================
+HERO SECTION
+================================================================================
+Customize the title page content here.
+SUBTITLE: Text that appears under your name
+TYPING: The text that gets typed out with animation
+DESCRIPTION: Main description text below the typing animation
+
+[HERO]
+SUBTITLE: I'm a Computer Science student at Toronto Metropolitan University with experience in full-stack development, database systems, and performance analysis. I enjoy building tools that improve workflow efficiency and user experience.
+TYPING: Computer Science Student & Full-Stack Developer
+DESCRIPTION: Building high-performance, beautiful digital experiences. Specialized in full-stack development, performance optimization, and creating tools that streamline workflows. Currently at Toronto Metropolitan University.
+
+================================================================================
+EXPERIENCES
+================================================================================
+Each experience block starts with [EXPERIENCE] and ends with blank lines.
+Format fields exactly as shown. Order by date (most recent first).
+Dates format: Mon YYYY (e.g., May 2025, Present)
+
+[EXPERIENCE]
+ROLE: Solutions Delivery Intern
+COMPANY: Geotab
+LOCATION: Oakville, Ontario
+START: May 2025
+END: Present
+DESCRIPTION: Built tools and systems that streamline development processes and improve workflow efficiency. Created BigQuery SQL and JavaScript solutions that significantly reduced manual data handling.
+TAGS: BigQuery SQL/JS, NLP Tools, 30% Efficiency
+
+[EXPERIENCE]
+ROLE: Graphics & Automation Intern
+COMPANY: AMD
+LOCATION: Markham, Ontario
+START: Jan 2024
+END: Aug 2024
+DESCRIPTION: Developed Python automation for GPU benchmarking and created internal CLI tools. Worked across SQL and data analysis to support engineering and marketing teams.
+TAGS: Python Automation, GPU Benchmarks, 60% Reduction
+
+[EXPERIENCE]
+ROLE: Automation & Data Tools Intern
+COMPANY: Bombardier
+LOCATION: Toronto, Ontario
+START: May 2023
+END: Aug 2023
+DESCRIPTION: Designed dashboards and built automated reporting tools for supplier KPI tracking. Reduced manual data entry and improved visibility across the team.
+TAGS: TypeScript/VBA, Dashboards, 70% Automation
+
+[EXPERIENCE]
+ROLE: Coding Camp Instructor
+COMPANY: Peel District School Board
+LOCATION: Brampton, Ontario
+START: Jul 2022
+END: Aug 2022
+DESCRIPTION: Taught Python and computational thinking to middle school students. Focused on hands-on learning and helping students build confidence with code.
+TAGS: Python Teaching, Mentorship, Education
+
+================================================================================
+PROJECTS
+================================================================================
+Each project block starts with [PROJECT].
+Image path should be relative to /public/images/ (just the filename).
+Tech stack: comma-separated values.
+
+[PROJECT]
+NAME: URL Shortener
+IMAGE: urlshortener.png
+DESCRIPTION: Full-stack URL shortening service with real-time analytics and custom slug support.
+TECH: React, Flask, Firebase, Docker, Azure
+LINK: https://github.com/shreywy/cuttt
+
+[PROJECT]
+NAME: Media Store DBMS
+IMAGE: dbms.png
+DESCRIPTION: GUI-based database management application for music and movies with advanced querying.
+TECH: Python, Oracle SQL, CustomTkinter
+LINK: https://github.com/shreywy/Movie-And-Music-Store-DBMS
+
+[PROJECT]
+NAME: TabStitcher
+IMAGE: tabstich.png
+DESCRIPTION: Python tool that automatically extracts and stitches guitar tabs from YouTube videos.
+TECH: Python, OpenCV, Tkinter
+LINK: https://github.com/shreywy/TabStitcher
+
+================================================================================
+SKILLS
+================================================================================
+List skills one per line. GroupBy category (comments for clarity).
+Order doesn't matter - skills will display automatically.
+
+# Frontend
+React
+TypeScript
+JavaScript
+Next.js
+Tailwind CSS
+
+# Backend
+Node.js
+Flask
+Python
+Java
+
+# Databases
+PostgreSQL
+Firebase
+SQL
+BigQuery
+Oracle SQL
+
+# DevOps & Tools
+Docker
+Git
+AWS
+Linux
+
+# Specialties
+API Design
+System Design
+Performance Tuning
+Data Analysis
+Automation
+
+# Languages
+C/C++
+
+================================================================================
+NOTES
+================================================================================
+- Do not remove [EXPERIENCE], [PROJECT], or section headers
+- Extra blank lines between entries are fine and will be ignored
+- Keep descriptions concise (1-2 sentences)
+- For tags/tech, separate with commas (spaces around commas handled automatically)
+- Image files must exist in /public/images/ with exact filename match
+- Current theme: midnight (blue - the second theme)
+================================================================================

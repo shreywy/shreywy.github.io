@@ -10,7 +10,7 @@ export default function Experience() {
   useEffect(() => {
     const fetchExperiences = async () => {
       try {
-        const response = await fetch('/api/content');
+        const response = await fetch('/content.json');
         const data = await response.json();
         setExperiences(data.experiences || []);
       } catch (error) {

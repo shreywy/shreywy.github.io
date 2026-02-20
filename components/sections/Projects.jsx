@@ -15,7 +15,7 @@ export default function Projects() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await fetch('/api/content');
+        const response = await fetch('/content.json');
         const data = await response.json();
         setProjects(data.projects || []);
       } catch (error) {

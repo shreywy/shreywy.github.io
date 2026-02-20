@@ -13,7 +13,7 @@ export default function Skills() {
   useEffect(() => {
     const fetchSkills = async () => {
       try {
-        const response = await fetch('/api/content');
+        const response = await fetch('/content.json');
         const data = await response.json();
         setSkills(data.skills || []);
       } catch (error) {

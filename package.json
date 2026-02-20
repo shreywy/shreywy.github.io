@@ -4,6 +4,7 @@
   "description": "A modern, reactive portfolio showcasing Shrey Mistry's work",
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/generate-content.js",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

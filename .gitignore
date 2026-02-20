@@ -31,7 +31,7 @@ Thumbs.db
 legacy/
 images/
 
-# Documentation (local reference only)
+# Documentation (keep only README.md)
 AI_CONTEXT.md
 PROJECT_DETAILS.md
 CHANGELOG.md

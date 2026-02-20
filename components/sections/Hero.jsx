@@ -17,7 +17,7 @@ export default function Hero() {
   useEffect(() => {
     const fetchHeroContent = async () => {
       try {
-        const response = await fetch('/api/content');
+        const response = await fetch('/content.json');
         const data = await response.json();
         setHeroContent(data.hero || {});
         setLoading(false);

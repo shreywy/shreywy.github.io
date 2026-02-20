@@ -3,43 +3,35 @@ node_modules/
 .pnp
 .pnp.js
 
-# Testing
-coverage/
-
-# Next.js
+# Build
 .next/
 out/
-
-# Production build
 build/
 
-# Misc
-.DS_Store
-*.pem
+# Environment
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
 
 # Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-lerna-debug.log*
 
-# IDE & Editor
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
 # System
+.DS_Store
 Thumbs.db
-.Spotlight-V100
-.Trashes
 
-# Documentation & Reference (keep in local, don't commit)
+# Folders to exclude
+legacy/
+images/
+
+# Documentation (local reference only)
 AI_CONTEXT.md
 PROJECT_DETAILS.md
 CHANGELOG.md
@@ -51,9 +43,4 @@ FORMSPREE_SETUP.txt
 FORMSPREE_QUICK_START.txt
 IMPLEMENTATION_SUMMARY.txt
 prompt to conitnue work.md
-
-# Folders
-legacy/
-images/
-.github/
 

@@ -9,13 +9,14 @@ interface GlowingEffectProps {
   inactiveZone?: number;
   proximity?: number;
   spread?: number;
-  variant?: "default" | "white";
+  variant?: "default" | "white" | "blue";
   glow?: boolean;
   className?: string;
   disabled?: boolean;
   movementDuration?: number;
   borderWidth?: number;
 }
+
 const GlowingEffect = memo(
   ({
     blur = 0,
@@ -25,7 +26,7 @@ const GlowingEffect = memo(
     variant = "default",
     glow = false,
     className,
-    movementDuration = 0.5, // Made snappier
+    movementDuration = 0.5,
     borderWidth = 1,
     disabled = true,
   }: GlowingEffectProps) => {
@@ -117,6 +118,45 @@ const GlowingEffect = memo(
       };
     }, [handleMove, disabled]);
 
+    // Blue gradient for liquid crystal shader match
+    const blueGradient = `radial-gradient(circle, #3b82f6 10%, transparent 20%),
+      radial-gradient(circle at 40% 40%, #60a5fa 5%, transparent 15%),
+      radial-gradient(circle at 60% 60%, #2563eb 10%, transparent 20%),
+      radial-gradient(circle at 40% 60%, #7dd3fc 10%, transparent 20%),
+      repeating-conic-gradient(
+        from 236.84deg at 50% 50%,
+        #3b82f6 0%,
+        #60a5fa calc(25% / var(--repeating-conic-gradient-times)),
+        #2563eb calc(50% / var(--repeating-conic-gradient-times)),
+        #7dd3fc calc(75% / var(--repeating-conic-gradient-times)),
+        #3b82f6 calc(100% / var(--repeating-conic-gradient-times))
+      )`;
+
+    const defaultGradient = `radial-gradient(circle, #a855f7 10%, transparent 20%),
+      radial-gradient(circle at 40% 40%, #c084fc 5%, transparent 15%),
+      radial-gradient(circle at 60% 60%, #9333ea 10%, transparent 20%),
+      radial-gradient(circle at 40% 60%, #e879f9 10%, transparent 20%),
+      repeating-conic-gradient(
+        from 236.84deg at 50% 50%,
+        #a855f7 0%,
+        #c084fc calc(25% / var(--repeating-conic-gradient-times)),
+        #9333ea calc(50% / var(--repeating-conic-gradient-times)),
+        #e879f9 calc(75% / var(--repeating-conic-gradient-times)),
+        #a855f7 calc(100% / var(--repeating-conic-gradient-times))
+      )`;
+
+    const whiteGradient = `repeating-conic-gradient(
+      from 236.84deg at 50% 50%,
+      #000,
+      #000 calc(25% / var(--repeating-conic-gradient-times))
+    )`;
+
+    const getGradient = () => {
+      if (variant === "white") return whiteGradient;
+      if (variant === "blue") return blueGradient;
+      return defaultGradient;
+    };
+
     return (
       <>
         <div
@@ -137,25 +177,7 @@ const GlowingEffect = memo(
               "--active": "0",
               "--glowingeffect-border-width": `${borderWidth}px`,
               "--repeating-conic-gradient-times": "5",
-              "--gradient":
-                variant === "white"
-                  ? `repeating-conic-gradient(
-                  from 236.84deg at 50% 50%,
-                  var(--black),
-                  var(--black) calc(25% / var(--repeating-conic-gradient-times))
-                )`
-                  : `radial-gradient(circle, var(--theme-color) 10%, transparent 20%),
-                radial-gradient(circle at 40% 40%, var(--theme-color) 5%, transparent 15%),
-                radial-gradient(circle at 60% 60%, var(--theme-color) 10%, transparent 20%), 
-                radial-gradient(circle at 40% 60%, var(--theme-color) 10%, transparent 20%),
-                repeating-conic-gradient(
-                  from 236.84deg at 50% 50%,
-                  var(--theme-color) 0%,
-                  var(--theme-color) calc(25% / var(--repeating-conic-gradient-times)),
-                  var(--theme-color) calc(50% / var(--repeating-conic-gradient-times)), 
-                  var(--theme-color) calc(75% / var(--repeating-conic-gradient-times)),
-                  var(--theme-color) calc(100% / var(--repeating-conic-gradient-times))
-                )`,
+              "--gradient": getGradient(),
             } as React.CSSProperties
           }
           className={cn(

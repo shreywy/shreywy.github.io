@@ -2,34 +2,44 @@ import React, { useState, useEffect } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { Timeline } from "@/components/ui/timeline";
 import LiquidCrystalBackground from "@/components/ui/liquid-crystal-shader";
+import { ShaderComponent } from "@/components/ui/abstract-glassy-shader";
+import { AuroraShader } from "@/components/ui/aurora-shader";
+import { RippleShader } from "@/components/ui/ripple-shader";
+import { LinesShader } from "@/components/ui/lines-shader";
 import { ProjectCard } from "@/components/ui/project-card";
 import { FrostedGlassCard } from "@/components/ui/interactive-frosted-glass-card";
-import { 
-  Home, 
-  Briefcase, 
-  Code2, 
-  Wrench, 
-  Github, 
-  Linkedin, 
+import { GlowingEffect } from "@/components/ui/glowing-effect";
+import { ShaderToggle } from "@/components/ui/shader-toggle";
+import {
+  Home,
+  Briefcase,
+  Code2,
+  Wrench,
+  Github,
+  Linkedin,
   Mail,
-  ChevronDown,
-  ArrowDown
+  ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  type BackgroundShader,
+  getBackgroundShaderPreference,
+  setBackgroundShaderPreference,
+  getDefaultShader,
+  getNextShader
+} from "@/lib/cookies";
 
-const ExpandableExperience = ({ role, company, points }: { role: string, company: string, points: string[] }) => {
+const ExpandableExperience = ({ points }: { role: string, company: string, points: string[] }) => {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <FrostedGlassCard className="p-6 md:p-8 w-full">
-      <h4 className="text-xl md:text-2xl font-bold text-white mb-2">{role}</h4>
-      <p className="text-[var(--theme-color)] font-medium mb-4">{company}</p>
+    <div className="w-full">
       <ul className="list-disc list-inside text-white space-y-2 text-sm md:text-base">
         {points.slice(0, 2).map((point, idx) => (
           <li key={idx} className="text-white/90">{point}</li>
         ))}
       </ul>
-      
+
       <AnimatePresence initial={false}>
         {expanded && (
           <motion.div
@@ -49,9 +59,9 @@ const ExpandableExperience = ({ role, company, points }: { role: string, company
       </AnimatePresence>
 
       {points.length > 2 && (
-        <button 
+        <button
           onClick={() => setExpanded(!expanded)}
-          className="mt-4 text-sm font-medium text-[var(--theme-color)] hover:text-white transition-colors flex items-center gap-1"
+          className="mt-4 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1"
         >
           {expanded ? "Show Less" : "Show More"}
           <motion.div animate={{ rotate: expanded ? 180 : 0 }}>
@@ -59,17 +69,59 @@ const ExpandableExperience = ({ role, company, points }: { role: string, company
           </motion.div>
         </button>
       )}
-    </FrostedGlassCard>
+    </div>
   );
 };
 
 export default function App() {
   const [open, setOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [currentShader, setCurrentShader] = useState<BackgroundShader>('liquid-crystal');
 
   useEffect(() => {
     setIsLoaded(true);
+    // Load shader preference from cookie, or use default (liquid-crystal)
+    const savedShader = getBackgroundShaderPreference();
+    if (savedShader) {
+      setCurrentShader(savedShader);
+    } else {
+      // No preference saved, use default shader
+      const defaultShader = getDefaultShader();
+      setCurrentShader(defaultShader);
+      setBackgroundShaderPreference(defaultShader);
+    }
   }, []);
+
+  const handleCycleShader = () => {
+    const nextShader = getNextShader(currentShader);
+    setCurrentShader(nextShader);
+    setBackgroundShaderPreference(nextShader);
+  };
+
+  const renderBackground = () => {
+    switch (currentShader) {
+      case 'liquid-crystal':
+        return (
+          <LiquidCrystalBackground
+            speed={0.2}
+            radii={[0.3, 0.2, 0.25]}
+            smoothK={[0.3, 0.3]}
+            className="w-full h-full"
+          />
+        );
+      case 'abstract-glassy':
+        return <ShaderComponent className="w-full h-full" />;
+      case 'aurora':
+        return <AuroraShader className="w-full h-full" />;
+      case 'ripple':
+        return <RippleShader className="w-full h-full" />;
+      case 'lines':
+        return <LinesShader className="w-full h-full" />;
+      case 'none':
+      default:
+        return null;
+    }
+  };
 
   const navLinks = [
     { label: "Home", href: "#home", icon: <Home className="text-white h-5 w-5 flex-shrink-0" />, onClick: () => setOpen(false) },
@@ -86,15 +138,12 @@ export default function App() {
 
   const timelineData = [
     {
-      title: (
-        <div className="flex flex-col space-y-1">
-          <span className="text-white/60 font-medium text-lg md:text-xl">May 2025</span>
-          <ArrowDown className="w-5 h-5 text-[var(--theme-color)]" />
-          <span className="text-white font-bold text-xl md:text-2xl">Present</span>
-        </div>
-      ),
+      date: "May 2025 → Present",
+      company: "Geotab Inc.",
+      companyLogo: "/geotab_logo.jpg",
+      position: "Technical Project Management Intern",
       content: (
-        <ExpandableExperience 
+        <ExpandableExperience
           role="Technical Project Management Intern"
           company="Geotab"
           points={[
@@ -109,15 +158,12 @@ export default function App() {
       ),
     },
     {
-      title: (
-        <div className="flex flex-col space-y-1">
-          <span className="text-white/60 font-medium text-lg md:text-xl">Jan 2024</span>
-          <ArrowDown className="w-5 h-5 text-[var(--theme-color)]" />
-          <span className="text-white font-bold text-xl md:text-2xl">Aug 2024</span>
-        </div>
-      ),
+      date: "Jan 2024 → Aug 2024",
+      company: "AMD",
+      companyLogo: "/amd_logo.jpg",
+      position: "Automation Engineering Intern",
       content: (
-        <ExpandableExperience 
+        <ExpandableExperience
           role="Automation Engineering Intern"
           company="AMD"
           points={[
@@ -132,15 +178,12 @@ export default function App() {
       ),
     },
     {
-      title: (
-        <div className="flex flex-col space-y-1">
-          <span className="text-white/60 font-medium text-lg md:text-xl">May 2023</span>
-          <ArrowDown className="w-5 h-5 text-[var(--theme-color)]" />
-          <span className="text-white font-bold text-xl md:text-2xl">Aug 2023</span>
-        </div>
-      ),
+      date: "May 2023 → Aug 2023",
+      company: "Bombardier Aerospace",
+      companyLogo: "/bombardier_logo.jpg",
+      position: "Automation & Data Tools Intern",
       content: (
-        <ExpandableExperience 
+        <ExpandableExperience
           role="Automation & Data Tools Intern"
           company="Bombardier"
           points={[
@@ -188,12 +231,7 @@ export default function App() {
     <div className="flex h-screen w-full bg-black overflow-hidden relative text-white font-sans">
       {/* Global Background Effect */}
       <div className="absolute inset-0 z-0 pointer-events-none opacity-50">
-        <LiquidCrystalBackground 
-          speed={0.2}
-          radii={[0.3, 0.2, 0.25]}
-          smoothK={[0.3, 0.3]}
-          className="w-full h-full" 
-        />
+        {renderBackground()}
       </div>
 
       <motion.div 
@@ -221,6 +259,13 @@ export default function App() {
               </div>
             </div>
             <div className="flex flex-col gap-2">
+              <div className="border-t border-white/10 pt-4 mb-2">
+                <ShaderToggle
+                  currentShader={currentShader}
+                  onCycle={handleCycleShader}
+                  isExpanded={open}
+                />
+              </div>
               {connectLinks.map((link, idx) => (
                 <SidebarLink key={idx} link={link} />
               ))}
@@ -266,17 +311,15 @@ export default function App() {
         {/* Experience Section */}
         <section id="experience" className="py-16 relative z-10 px-6 md:px-10">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-12">Experience</h2>
-            <FrostedGlassCard className="p-0 md:p-0 overflow-hidden">
-              <Timeline data={timelineData} />
-            </FrostedGlassCard>
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-12 [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]">Experience</h2>
+            <Timeline data={timelineData} />
           </div>
         </section>
 
         {/* Projects Section */}
         <section id="projects" className="py-16 relative z-10 px-6 md:px-10">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-12">Projects</h2>
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-12 [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]">Projects</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <ProjectCard 
                 title="Cuttt - URL Shortener"
@@ -306,23 +349,34 @@ export default function App() {
         {/* Skills Section */}
         <section id="skills" className="pt-16 pb-12 px-6 md:px-10 relative z-10">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-12">Skills</h2>
-            <FrostedGlassCard className="p-8 md:p-12">
-              <div className="flex flex-wrap gap-3">
-                {skills.map((skill, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ duration: 0.3, delay: idx * 0.02 }}
-                    className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white font-medium hover:bg-white/20 transition-colors"
-                  >
-                    {skill}
-                  </motion.div>
-                ))}
-              </div>
-            </FrostedGlassCard>
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-12 [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]">Skills</h2>
+            <div className="relative rounded-2xl p-[2px]">
+              <GlowingEffect
+                spread={40}
+                glow={true}
+                disabled={false}
+                proximity={64}
+                inactiveZone={0.01}
+                borderWidth={2}
+                variant="blue"
+              />
+              <FrostedGlassCard className="p-8 md:p-12 rounded-2xl">
+                <div className="flex flex-wrap gap-3">
+                  {skills.map((skill, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true, margin: "-50px" }}
+                      transition={{ duration: 0.3, delay: idx * 0.02 }}
+                      className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white font-medium hover:bg-white/20 transition-colors"
+                    >
+                      {skill}
+                    </motion.div>
+                  ))}
+                </div>
+              </FrostedGlassCard>
+            </div>
           </div>
         </section>
 

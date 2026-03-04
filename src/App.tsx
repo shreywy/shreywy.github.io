@@ -234,11 +234,11 @@ export default function App() {
         {renderBackground()}
       </div>
 
-      <motion.div 
-        initial={{ x: -300 }} 
-        animate={{ x: 0 }} 
+      <motion.div
+        initial={{ x: -300 }}
+        animate={{ x: 0 }}
         transition={{ delay: 1, duration: 0.5, ease: "easeOut" }}
-        className="z-50"
+        className="z-50 hidden md:block"
       >
         <Sidebar open={open} setOpen={setOpen}>
           <SidebarBody className="justify-between gap-10 bg-black/40 backdrop-blur-xl border-r border-white/10">
@@ -278,7 +278,7 @@ export default function App() {
         initial={{ opacity: 0 }} 
         animate={{ opacity: 1 }} 
         transition={{ delay: 1, duration: 1 }}
-        className="flex-1 overflow-y-auto z-10 scroll-smooth relative pt-14 md:pt-0 flex flex-col"
+        className="flex-1 overflow-y-auto z-10 scroll-smooth relative flex flex-col"
       >
         {/* Hero Section */}
         <section id="home" className="flex flex-col items-center justify-center relative px-6 md:px-20 min-h-screen">
@@ -382,6 +382,20 @@ export default function App() {
 
         {/* Footer */}
         <footer className="py-6 text-center text-white/60 text-sm relative z-10 bg-black/40 backdrop-blur-md border-t border-white/10 mt-auto w-full shrink-0">
+          {/* Mobile social links */}
+          <div className="flex justify-center gap-6 mb-4 md:hidden">
+            {connectLinks.map((link, idx) => (
+              <a
+                key={idx}
+                href={link.href}
+                target={link.href.startsWith('mailto:') ? undefined : '_blank'}
+                rel={link.href.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
+                className="text-white/70 hover:text-white transition-colors"
+              >
+                {link.icon}
+              </a>
+            ))}
+          </div>
           <p>Made by Shrey Mistry</p>
         </footer>
       </motion.main>

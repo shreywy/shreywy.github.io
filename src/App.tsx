@@ -280,22 +280,22 @@ export default function App() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <ProjectCard 
                 title="Cuttt - URL Shortener"
-                description='Cuttt is a "cuttt"ing-edge URL shortening service that streamlines the way you share links online. It uses a powerful tech stack for the frontend and backend.'
-                imageSrc="/public/urlshortener.png"
+                description="..."
+                imageSrc="/urlshortener.png" // Remove /public
                 tags={["React", "Node.js", "Python", "Flask", "Firebase", "Azure", "Docker"]}
                 githubUrl="https://github.com/shreywy/cuttt"
               />
               <ProjectCard 
                 title="Music and Movie Store DBMS"
-                description="A Python application to interact with an Oracle Database intended for a Movie and Music store. This tool provides a simple UI to display tables, manage entries, and execute custom SQL queries."
-                imageSrc="/public/dbms.png"
+                description="..."
+                imageSrc="/dbms.png" // Remove /public
                 tags={["Python", "cx_Oracle", "customtkinter", "tabulate", "Oracle XE 21c"]}
                 githubUrl="https://github.com/shreywy/Movie-And-Music-Store-DBMS"
               />
               <ProjectCard 
                 title="TabStitch - Guitar Tab Extractor"
-                description="A powerful tool for extracting guitar tablature from videos with automatic deduplication and stitching capabilities. Uses a multi-stage processing pipeline."
-                imageSrc="/public/tabstich.png"
+                description="..."
+                imageSrc="/tabstich.png" // Remove /public
                 tags={["Python", "OpenCV", "imagehash", "yt-dlp"]}
                 githubUrl="https://github.com/shreywy/TabStitcher"
               />

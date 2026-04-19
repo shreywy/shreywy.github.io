@@ -6,6 +6,12 @@
   <meta name="description" content="Shrey Mistry - PM @ Geotab | CS Student | Builder of things">
   <meta name="author" content="Shrey Mistry">
   <title>Shrey's Terminal</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23001a00'/><text x='4' y='22' font-family='monospace' font-size='18' fill='%2333ff33'>%3E_</text></svg>">
+  <meta property="og:title" content="Shrey Mistry - Terminal Portfolio">
+  <meta property="og:description" content="Interactive CRT terminal portfolio - type commands to explore. Built with vanilla HTML/CSS/JS.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://shreywy.github.io">
+  <meta name="theme-color" content="#33ff33">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=DM+Sans:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     * {
@@ -285,10 +291,27 @@
     #commandPalette::-webkit-scrollbar-thumb { background: var(--dim); }
 
     .palette-header {
-      padding: 10px 16px 8px;
+      padding: 10px 16px 0;
       color: var(--dim);
       font-size: 0.85rem;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .palette-tabs {
+      display: flex;
+      gap: 0;
+      padding: 8px 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .palette-tab {
+      padding: 6px 16px;
+      cursor: pointer;
+      color: var(--dim);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .palette-tab:hover { color: var(--text); }
+    .palette-tab.active {
+      color: var(--bright);
+      border-bottom-color: var(--bright);
     }
 
     .palette-item {
@@ -313,17 +336,7 @@
 
     /* ============ QUICKBAR - HIDDEN, use / key instead ============ */
     #quickbar { display: none; }
-
-    /* ============ HINT BAR ============ */
-    #hintbar {
-      background: var(--bg);
-      border-top: 1px solid rgba(255,255,255,0.05);
-      padding: 6px 20px;
-      text-align: center;
-      color: var(--dim);
-      font-size: 0.9rem;
-      z-index: 20;
-    }
+    #hintbar { display: none; }
 
     /* ============ WIN98 WINDOW SYSTEM ============ */
     .w98 {
@@ -845,7 +858,7 @@
         <div id="commandPalette"></div>
       </div>
     </div>
-    <div id="hintbar">Press <span style="color:var(--bright)">/</span> to open command menu</div>
+    <!-- bottom bar removed, use / key for command palette -->
   </div>
 
   <!-- Windows 98 - Browser -->
@@ -880,7 +893,7 @@
           "  SHREY OS v1.0 - Portfolio Terminal Shell",
           "==========================================="
         ],
-        "welcomeMessage": "System ready. Type 'help' for available commands.",
+        "welcomeMessage": "System ready. Type 'help' or press / to see all commands.",
         "prompt": "C:\\Users\\shrey> ",
         "bootMessages": [
           "SM-BIOS (C) 2026 Mistry Systems, Inc.",
@@ -1279,24 +1292,32 @@
 
       if (cmd === 'help') {
         addLine('');
-        await typeLinesSlow([
-          { t: 'Available commands:', c: 'b' }, '',
-          '  about         Display bio (neofetch style)',
-          '  experience    Work experience',
-          '  skills        Technical skills',
-          '  education     Education history',
-          '  projects      Portfolio projects',
-          '  contact       Contact info',
-          '  browse        Open portfolio browser',
-          '  paint         Open Paint',
-          '  notepad       Open Notepad',
-          '  explorer      Open File Explorer',
-          '  dir           Directory listing',
-          '  cls/clear     Clear terminal',
-          '  neofetch      System info',
-          '  history       Command history',
-          '', { t: '  Try typing anything.', c: 'd' }, ''
-        ]);
+        addLine('--- Portfolio ---', 'b');
+        addLine('  about         Bio & system info');
+        addLine('  experience    Work history timeline');
+        addLine('  skills        Technical skills');
+        addLine('  education     Education');
+        addLine('  projects      Portfolio projects');
+        addLine('  contact       Email & social links');
+        addLine('  browse        Open portfolio page');
+        addLine('');
+        addLine('--- Apps ---', 'b');
+        addLine('  paint         MS Paint');
+        addLine('  notepad       Notepad');
+        addLine('  explorer      File Explorer');
+        addLine('');
+        addLine('--- Games ---', 'b');
+        addLine('  snake         Snake game (WASD/arrows)');
+        addLine('  tetris        Tetris (arrows)');
+        addLine('');
+        addLine('--- System ---', 'b');
+        addLine('  dir           Directory listing');
+        addLine('  restart       Reboot the terminal');
+        addLine('  cls/clear     Clear screen');
+        addLine('  history       Command history');
+        addLine('');
+        addLine('Tip: press / to open the command menu', 'd');
+        addLine('');
       }
       else if (cmd === 'about' || cmd === 'neofetch') {
         addLine('');
@@ -1437,6 +1458,18 @@
         await sleep(500);
         document.getElementById('browserBody').innerHTML = renderPortfolioPage();
         openBrowser();
+      }
+      else if (cmd === 'snake') {
+        addLine('Loading snake.exe...', 'a');
+        addLine('WASD or arrow keys to move. Ctrl+C to quit.', 'd');
+        await sleep(300);
+        spawnSnake();
+      }
+      else if (cmd === 'tetris') {
+        addLine('Loading tetris.exe...', 'a');
+        addLine('Arrows to move/rotate. Space to hard drop. Ctrl+C to quit.', 'd');
+        await sleep(300);
+        spawnTetris();
       }
       else if (cmd === 'paint') {
         addLine('Starting mspaint.exe...', 'a');
@@ -1579,55 +1612,99 @@
     // Quickbar removed - use / command palette instead
 
     // ============ COMMAND PALETTE ============
-    const cmdList = [
-      { cmd: 'about', desc: 'Bio & system info' },
-      { cmd: 'experience', desc: 'Work history timeline' },
-      { cmd: 'skills', desc: 'Technical skills' },
-      { cmd: 'education', desc: 'Education' },
-      { cmd: 'projects', desc: 'Portfolio projects' },
-      { cmd: 'contact', desc: 'Email & social links' },
-      { cmd: 'browse', desc: 'Open portfolio page' },
-      { cmd: 'paint', desc: 'Open MS Paint' },
-      { cmd: 'notepad', desc: 'Open Notepad' },
-      { cmd: 'explorer', desc: 'Open File Explorer' },
-      { cmd: 'dir', desc: 'Directory listing' },
-      { cmd: 'neofetch', desc: 'System info' },
-      { cmd: 'restart', desc: 'Reboot the terminal' },
-      { cmd: 'cls', desc: 'Clear screen' },
-      { cmd: 'history', desc: 'Command history' },
-      { cmd: 'cowsay', desc: 'Cow says moo' },
-      { cmd: 'matrix', desc: 'Follow the rabbit' },
-    ];
+    const cmdTabs = {
+      'Portfolio': [
+        { cmd: 'about', desc: 'Bio & system info' },
+        { cmd: 'experience', desc: 'Work history timeline' },
+        { cmd: 'skills', desc: 'Technical skills' },
+        { cmd: 'education', desc: 'Education' },
+        { cmd: 'projects', desc: 'Portfolio projects' },
+        { cmd: 'contact', desc: 'Email & social links' },
+        { cmd: 'browse', desc: 'Open portfolio page' },
+      ],
+      'Apps': [
+        { cmd: 'paint', desc: 'MS Paint' },
+        { cmd: 'notepad', desc: 'Notepad' },
+        { cmd: 'explorer', desc: 'File Explorer' },
+      ],
+      'Games': [
+        { cmd: 'snake', desc: 'Snake game' },
+        { cmd: 'tetris', desc: 'Tetris' },
+      ],
+      'System': [
+        { cmd: 'dir', desc: 'Directory listing' },
+        { cmd: 'neofetch', desc: 'System info' },
+        { cmd: 'restart', desc: 'Reboot terminal' },
+        { cmd: 'cls', desc: 'Clear screen' },
+        { cmd: 'history', desc: 'Command history' },
+        { cmd: 'cowsay', desc: 'Cow says moo' },
+        { cmd: 'matrix', desc: 'Follow the rabbit' },
+      ]
+    };
+    let paletteTab = 'Portfolio';
 
-    function showCommandPalette() {
-      const palette = document.getElementById('commandPalette');
-      palette.innerHTML = '<div class="palette-header">Commands - press Enter to run, Esc to close</div>';
-      cmdList.forEach((c, idx) => {
+    function getCmdList() {
+      return cmdTabs[paletteTab] || [];
+    }
+
+    function renderPaletteItems(palette) {
+      // Remove old items
+      palette.querySelectorAll('.palette-item').forEach(e => e.remove());
+      const list = getCmdList();
+      list.forEach((c, idx) => {
         const item = document.createElement('div');
         item.className = 'palette-item' + (idx === 0 ? ' selected' : '');
         item.innerHTML = '<span class="pi-cmd">' + c.cmd + '</span><span class="pi-desc">' + c.desc + '</span>';
         item.onclick = () => selectCommand(c.cmd);
         palette.appendChild(item);
       });
+    }
+
+    function showCommandPalette() {
+      const palette = document.getElementById('commandPalette');
+      paletteTab = 'Portfolio';
+      palette.innerHTML = '<div class="palette-header">Press Enter to run, Esc to close</div>';
+      // Tabs
+      const tabRow = document.createElement('div');
+      tabRow.className = 'palette-tabs';
+      Object.keys(cmdTabs).forEach(tab => {
+        const t = document.createElement('div');
+        t.className = 'palette-tab' + (tab === paletteTab ? ' active' : '');
+        t.textContent = tab;
+        t.onclick = () => { paletteTab = tab; palette.querySelectorAll('.palette-tab').forEach(x => x.classList.toggle('active', x.textContent === tab)); renderPaletteItems(palette); };
+        tabRow.appendChild(t);
+      });
+      palette.appendChild(tabRow);
+      renderPaletteItems(palette);
       palette.style.display = 'block';
 
       let selectedIdx = 0;
       const handlePaletteKey = (e) => {
+        const list = getCmdList();
         if (e.key === 'ArrowUp') {
           e.preventDefault();
-          selectedIdx = (selectedIdx - 1 + cmdList.length) % cmdList.length;
+          selectedIdx = (selectedIdx - 1 + list.length) % list.length;
           updatePaletteSelection(selectedIdx);
           const items = palette.querySelectorAll('.palette-item');
           if (items[selectedIdx]) items[selectedIdx].scrollIntoView({ block: 'nearest' });
         } else if (e.key === 'ArrowDown') {
           e.preventDefault();
-          selectedIdx = (selectedIdx + 1) % cmdList.length;
+          selectedIdx = (selectedIdx + 1) % list.length;
           updatePaletteSelection(selectedIdx);
           const items = palette.querySelectorAll('.palette-item');
           if (items[selectedIdx]) items[selectedIdx].scrollIntoView({ block: 'nearest' });
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+          e.preventDefault();
+          const tabs = Object.keys(cmdTabs);
+          let ti = tabs.indexOf(paletteTab);
+          ti = e.key === 'ArrowRight' ? (ti + 1) % tabs.length : (ti - 1 + tabs.length) % tabs.length;
+          paletteTab = tabs[ti];
+          palette.querySelectorAll('.palette-tab').forEach(x => x.classList.toggle('active', x.textContent === paletteTab));
+          selectedIdx = 0;
+          renderPaletteItems(palette);
         } else if (e.key === 'Tab' || e.key === 'Enter') {
           e.preventDefault();
-          selectCommand(cmdList[selectedIdx].cmd);
+          if (list[selectedIdx]) selectCommand(list[selectedIdx].cmd);
         } else if (e.key === 'Escape') {
           e.preventDefault();
           closePalette();
@@ -1934,6 +2011,107 @@
         '<textarea class="notepad-textarea" spellcheck="false" style="flex:1;width:100%;border:none;outline:none;resize:none;font-family:\'Courier New\',monospace;font-size:13px;padding:4px;">' + content.replace(/</g,'&lt;') + '</textarea>',
         420, 340
       );
+    }
+
+    // ============ SNAKE ============
+    function spawnSnake() {
+      spawnCount++;
+      const off = ((spawnCount - 1) % 8) * 28;
+      const winId = 'dw-' + Date.now();
+      const win = document.createElement('div');
+      win.className = 'w98'; win.id = winId;
+      win.style.cssText = 'display:flex;width:310px;height:370px;left:'+(60+off)+'px;top:'+(40+off)+'px;z-index:'+(++zIndex)+';';
+      win.innerHTML = '<div class="w98-title"><div class="w98-title-text">Snake - Score: 0</div><div class="w98-close">X</div></div>' +
+        '<div class="w98-content" style="display:flex;flex-direction:column;align-items:center;background:#000;padding:8px;">' +
+        '<canvas width="280" height="280" style="border:2px solid #808080;"></canvas>' +
+        '<div style="color:#33ff33;font-size:10px;margin-top:4px;font-family:Tahoma,sans-serif;">WASD/Arrows | Ctrl+C quit</div></div>';
+      document.body.appendChild(win);
+      makeWindowDraggable(win);
+      const canvas = win.querySelector('canvas'), ctx = canvas.getContext('2d');
+      const C = 14, W = 20, H = 20;
+      let snake = [{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+      let dir = {x:1,y:0}, ndir = {x:1,y:0}, food, score = 0, alive = true, loop;
+      function pf() { let f; do { f = {x:Math.floor(Math.random()*W),y:Math.floor(Math.random()*H)}; } while (snake.some(s=>s.x===f.x&&s.y===f.y)); food = f; }
+      function draw() {
+        ctx.fillStyle = '#000'; ctx.fillRect(0,0,280,280);
+        ctx.fillStyle = '#33ff33'; snake.forEach(s => ctx.fillRect(s.x*C+1,s.y*C+1,C-2,C-2));
+        ctx.fillStyle = '#ff3333'; ctx.fillRect(food.x*C+1,food.y*C+1,C-2,C-2);
+      }
+      function step() {
+        if (!alive) return;
+        dir = ndir;
+        const h = {x:snake[0].x+dir.x, y:snake[0].y+dir.y};
+        if (h.x<0||h.x>=W||h.y<0||h.y>=H||snake.some(s=>s.x===h.x&&s.y===h.y)) {
+          alive = false; ctx.fillStyle='rgba(255,0,0,0.3)'; ctx.fillRect(0,0,280,280);
+          ctx.fillStyle='#fff'; ctx.font='18px monospace'; ctx.textAlign='center';
+          ctx.fillText('GAME OVER',140,130); ctx.fillText('Score: '+score,140,155); return;
+        }
+        snake.unshift(h);
+        if (h.x===food.x&&h.y===food.y) { score++; win.querySelector('.w98-title-text').textContent='Snake - Score: '+score; pf(); } else snake.pop();
+        draw();
+      }
+      const kh = e => {
+        if (!alive) return;
+        const m = {ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0},w:{x:0,y:-1},s:{x:0,y:1},a:{x:-1,y:0},d:{x:1,y:0}};
+        const nd = m[e.key]; if (nd&&!(nd.x===-dir.x&&nd.y===-dir.y)) { ndir=nd; e.preventDefault(); }
+        if (e.ctrlKey&&e.key==='c') cleanup();
+      };
+      function cleanup() { alive=false; clearInterval(loop); document.removeEventListener('keydown',kh); closeWindow(winId); }
+      win.querySelector('.w98-close').onclick = cleanup;
+      document.addEventListener('keydown', kh);
+      pf(); draw(); loop = setInterval(step, 140);
+    }
+
+    // ============ TETRIS ============
+    function spawnTetris() {
+      spawnCount++;
+      const off = ((spawnCount - 1) % 8) * 28;
+      const winId = 'dw-' + Date.now();
+      const win = document.createElement('div');
+      win.className = 'w98'; win.id = winId;
+      win.style.cssText = 'display:flex;width:240px;height:470px;left:'+(80+off)+'px;top:'+(30+off)+'px;z-index:'+(++zIndex)+';';
+      win.innerHTML = '<div class="w98-title"><div class="w98-title-text">Tetris - Score: 0</div><div class="w98-close">X</div></div>' +
+        '<div class="w98-content" style="display:flex;flex-direction:column;align-items:center;background:#000;padding:8px;">' +
+        '<canvas width="200" height="400" style="border:2px solid #808080;"></canvas>' +
+        '<div style="color:#33ff33;font-size:10px;margin-top:4px;font-family:Tahoma,sans-serif;">Arrows move/rotate | Space drop</div></div>';
+      document.body.appendChild(win);
+      makeWindowDraggable(win);
+      const canvas = win.querySelector('canvas'), ctx = canvas.getContext('2d');
+      const CS = 20, COLS = 10, ROWS = 20;
+      const SHAPES = [
+        {s:[[1,1,1,1]],c:'#0ff'}, {s:[[1,1],[1,1]],c:'#ff0'}, {s:[[0,1,0],[1,1,1]],c:'#a0f'},
+        {s:[[0,1,1],[1,1,0]],c:'#0f0'}, {s:[[1,1,0],[0,1,1]],c:'#f00'}, {s:[[1,0,0],[1,1,1]],c:'#00f'}, {s:[[0,0,1],[1,1,1]],c:'#f80'}
+      ];
+      let board = Array.from({length:ROWS},()=>Array(COLS).fill(0));
+      let cur, score = 0, alive = true, loop;
+      function np() { const p = SHAPES[Math.floor(Math.random()*SHAPES.length)]; cur = {s:p.s.map(r=>[...r]),c:p.c,x:3,y:0}; }
+      function ok(s,ox,oy) { return s.every((row,dy)=>row.every((c,dx)=>!c||(cur.x+dx+ox>=0&&cur.x+dx+ox<COLS&&cur.y+dy+oy>=0&&cur.y+dy+oy<ROWS&&!board[cur.y+dy+oy][cur.x+dx+ox]))); }
+      function place() {
+        cur.s.forEach((row,dy)=>row.forEach((c,dx)=>{ if(c) board[cur.y+dy][cur.x+dx]=cur.c; }));
+        let lines=0;
+        for(let r=ROWS-1;r>=0;r--) { if(board[r].every(c=>c)) { board.splice(r,1); board.unshift(Array(COLS).fill(0)); lines++; r++; } }
+        score += [0,100,300,500,800][lines]||0;
+        np(); if(!ok(cur.s,0,0)) { alive=false; ctx.fillStyle='rgba(255,0,0,0.3)'; ctx.fillRect(0,0,200,400); ctx.fillStyle='#fff'; ctx.font='16px monospace'; ctx.textAlign='center'; ctx.fillText('GAME OVER',100,180); ctx.fillText('Score: '+score,100,205); }
+      }
+      function draw() {
+        ctx.fillStyle='#000'; ctx.fillRect(0,0,200,400);
+        board.forEach((row,r)=>row.forEach((c,cl)=>{ if(c){ctx.fillStyle=c;ctx.fillRect(cl*CS+1,r*CS+1,CS-2,CS-2);} }));
+        if(cur) { ctx.fillStyle=cur.c; cur.s.forEach((row,dy)=>row.forEach((c,dx)=>{ if(c) ctx.fillRect((cur.x+dx)*CS+1,(cur.y+dy)*CS+1,CS-2,CS-2); })); }
+      }
+      function step() { if(!alive) return; if(ok(cur.s,0,1)) cur.y++; else place(); draw(); win.querySelector('.w98-title-text').textContent='Tetris - Score: '+score; }
+      const kh = e => {
+        if(!alive||!cur) return;
+        if(e.key==='ArrowLeft'&&ok(cur.s,-1,0)){cur.x--;draw();e.preventDefault();}
+        if(e.key==='ArrowRight'&&ok(cur.s,1,0)){cur.x++;draw();e.preventDefault();}
+        if(e.key==='ArrowDown'&&ok(cur.s,0,1)){cur.y++;draw();e.preventDefault();}
+        if(e.key==='ArrowUp'){const rot=cur.s[0].map((_,c)=>cur.s.map(r=>r[c]).reverse());const os=cur.s;cur.s=rot;if(!ok(cur.s,0,0))cur.s=os;else draw();e.preventDefault();}
+        if(e.key===' '){while(ok(cur.s,0,1))cur.y++;place();draw();e.preventDefault();}
+        if(e.ctrlKey&&e.key==='c') cleanup();
+      };
+      function cleanup() { alive=false; clearInterval(loop); document.removeEventListener('keydown',kh); closeWindow(winId); }
+      win.querySelector('.w98-close').onclick = cleanup;
+      document.addEventListener('keydown', kh);
+      np(); draw(); loop = setInterval(step, 500);
     }
 
     // ============ FILE EXPLORER DATA ============

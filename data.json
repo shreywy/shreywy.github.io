@@ -28,7 +28,7 @@
       "  SHREY OS v1.0 - Portfolio Terminal Shell",
       "==========================================="
     ],
-    "welcomeMessage": "System ready. Press / to see all commands.",
+    "welcomeMessage": "System ready. Type 'help' or press / to see all commands.",
     "prompt": "C:\\Users\\shrey> ",
     "bootMessages": [
       "SM-BIOS (C) 2026 Mistry Systems, Inc.",

@@ -182,13 +182,13 @@
     /* ============ EXPERIENCE / PROJECT CARDS ============ */
     .exp-timeline {
       position: relative;
-      padding-left: 28px;
+      padding-left: 120px;
       margin: 8px 0;
     }
     .exp-timeline::before {
       content: '';
       position: absolute;
-      left: 8px; top: 0; bottom: 0;
+      left: 108px; top: 0; bottom: 0;
       width: 2px;
       background: var(--dim);
     }
@@ -198,17 +198,33 @@
       transition: transform 0.15s, box-shadow 0.15s, opacity 0.4s;
       opacity: 0; transform: translateY(12px);
       cursor: default; position: relative;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
     .exp-timeline .exp-card::before {
       content: '';
       position: absolute;
-      left: -24px; top: 16px;
+      left: -17px; top: 16px;
       width: 10px; height: 10px;
       border-radius: 50%;
       background: var(--accent);
       border: 2px solid var(--bg);
       z-index: 1;
+    }
+    .exp-timeline .exp-card::after {
+      content: '';
+      position: absolute;
+      left: -12px; top: 20px;
+      width: 8px; height: 2px;
+      background: var(--dim);
+    }
+    .ec-date {
+      position: absolute;
+      left: -115px; top: 14px;
+      width: 90px;
+      text-align: right;
+      color: var(--dim);
+      font-size: 0.85rem;
+      white-space: nowrap;
     }
     .exp-card.show { opacity: 1; transform: translateY(0); }
     .exp-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.3), 0 0 10px rgba(51,255,51,0.15); }
@@ -731,16 +747,19 @@
       gap: 0;
     }
 
-    .notepad-menu span {
-      cursor: pointer;
+    .nm-item {
+      cursor: default;
       padding: 2px 8px;
-      position: relative;
+      font-family: Tahoma, Arial, sans-serif;
+      font-size: 11px;
+      color: #000;
+      user-select: none;
     }
-    .notepad-menu span:hover {
+    .nm-item:hover {
       background: #000080;
       color: #fff;
     }
-    .notepad-menu span u { text-decoration: underline; }
+    .nm-item u { text-decoration: underline; }
 
     .notepad-textarea {
       flex: 1;
@@ -757,6 +776,12 @@
 
     /* ============ RESPONSIVE ============ */
     @media (max-width: 768px) {
+      .exp-timeline { padding-left: 24px; }
+      .exp-timeline::before { left: 6px; }
+      .exp-timeline .exp-card::before { left: -22px; }
+      .exp-timeline .exp-card::after { left: -16px; }
+      .ec-date { display: none; }
+
       body {
         font-size: 0.9rem;
       }
@@ -855,6 +880,41 @@
   <script>
     // ============ DATA ============
     let D = {
+      "terminal": {
+        "banner": [
+          "===========================================",
+          "  SHREY OS v1.0 - Portfolio Terminal Shell",
+          "==========================================="
+        ],
+        "welcomeMessage": "System ready. Type 'help' for available commands.",
+        "prompt": "C:\\Users\\shrey> ",
+        "bootMessages": [
+          "SM-BIOS (C) 2026 Mistry Systems, Inc.",
+          "BIOS Date: 04/19/26  Ver: 4.2.0",
+          "",
+          "CPU: AMD Ryzen 9 7950X @ 5.7 GHz",
+          "Memory Test: 16384M OK",
+          "",
+          "Detecting Primary Master... SM-SSD 2TB",
+          "Detecting Primary Slave... None",
+          "",
+          "PCI Device Listing...",
+          "  GPU: AMD Radeon RX 7900 XTX         [OK]",
+          "  NIC: Realtek RTL8125 2.5GbE          [OK]",
+          "",
+          "Loading OS...",
+          "",
+          "Loading modules:",
+          "  > personality.ko .............. [OK]",
+          "  > skills.db: 14 entries ....... [OK]",
+          "  > experience.log: 5 entries ... [OK]",
+          "  > projects.idx: 2 entries ..... [OK]",
+          "  > humor.mod ................... [QUESTIONABLE]",
+          "",
+          "System ready.",
+          "Type 'help' for available commands."
+        ]
+      },
       "name": "Shrey Mistry",
       "tagline": "PM @ Geotab | CS Student | Builder of things",
       "location": "Greater Toronto Area, Canada",
@@ -1110,9 +1170,21 @@
       }
     });
     document.addEventListener('click', (e) => {
-      if (!bootSkipped && document.getElementById('boot').style.display !== 'none') {
+      const boot = document.getElementById('boot');
+      const term = document.getElementById('terminal');
+      if (!bootSkipped && boot.style.display !== 'none') {
         skipBoot();
         try { initAudio(); } catch(x) {}
+        return;
+      }
+      // Focus input when clicking CRT area (not inside a Win98 window or quickbar)
+      if (term && !term.hidden && term.style.display !== 'none') {
+        const isWin = e.target.closest('.w98');
+        const isBar = e.target.closest('#quickbar');
+        const isInput = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
+        if (!isWin && !isBar && !isInput) {
+          document.getElementById('input').focus();
+        }
       }
     });
 
@@ -1275,7 +1347,9 @@
           card.className = 'exp-card';
           card.setAttribute('onmousemove', 'tilt(event,this)');
           card.setAttribute('onmouseleave', 'untilt(this)');
-          card.innerHTML = '<div class="ec-t">' + esc(exp.title) + '</div>'
+          const periodShort = exp.period.split(' - ')[0];
+          card.innerHTML = '<div class="ec-date">' + esc(periodShort) + '</div>'
+            + '<div class="ec-t">' + esc(exp.title) + '</div>'
             + '<div class="ec-c">@ ' + esc(exp.company) + '</div>'
             + '<div class="ec-p">' + esc(exp.period) + ' - ' + esc(exp.location) + '</div>'
             + '<div class="ec-d">' + esc(exp.description) + '</div>'
@@ -1771,11 +1845,11 @@
     // ============ NOTEPAD ============
     function spawnNotepad() {
       const id = spawnWin('Untitled - Notepad',
-        '<div class="notepad-menu">' +
-          '<span onclick="notepadMenuAction(this,\'new\')"><u>F</u>ile</span>' +
-          '<span><u>E</u>dit</span>' +
-          '<span>F<u>o</u>rmat</span>' +
-          '<span><u>H</u>elp</span>' +
+        '<div class="notepad-menu" style="background:#c0c0c0;padding:0 2px;border-bottom:1px solid #808080;display:flex;gap:0;font-family:Tahoma,Arial,sans-serif;font-size:11px;">' +
+          '<div class="nm-item" onclick="notepadMenuAction(this,\'new\')"><u>F</u>ile</div>' +
+          '<div class="nm-item"><u>E</u>dit</div>' +
+          '<div class="nm-item">F<u>o</u>rmat</div>' +
+          '<div class="nm-item"><u>H</u>elp</div>' +
         '</div>' +
         '<textarea class="notepad-textarea" spellcheck="false" style="flex:1;width:100%;border:none;outline:none;resize:none;font-family:\'Courier New\',monospace;font-size:13px;padding:4px;"></textarea>',
         480, 380
@@ -1817,13 +1891,35 @@
       renderExplorerFiles(win.querySelector('[data-files]'), 'C:\\Users\\shrey');
     }
 
+    const funnyFiles = {
+      'readme.txt': "=== README.txt ===\n\nHey! You found the secret file.\n\nFun facts about this portfolio:\n- Built entirely in one HTML file\n- The boot sequence is fake (sorry)\n- No actual files were harmed\n- This terminal runs on vibes\n- The paint app actually works tho\n\nThanks for visiting!\n\n- Shrey",
+      'todo.txt': "=== TODO ===\n\n[x] Build portfolio\n[x] Make it look cool\n[x] Add easter eggs\n[ ] Get hired\n[ ] Touch grass\n[ ] Sleep",
+      'resume.pdf': "ERROR: Cannot render PDF in Notepad.\n\nBut nice try! Check out the real\nportfolio by typing 'browse' in\nthe terminal.",
+      'cover_letter.docx': "Dear Hiring Manager,\n\nI am writing to express my\ninterest in the position of\n\"Person Who Gets Paid.\"\n\nI am qualified because I built\nthis entire terminal in HTML.\n\nSincerely,\nShrey",
+    };
+
     function renderExplorerFiles(container, path) {
       const dir = explorerFS[path] || { folders: [], files: [] };
       let html = '';
       dir.folders.forEach(f => { html += '<div class="explorer-item" style="padding:3px 6px;">&#128193; ' + f + '</div>'; });
-      dir.files.forEach(f => { html += '<div class="explorer-item" style="padding:3px 6px;">&#128196; ' + f + '</div>'; });
+      dir.files.forEach(f => {
+        html += '<div class="explorer-item" style="padding:3px 6px;cursor:pointer;" ondblclick="openFileInNotepad(\'' + f.replace(/'/g,"\\'") + '\')">&#128196; ' + f + '</div>';
+      });
       if (!dir.folders.length && !dir.files.length) html = '<div style="padding:8px;color:#888;">(empty)</div>';
       container.innerHTML = html;
+    }
+
+    function openFileInNotepad(filename) {
+      const content = funnyFiles[filename] || 'This file is empty.\n\n(But you clicked it, so that\'s something.)';
+      const id = spawnWin(filename + ' - Notepad',
+        '<div class="notepad-menu" style="background:#c0c0c0;padding:0 2px;border-bottom:1px solid #808080;display:flex;gap:0;font-family:Tahoma,Arial,sans-serif;font-size:11px;">' +
+          '<div class="nm-item"><u>F</u>ile</div>' +
+          '<div class="nm-item"><u>E</u>dit</div>' +
+          '<div class="nm-item"><u>H</u>elp</div>' +
+        '</div>' +
+        '<textarea class="notepad-textarea" spellcheck="false" style="flex:1;width:100%;border:none;outline:none;resize:none;font-family:\'Courier New\',monospace;font-size:13px;padding:4px;">' + content.replace(/</g,'&lt;') + '</textarea>',
+        420, 340
+      );
     }
 
     // ============ FILE EXPLORER DATA ============

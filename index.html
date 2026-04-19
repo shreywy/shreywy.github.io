@@ -1023,12 +1023,20 @@
     function sndType() {
       try {
         if (!audioContext) initAudio();
-        const o = audioContext.createOscillator(), g = audioContext.createGain();
-        o.connect(g); g.connect(audioContext.destination);
-        o.frequency.value = 800;
-        g.gain.setValueAtTime(0.1, audioContext.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
-        o.start(audioContext.currentTime); o.stop(audioContext.currentTime + 0.05);
+        const t = audioContext.currentTime;
+        // Short noise burst = mechanical click
+        const buf = audioContext.createBuffer(1, audioContext.sampleRate * 0.015, audioContext.sampleRate);
+        const d = buf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioContext.sampleRate * 0.003));
+        const src = audioContext.createBufferSource();
+        src.buffer = buf;
+        const g = audioContext.createGain();
+        g.gain.setValueAtTime(0.06, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.015);
+        const hp = audioContext.createBiquadFilter();
+        hp.type = 'highpass'; hp.frequency.value = 2000;
+        src.connect(hp); hp.connect(g); g.connect(audioContext.destination);
+        src.start(t);
       } catch(e) {}
     }
 

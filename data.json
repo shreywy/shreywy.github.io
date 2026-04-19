@@ -1,0 +1,123 @@
+{
+  "terminal": {
+    "banner": [
+      "===========================================",
+      "  SHREY OS v1.0 - Portfolio Terminal Shell",
+      "==========================================="
+    ],
+    "welcomeMessage": "System ready. Type 'help' for available commands.",
+    "prompt": "C:\\Users\\shrey> ",
+    "bootMessages": [
+      "SM-BIOS (C) 2026 Mistry Systems, Inc.",
+      "BIOS Date: 04/19/26  Ver: 4.2.0",
+      "",
+      "CPU: AMD Ryzen 9 7950X @ 5.7 GHz",
+      "Memory Test: 16384M OK",
+      "",
+      "Detecting Primary Master... SM-SSD 2TB",
+      "Detecting Primary Slave... None",
+      "",
+      "PCI Device Listing...",
+      "  GPU: AMD Radeon RX 7900 XTX         [OK]",
+      "  NIC: Realtek RTL8125 2.5GbE          [OK]",
+      "",
+      "Loading OS...",
+      "",
+      "Loading modules:",
+      "  > personality.ko .............. [OK]",
+      "  > skills.db: 14 entries ....... [OK]",
+      "  > experience.log: 5 entries ... [OK]",
+      "  > projects.idx: 2 entries ..... [OK]",
+      "  > humor.mod ................... [QUESTIONABLE]",
+      "",
+      "System ready.",
+      "Type 'help' for available commands."
+    ]
+  },
+
+  "name": "Shrey Mistry",
+  "tagline": "PM @ Geotab | CS Student | Builder of things",
+  "location": "Greater Toronto Area, Canada",
+  "email": "shrey.d.mistry@gmail.com",
+  "linkedin": "https://linkedin.com/in/shreymistry",
+  "github": "https://github.com/shreywy",
+  "about": "Computer Science student at Toronto Metropolitan University. Done a few internships and always looking to broaden my horizons before graduation.",
+
+  "skills": {
+    "Languages": ["Python", "JavaScript", "TypeScript", "Java", "SQL"],
+    "Frontend": ["React", "HTML/CSS"],
+    "Backend": ["Flask", "Docker", "BigQuery"],
+    "Tools": ["Jira", "Google Apps Script", "VBA", "Git"]
+  },
+
+  "experience": [
+    {
+      "title": "Technical Project Management Intern",
+      "company": "Geotab",
+      "period": "May 2025 - Present",
+      "location": "Oakville, ON",
+      "description": "Led new product development efforts by building tools and automations to streamline processes for upcoming telematics devices.",
+      "skills": ["Jira", "PM", "GAS", "BigQuery", "HTML/CSS/JS"]
+    },
+    {
+      "title": "Automation Engineering Intern",
+      "company": "AMD",
+      "period": "Jan 2024 - Aug 2024",
+      "location": "Markham, ON",
+      "description": "Developed automated benchmarking frameworks with Python, SQL, and custom tools to test GPU performance.",
+      "skills": ["Python", "SQL", "Data Analysis", "Java"]
+    },
+    {
+      "title": "Automation & Data Tools Intern",
+      "company": "Bombardier",
+      "period": "May 2023 - Aug 2023",
+      "location": "Toronto, ON",
+      "description": "Led development of internal dashboards using TypeScript and PowerBI for real-time supplier KPI tracking.",
+      "skills": ["TypeScript", "PowerBI", "VBA", "Excel"]
+    },
+    {
+      "title": "Coding Camp Instructor",
+      "company": "Peel District School Board",
+      "period": "Jul 2022 - Aug 2022",
+      "location": "Brampton, ON",
+      "description": "Designed and taught a two-week Python programming camp for middle school students.",
+      "skills": ["Python", "Teaching"]
+    },
+    {
+      "title": "Flight Sergeant",
+      "company": "Royal Canadian Air Cadets",
+      "period": "Sep 2018 - Jun 2022",
+      "location": "Brampton, ON",
+      "description": "Flight Sergeant at Air Cadets with 132 Spitfire Squadron.",
+      "skills": ["Leadership", "Public Speaking"]
+    }
+  ],
+
+  "education": [
+    {
+      "school": "Toronto Metropolitan University",
+      "degree": "BSc Computer Science",
+      "period": "Sep 2022 - May 2026"
+    },
+    {
+      "school": "Fletcher's Meadow Secondary School",
+      "degree": "High School Diploma",
+      "period": "Sep 2018 - Jul 2022"
+    }
+  ],
+
+  "projects": [
+    {
+      "name": "Media Store DBMS",
+      "description": "Dynamic media store DBMS with CustomTkinter UI, real-time Oracle DB interactions, and custom SQL execution.",
+      "skills": ["Python", "Oracle DB", "SQL"],
+      "link": null
+    },
+    {
+      "name": "Cuttt: URL Shortener",
+      "description": "URL shortening platform with React frontend, Flask backend, and Firebase storage via Docker and Azure.",
+      "skills": ["React", "Flask", "Firebase", "Docker"],
+      "link": null
+    }
+  ]
+}

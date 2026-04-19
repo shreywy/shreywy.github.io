@@ -1588,9 +1588,9 @@
         setTimeout(() => sndType(), 0);
       }
       if (e.key === 'Enter') {
-        const cmd = input.value;
+        const cmd = input.value.trim();
         input.value = '';
-        handleCommand(cmd);
+        if (cmd) handleCommand(cmd);
       } else if (e.key === '/') {
         e.preventDefault();
         if (document.getElementById('commandPalette').style.display === 'block') { closePalette(); } else { showCommandPalette(); }
@@ -1764,7 +1764,7 @@
       bar.innerHTML = '';
       bTabs.forEach(t => {
         const tab = document.createElement('div');
-        tab.style.cssText = 'display:flex;align-items:center;gap:4px;padding:4px 10px 4px 10px;border:1px solid #808080;border-bottom:none;cursor:pointer;font-family:Tahoma,Arial,sans-serif;font-size:11px;max-width:160px;white-space:nowrap;overflow:hidden;' + (t.id===bActiveTab ? 'background:#fff;' : 'background:#d8d8d8;margin-top:2px;');
+        tab.style.cssText = 'display:flex;align-items:center;gap:4px;padding:4px 10px 4px 10px;border:1px solid #808080;border-bottom:none;cursor:pointer;font-family:Tahoma,Arial,sans-serif;font-size:11px;max-width:160px;white-space:nowrap;overflow:hidden;color:#000;text-shadow:none;' + (t.id===bActiveTab ? 'background:#fff;' : 'background:#d8d8d8;margin-top:2px;');
         tab.innerHTML = '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;">' + t.title + '</span><span style="margin-left:4px;padding:0 3px;border:1px solid transparent;font-size:9px;" onmouseenter="this.style.border=\'1px solid #808080\'" onmouseleave="this.style.border=\'1px solid transparent\'">x</span>';
         tab.querySelector('span:first-child').onclick = () => bSwitchTab(t.id);
         tab.querySelector('span:last-child').onclick = e => { e.stopPropagation(); bCloseTab(t.id); };
@@ -2211,7 +2211,10 @@
       document.body.appendChild(win);
       makeWindowDraggable(win);
       const canvas = win.querySelector('canvas'), ctx = canvas.getContext('2d');
-      let grid = [], revealed = [], flagged = [], alive = true, won = false, first = true;
+      let grid = Array.from({length:ROWS},()=>Array(COLS).fill(0));
+      let revealed = Array.from({length:ROWS},()=>Array(COLS).fill(false));
+      let flagged = Array.from({length:ROWS},()=>Array(COLS).fill(false));
+      let alive = true, won = false, first = true;
       const NUMCOL = ['','#00f','#080','#f00','#008','#800','#088','#000','#888'];
       function init(sx,sy) {
         grid = Array.from({length:ROWS},()=>Array(COLS).fill(0));

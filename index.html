@@ -425,17 +425,13 @@
     #browserWindow {
       display: none;
       position: fixed;
-      top: 0; right: 0; bottom: 48px;
-      width: 50%;
-      height: auto;
-      border-radius: 0;
-      border-right: none;
+      top: 30px; right: 20px;
+      width: 55%;
+      height: 85vh;
       z-index: 55;
     }
-    #content.split { margin-right: 50%; }
     @media (max-width: 900px) {
-      #browserWindow { width: 100%; bottom: 48px; border-radius: 0; }
-      #content.split { margin-right: 0; }
+      #browserWindow { width: 100% !important; left: 0 !important; }
     }
 
     .browser-toolbar {
@@ -867,15 +863,15 @@
       <div class="w98-title-text">SHREY-Web</div>
       <div class="w98-close" onclick="closeWindow('browserWindow')">X</div>
     </div>
-    <div class="w98-content" style="display:flex;flex-direction:column;">
-      <div class="browser-toolbar">
+    <div class="w98-content" style="display:flex;flex-direction:column;padding:0;">
+      <div class="browser-toolbar" style="padding:3px 4px;">
         <button class="browser-btn" title="Back" style="font-size:10px;">&#9664;</button>
         <button class="browser-btn" title="Forward" style="font-size:10px;">&#9654;</button>
-        <button class="browser-btn" title="Refresh" style="font-size:9px;">&#8635;</button>
-        <div class="browser-address">file:///C:/www/portfolio/index.html</div>
+        <button class="browser-btn" id="bRefresh" title="Refresh" style="font-size:9px;">&#8635;</button>
+        <div class="browser-address" id="bAddr">file:///C:/www/portfolio/index.html</div>
       </div>
-      <div style="background:#c0c0c0;display:flex;border-bottom:1px solid #808080;padding:0 4px;">
-        <div class="browser-tab active" style="background:#fff;border-bottom:none;margin-bottom:-1px;">Shrey's Portfolio</div>
+      <div id="bTabBar" style="background:#c0c0c0;display:flex;align-items:flex-end;border-bottom:1px solid #808080;padding:0 4px;gap:2px;">
+        <!-- tabs rendered by JS -->
       </div>
       <div class="browser-content" id="browserBody" style="overflow-y:auto;flex:1;background:#fff;min-height:0;"></div>
     </div>
@@ -1307,8 +1303,9 @@
         addLine('  explorer      File Explorer');
         addLine('');
         addLine('--- Games ---', 'b');
-        addLine('  snake         Snake game (WASD/arrows)');
-        addLine('  tetris        Tetris (arrows)');
+        addLine('  snake         Snake (WASD/arrows, wraps edges)');
+        addLine('  tetris        Tetris (arrows, C=hold, space=drop)');
+        addLine('  minesweeper   Minesweeper (click/right-click)');
         addLine('');
         addLine('--- System ---', 'b');
         addLine('  dir           Directory listing');
@@ -1449,14 +1446,8 @@
         ]);
       }
       else if (cmd === 'browse') {
-        addLine('');
-        await typeLinesSlow([
-          'C:\\Users\\shrey> cd C:\\www\\portfolio',
-          'C:\\www\\portfolio> start index.html',
-          { t: 'Opening browser...', c: 'a' }
-        ], 10);
-        await sleep(500);
-        document.getElementById('browserBody').innerHTML = renderPortfolioPage();
+        addLine('Opening browser...', 'a');
+        await sleep(300);
         openBrowser();
       }
       else if (cmd === 'snake') {
@@ -1470,6 +1461,11 @@
         addLine('Arrows to move/rotate. Space to hard drop. Ctrl+C to quit.', 'd');
         await sleep(300);
         spawnTetris();
+      }
+      else if (cmd === 'minesweeper') {
+        addLine('Loading winmine.exe...', 'a');
+        await sleep(300);
+        spawnMinesweeper();
       }
       else if (cmd === 'paint') {
         addLine('Starting mspaint.exe...', 'a');
@@ -1597,7 +1593,7 @@
         handleCommand(cmd);
       } else if (e.key === '/') {
         e.preventDefault();
-        showCommandPalette();
+        if (document.getElementById('commandPalette').style.display === 'block') { closePalette(); } else { showCommandPalette(); }
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         historyIndex = Math.min(historyIndex + 1, commandHistory.length - 1);
@@ -1630,6 +1626,7 @@
       'Games': [
         { cmd: 'snake', desc: 'Snake game' },
         { cmd: 'tetris', desc: 'Tetris' },
+        { cmd: 'minesweeper', desc: 'Minesweeper' },
       ],
       'System': [
         { cmd: 'dir', desc: 'Directory listing' },
@@ -1756,17 +1753,75 @@
       }
     }
 
+    // ============ BROWSER TAB MANAGEMENT ============
+    const blankPage = () => '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;background:#fff;font-family:Tahoma,Arial;color:#666;"><div style="font-size:48px;margin-bottom:16px;">:(</div><div style="font-size:18px;font-weight:bold;color:#333;">This page can\'t be reached</div><div style="margin-top:8px;font-size:13px;">No internet. This is a terminal, after all.</div><div style="margin-top:4px;font-size:12px;color:#999;">ERR_TERMINAL_NO_NETWORK</div></div>';
+    const loadingPage = () => '<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#fff;font-family:Tahoma;font-size:14px;color:#888;">Loading...</div>';
+    let bTabs = [{ id:1, title:"Shrey's Portfolio", content: null, url:'file:///C:/www/portfolio/index.html' }];
+    let bActiveTab = 1;
+
+    function bRenderTabs() {
+      const bar = document.getElementById('bTabBar');
+      bar.innerHTML = '';
+      bTabs.forEach(t => {
+        const tab = document.createElement('div');
+        tab.style.cssText = 'display:flex;align-items:center;gap:4px;padding:4px 10px 4px 10px;border:1px solid #808080;border-bottom:none;cursor:pointer;font-family:Tahoma,Arial,sans-serif;font-size:11px;max-width:160px;white-space:nowrap;overflow:hidden;' + (t.id===bActiveTab ? 'background:#fff;' : 'background:#d8d8d8;margin-top:2px;');
+        tab.innerHTML = '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;">' + t.title + '</span><span style="margin-left:4px;padding:0 3px;border:1px solid transparent;font-size:9px;" onmouseenter="this.style.border=\'1px solid #808080\'" onmouseleave="this.style.border=\'1px solid transparent\'">x</span>';
+        tab.querySelector('span:first-child').onclick = () => bSwitchTab(t.id);
+        tab.querySelector('span:last-child').onclick = e => { e.stopPropagation(); bCloseTab(t.id); };
+        bar.appendChild(tab);
+      });
+      const newBtn = document.createElement('div');
+      newBtn.style.cssText = 'padding:4px 10px;cursor:pointer;font-family:Tahoma,sans-serif;font-size:14px;color:#555;margin-bottom:0;align-self:flex-end;';
+      newBtn.textContent = '+';
+      newBtn.onclick = bNewTab;
+      bar.appendChild(newBtn);
+      document.getElementById('bAddr').textContent = bTabs.find(t=>t.id===bActiveTab)?.url || '';
+    }
+
+    function bSwitchTab(id) {
+      bActiveTab = id;
+      const t = bTabs.find(t=>t.id===id);
+      document.getElementById('browserBody').innerHTML = t?.content || '';
+      bRenderTabs();
+    }
+
+    function bCloseTab(id) {
+      const idx = bTabs.findIndex(t=>t.id===id);
+      bTabs.splice(idx, 1);
+      if (!bTabs.length) { closeBrowser(); return; }
+      bActiveTab = bTabs[Math.min(idx, bTabs.length-1)].id;
+      bSwitchTab(bActiveTab);
+    }
+
+    function bNewTab() {
+      const id = Date.now();
+      bTabs.push({ id, title: 'New Tab', content: blankPage(), url: 'about:blank' });
+      bActiveTab = id;
+      bSwitchTab(id);
+    }
+
+    document.getElementById('bRefresh').onclick = () => {
+      const body = document.getElementById('browserBody');
+      const active = bTabs.find(t=>t.id===bActiveTab);
+      if (!active) return;
+      body.innerHTML = loadingPage();
+      setTimeout(() => { body.innerHTML = active.content || blankPage(); }, 600);
+    };
+
     function openBrowser() {
       const bw = document.getElementById('browserWindow');
       bw.style.display = 'flex';
       bw.style.zIndex = ++zIndex;
-      document.getElementById('content').classList.add('split');
+      const portfolioContent = renderPortfolioPage();
+      bTabs[0].content = portfolioContent;
+      bActiveTab = bTabs[0].id;
+      document.getElementById('browserBody').innerHTML = portfolioContent;
+      bRenderTabs();
       makeWindowDraggable(bw);
     }
 
     function closeBrowser() {
       const bw = document.getElementById('browserWindow');
-      document.getElementById('content').classList.remove('split');
       bw.classList.add('closing');
       setTimeout(() => {
         bw.style.display = 'none';
@@ -2024,13 +2079,13 @@
       win.innerHTML = '<div class="w98-title"><div class="w98-title-text">Snake - Score: 0</div><div class="w98-close">X</div></div>' +
         '<div class="w98-content" style="display:flex;flex-direction:column;align-items:center;background:#000;padding:8px;">' +
         '<canvas width="280" height="280" style="border:2px solid #808080;"></canvas>' +
-        '<div style="color:#33ff33;font-size:10px;margin-top:4px;font-family:Tahoma,sans-serif;">WASD/Arrows | Ctrl+C quit</div></div>';
+        '<div style="color:#33ff33;font-size:10px;margin-top:4px;font-family:Tahoma,sans-serif;">WASD/Arrows | Wraps around edges</div></div>';
       document.body.appendChild(win);
       makeWindowDraggable(win);
       const canvas = win.querySelector('canvas'), ctx = canvas.getContext('2d');
       const C = 14, W = 20, H = 20;
       let snake = [{x:10,y:10},{x:9,y:10},{x:8,y:10}];
-      let dir = {x:1,y:0}, ndir = {x:1,y:0}, food, score = 0, alive = true, loop;
+      let dir = {x:1,y:0}, ndir = {x:1,y:0}, food, score = 0, alive = true, loop, speed = 140;
       function pf() { let f; do { f = {x:Math.floor(Math.random()*W),y:Math.floor(Math.random()*H)}; } while (snake.some(s=>s.x===f.x&&s.y===f.y)); food = f; }
       function draw() {
         ctx.fillStyle = '#000'; ctx.fillRect(0,0,280,280);
@@ -2040,14 +2095,17 @@
       function step() {
         if (!alive) return;
         dir = ndir;
-        const h = {x:snake[0].x+dir.x, y:snake[0].y+dir.y};
-        if (h.x<0||h.x>=W||h.y<0||h.y>=H||snake.some(s=>s.x===h.x&&s.y===h.y)) {
+        const h = {x:(snake[0].x+dir.x+W)%W, y:(snake[0].y+dir.y+H)%H};
+        if (snake.some(s=>s.x===h.x&&s.y===h.y)) {
           alive = false; ctx.fillStyle='rgba(255,0,0,0.3)'; ctx.fillRect(0,0,280,280);
-          ctx.fillStyle='#fff'; ctx.font='18px monospace'; ctx.textAlign='center';
+          ctx.fillStyle='#fff'; ctx.font='18px VT323'; ctx.textAlign='center';
           ctx.fillText('GAME OVER',140,130); ctx.fillText('Score: '+score,140,155); return;
         }
         snake.unshift(h);
-        if (h.x===food.x&&h.y===food.y) { score++; win.querySelector('.w98-title-text').textContent='Snake - Score: '+score; pf(); } else snake.pop();
+        if (h.x===food.x&&h.y===food.y) {
+          score++; win.querySelector('.w98-title-text').textContent='Snake - Score: '+score; pf();
+          if (score <= 5) { clearInterval(loop); speed = Math.max(70, 140 - score * 14); loop = setInterval(step, speed); }
+        } else snake.pop();
         draw();
       }
       const kh = e => {
@@ -2059,7 +2117,7 @@
       function cleanup() { alive=false; clearInterval(loop); document.removeEventListener('keydown',kh); closeWindow(winId); }
       win.querySelector('.w98-close').onclick = cleanup;
       document.addEventListener('keydown', kh);
-      pf(); draw(); loop = setInterval(step, 140);
+      pf(); draw(); loop = setInterval(step, speed);
     }
 
     // ============ TETRIS ============
@@ -2069,32 +2127,53 @@
       const winId = 'dw-' + Date.now();
       const win = document.createElement('div');
       win.className = 'w98'; win.id = winId;
-      win.style.cssText = 'display:flex;width:240px;height:470px;left:'+(80+off)+'px;top:'+(30+off)+'px;z-index:'+(++zIndex)+';';
+      const CW = 250, CH = 500, CS = 25, COLS = 10, ROWS = 20;
+      win.style.cssText = 'display:flex;width:360px;height:560px;left:'+(80+off)+'px;top:'+(20+off)+'px;z-index:'+(++zIndex)+';';
       win.innerHTML = '<div class="w98-title"><div class="w98-title-text">Tetris - Score: 0</div><div class="w98-close">X</div></div>' +
-        '<div class="w98-content" style="display:flex;flex-direction:column;align-items:center;background:#000;padding:8px;">' +
-        '<canvas width="200" height="400" style="border:2px solid #808080;"></canvas>' +
-        '<div style="color:#33ff33;font-size:10px;margin-top:4px;font-family:Tahoma,sans-serif;">Arrows move/rotate | Space drop</div></div>';
+        '<div class="w98-content" style="display:flex;background:#000;padding:8px;gap:8px;">' +
+        '<canvas width="'+CW+'" height="'+CH+'" style="border:2px solid #808080;flex-shrink:0;"></canvas>' +
+        '<div style="color:#33ff33;font-family:VT323,monospace;font-size:16px;width:80px;">' +
+          '<div>HOLD</div><canvas class="hold-cv" width="80" height="80" style="border:1px solid #333;margin:4px 0 12px;"></canvas>' +
+          '<div>SCORE</div><div class="t-score" style="font-size:20px;margin:4px 0 12px;">0</div>' +
+          '<div style="font-size:12px;margin-top:16px;color:#0a6b0a;">Arrows move<br>Up rotate<br>Space drop<br>C hold</div>' +
+        '</div></div>';
       document.body.appendChild(win);
       makeWindowDraggable(win);
       const canvas = win.querySelector('canvas'), ctx = canvas.getContext('2d');
-      const CS = 20, COLS = 10, ROWS = 20;
+      const holdCv = win.querySelector('.hold-cv'), holdCtx = holdCv.getContext('2d');
       const SHAPES = [
         {s:[[1,1,1,1]],c:'#0ff'}, {s:[[1,1],[1,1]],c:'#ff0'}, {s:[[0,1,0],[1,1,1]],c:'#a0f'},
         {s:[[0,1,1],[1,1,0]],c:'#0f0'}, {s:[[1,1,0],[0,1,1]],c:'#f00'}, {s:[[1,0,0],[1,1,1]],c:'#00f'}, {s:[[0,0,1],[1,1,1]],c:'#f80'}
       ];
       let board = Array.from({length:ROWS},()=>Array(COLS).fill(0));
-      let cur, score = 0, alive = true, loop;
-      function np() { const p = SHAPES[Math.floor(Math.random()*SHAPES.length)]; cur = {s:p.s.map(r=>[...r]),c:p.c,x:3,y:0}; }
+      let cur, hold = null, canHold = true, score = 0, alive = true, loop;
+      function np() { const p = SHAPES[Math.floor(Math.random()*SHAPES.length)]; cur = {s:p.s.map(r=>[...r]),c:p.c,x:3,y:0}; canHold = true; }
       function ok(s,ox,oy) { return s.every((row,dy)=>row.every((c,dx)=>!c||(cur.x+dx+ox>=0&&cur.x+dx+ox<COLS&&cur.y+dy+oy>=0&&cur.y+dy+oy<ROWS&&!board[cur.y+dy+oy][cur.x+dx+ox]))); }
+      function doHold() {
+        if (!canHold) return;
+        canHold = false;
+        if (hold) { const tmp = hold; hold = {s:cur.s,c:cur.c}; cur = {s:tmp.s.map(r=>[...r]),c:tmp.c,x:3,y:0}; }
+        else { hold = {s:cur.s,c:cur.c}; np(); }
+        drawHold();
+      }
+      function drawHold() {
+        holdCtx.fillStyle = '#000'; holdCtx.fillRect(0,0,80,80);
+        if (hold) { holdCtx.fillStyle = hold.c; hold.s.forEach((row,dy)=>row.forEach((c,dx)=>{ if(c) holdCtx.fillRect(dx*16+8,dy*16+8,14,14); })); }
+      }
       function place() {
         cur.s.forEach((row,dy)=>row.forEach((c,dx)=>{ if(c) board[cur.y+dy][cur.x+dx]=cur.c; }));
         let lines=0;
         for(let r=ROWS-1;r>=0;r--) { if(board[r].every(c=>c)) { board.splice(r,1); board.unshift(Array(COLS).fill(0)); lines++; r++; } }
         score += [0,100,300,500,800][lines]||0;
-        np(); if(!ok(cur.s,0,0)) { alive=false; ctx.fillStyle='rgba(255,0,0,0.3)'; ctx.fillRect(0,0,200,400); ctx.fillStyle='#fff'; ctx.font='16px monospace'; ctx.textAlign='center'; ctx.fillText('GAME OVER',100,180); ctx.fillText('Score: '+score,100,205); }
+        win.querySelector('.t-score').textContent = score;
+        np(); if(!ok(cur.s,0,0)) { alive=false; ctx.fillStyle='rgba(255,0,0,0.3)'; ctx.fillRect(0,0,CW,CH); ctx.fillStyle='#fff'; ctx.font='20px VT323'; ctx.textAlign='center'; ctx.fillText('GAME OVER',CW/2,CH/2-10); ctx.fillText('Score: '+score,CW/2,CH/2+15); }
       }
       function draw() {
-        ctx.fillStyle='#000'; ctx.fillRect(0,0,200,400);
+        ctx.fillStyle='#000'; ctx.fillRect(0,0,CW,CH);
+        // Grid lines
+        ctx.strokeStyle='#111';
+        for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*CS,0);ctx.lineTo(x*CS,CH);ctx.stroke();}
+        for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*CS);ctx.lineTo(CW,y*CS);ctx.stroke();}
         board.forEach((row,r)=>row.forEach((c,cl)=>{ if(c){ctx.fillStyle=c;ctx.fillRect(cl*CS+1,r*CS+1,CS-2,CS-2);} }));
         if(cur) { ctx.fillStyle=cur.c; cur.s.forEach((row,dy)=>row.forEach((c,dx)=>{ if(c) ctx.fillRect((cur.x+dx)*CS+1,(cur.y+dy)*CS+1,CS-2,CS-2); })); }
       }
@@ -2106,12 +2185,96 @@
         if(e.key==='ArrowDown'&&ok(cur.s,0,1)){cur.y++;draw();e.preventDefault();}
         if(e.key==='ArrowUp'){const rot=cur.s[0].map((_,c)=>cur.s.map(r=>r[c]).reverse());const os=cur.s;cur.s=rot;if(!ok(cur.s,0,0))cur.s=os;else draw();e.preventDefault();}
         if(e.key===' '){while(ok(cur.s,0,1))cur.y++;place();draw();e.preventDefault();}
+        if(e.key==='c'&&!e.ctrlKey) doHold();
         if(e.ctrlKey&&e.key==='c') cleanup();
       };
       function cleanup() { alive=false; clearInterval(loop); document.removeEventListener('keydown',kh); closeWindow(winId); }
       win.querySelector('.w98-close').onclick = cleanup;
       document.addEventListener('keydown', kh);
-      np(); draw(); loop = setInterval(step, 500);
+      np(); draw(); drawHold(); loop = setInterval(step, 500);
+    }
+
+    // ============ MINESWEEPER ============
+    function spawnMinesweeper() {
+      spawnCount++;
+      const off = ((spawnCount - 1) % 8) * 28;
+      const winId = 'dw-' + Date.now();
+      const COLS = 9, ROWS = 9, MINES = 10, CS = 28;
+      const W = COLS * CS, H = ROWS * CS;
+      const win = document.createElement('div');
+      win.className = 'w98'; win.id = winId;
+      win.style.cssText = 'display:flex;width:'+(W+24)+'px;height:'+(H+90)+'px;left:'+(60+off)+'px;top:'+(40+off)+'px;z-index:'+(++zIndex)+';';
+      win.innerHTML = '<div class="w98-title"><div class="w98-title-text">Minesweeper</div><div class="w98-close" onclick="closeWindow(\''+winId+'\')">X</div></div>' +
+        '<div class="w98-content" style="display:flex;flex-direction:column;align-items:center;padding:8px;background:#c0c0c0;">' +
+        '<div style="margin-bottom:4px;font-family:VT323;font-size:16px;color:#f00;" class="ms-status">Mines: '+MINES+'</div>' +
+        '<canvas width="'+W+'" height="'+H+'" style="border:3px solid;border-color:#808080 #fff #fff #808080;cursor:pointer;"></canvas></div>';
+      document.body.appendChild(win);
+      makeWindowDraggable(win);
+      const canvas = win.querySelector('canvas'), ctx = canvas.getContext('2d');
+      let grid = [], revealed = [], flagged = [], alive = true, won = false, first = true;
+      const NUMCOL = ['','#00f','#080','#f00','#008','#800','#088','#000','#888'];
+      function init(sx,sy) {
+        grid = Array.from({length:ROWS},()=>Array(COLS).fill(0));
+        revealed = Array.from({length:ROWS},()=>Array(COLS).fill(false));
+        flagged = Array.from({length:ROWS},()=>Array(COLS).fill(false));
+        let placed = 0;
+        while(placed < MINES) {
+          const r = Math.floor(Math.random()*ROWS), c = Math.floor(Math.random()*COLS);
+          if (grid[r][c]===-1||(r===sy&&c===sx)) continue;
+          grid[r][c] = -1; placed++;
+        }
+        for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) {
+          if(grid[r][c]===-1) continue;
+          let n=0;
+          for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++) { const nr=r+dr,nc=c+dc; if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS&&grid[nr][nc]===-1) n++; }
+          grid[r][c]=n;
+        }
+      }
+      function reveal(r,c) {
+        if(r<0||r>=ROWS||c<0||c>=COLS||revealed[r][c]||flagged[r][c]) return;
+        revealed[r][c]=true;
+        if(grid[r][c]===0) { for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++) reveal(r+dr,c+dc); }
+      }
+      function checkWin() {
+        let unrev = 0;
+        for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(!revealed[r][c]) unrev++;
+        if(unrev===MINES) { won=true; alive=false; win.querySelector('.ms-status').textContent='YOU WIN!'; win.querySelector('.ms-status').style.color='#0f0'; }
+      }
+      function draw() {
+        for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) {
+          const x=c*CS, y=r*CS;
+          if(revealed[r][c]) {
+            ctx.fillStyle='#c0c0c0'; ctx.fillRect(x,y,CS,CS);
+            ctx.strokeStyle='#808080'; ctx.strokeRect(x,y,CS,CS);
+            if(grid[r][c]===-1) { ctx.fillStyle='#f00'; ctx.fillRect(x+6,y+6,CS-12,CS-12); }
+            else if(grid[r][c]>0) { ctx.fillStyle=NUMCOL[grid[r][c]]; ctx.font='bold 16px VT323'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(grid[r][c],x+CS/2,y+CS/2); }
+          } else {
+            ctx.fillStyle='#c0c0c0'; ctx.fillRect(x,y,CS,CS);
+            ctx.fillStyle='#dfdfdf'; ctx.fillRect(x,y,CS-1,1); ctx.fillRect(x,y,1,CS-1);
+            ctx.fillStyle='#808080'; ctx.fillRect(x+CS-1,y,1,CS); ctx.fillRect(x,y+CS-1,CS,1);
+            if(flagged[r][c]) { ctx.fillStyle='#f00'; ctx.font='14px VT323'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('F',x+CS/2,y+CS/2); }
+          }
+        }
+      }
+      canvas.addEventListener('click', e => {
+        if(!alive) return;
+        const rect = canvas.getBoundingClientRect();
+        const c = Math.floor((e.clientX-rect.left)/CS), r = Math.floor((e.clientY-rect.top)/CS);
+        if(c<0||c>=COLS||r<0||r>=ROWS||flagged[r][c]) return;
+        if(first) { init(c,r); first=false; }
+        if(grid[r][c]===-1) { alive=false; for(let rr=0;rr<ROWS;rr++) for(let cc=0;cc<COLS;cc++) revealed[rr][cc]=true; draw(); win.querySelector('.ms-status').textContent='BOOM!'; return; }
+        reveal(r,c); draw(); checkWin();
+      });
+      canvas.addEventListener('contextmenu', e => {
+        e.preventDefault(); if(!alive||first) return;
+        const rect = canvas.getBoundingClientRect();
+        const c = Math.floor((e.clientX-rect.left)/CS), r = Math.floor((e.clientY-rect.top)/CS);
+        if(c<0||c>=COLS||r<0||r>=ROWS||revealed[r][c]) return;
+        flagged[r][c] = !flagged[r][c]; draw();
+        let flags = 0; flagged.forEach(row=>row.forEach(f=>{if(f)flags++;}));
+        win.querySelector('.ms-status').textContent = 'Mines: '+(MINES-flags);
+      });
+      draw();
     }
 
     // ============ FILE EXPLORER DATA ============

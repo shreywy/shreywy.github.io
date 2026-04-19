@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Shrey Mistry - PM @ Geotab | CS Student | Builder of things">
   <meta name="author" content="Shrey Mistry">
-  <title>Shrey Mistry - CRT Portfolio Terminal</title>
+  <title>Shrey's Terminal</title>
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=DM+Sans:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     * {
@@ -268,75 +268,61 @@
     /* ============ COMMAND PALETTE ============ */
     #commandPalette {
       display: none;
-      position: absolute;
+      position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: var(--bg);
-      border: 2px solid var(--text);
-      border-radius: 4px;
+      border: 1px solid var(--text);
+      border-radius: 6px;
       z-index: 100;
-      max-width: 500px;
-      max-height: 400px;
-      overflow: hidden;
-      box-shadow: 0 0 20px rgba(51, 255, 51, 0.3);
+      width: 380px;
+      max-height: 70vh;
+      overflow-y: auto;
+      box-shadow: 0 0 40px rgba(51,255,51,0.15), 0 20px 60px rgba(0,0,0,0.5);
+    }
+    #commandPalette::-webkit-scrollbar { width: 4px; }
+    #commandPalette::-webkit-scrollbar-thumb { background: var(--dim); }
+
+    .palette-header {
+      padding: 10px 16px 8px;
+      color: var(--dim);
+      font-size: 0.85rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
     }
 
     .palette-item {
-      padding: 8px 12px;
+      padding: 10px 16px;
       color: var(--text);
       cursor: pointer;
-      border-bottom: 1px solid var(--dim);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
     }
+    .palette-item:last-child { border-bottom: none; }
+    .palette-item .pi-cmd { color: var(--bright); }
+    .palette-item .pi-desc { color: var(--dim); font-size: 0.85rem; }
 
     .palette-item.selected {
-      background: var(--bright);
-      color: var(--bg);
+      background: rgba(51,255,51,0.08);
+    }
+    .palette-item:hover {
+      background: rgba(51,255,51,0.05);
     }
 
-    .palette-item:last-child {
-      border-bottom: none;
-    }
+    /* ============ QUICKBAR - HIDDEN, use / key instead ============ */
+    #quickbar { display: none; }
 
-    /* ============ QUICKBAR (TASKBAR) ============ */
-    #quickbar {
+    /* ============ HINT BAR ============ */
+    #hintbar {
       background: var(--bg);
-      border-top: 1px solid var(--dim);
-      padding: 10px 16px;
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      justify-content: center;
-      z-index: 60;
-      position: relative;
-    }
-    #content.split ~ #quickbar {
-      padding: 6px 10px;
-      gap: 3px;
-    }
-    #content.split ~ #quickbar .quickbar-btn {
-      padding: 2px 8px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 6px 20px;
+      text-align: center;
+      color: var(--dim);
       font-size: 0.9rem;
-    }
-
-    .quickbar-btn {
-      background: transparent;
-      border: 1px solid var(--dim);
-      color: var(--text);
-      padding: 4px 12px;
-      font: inherit;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .quickbar-btn:hover {
-      color: var(--bright);
-      background: rgba(255,255,255,0.04);
-      border-color: var(--text);
-    }
-
-    .quickbar-btn:active {
-      transform: scale(0.95);
+      z-index: 20;
     }
 
     /* ============ WIN98 WINDOW SYSTEM ============ */
@@ -406,9 +392,10 @@
 
     .w98-content {
       flex: 1;
-      overflow: auto;
+      overflow: hidden;
       background: #c0c0c0;
       padding: 4px;
+      min-height: 0;
     }
 
     .w98-resize {
@@ -428,7 +415,8 @@
       top: 0; right: 0; bottom: 48px;
       width: 50%;
       height: auto;
-      border-radius: 0 14px 0 0;
+      border-radius: 0;
+      border-right: none;
       z-index: 55;
     }
     #content.split { margin-right: 50%; }
@@ -857,7 +845,7 @@
         <div id="commandPalette"></div>
       </div>
     </div>
-    <div id="quickbar"></div>
+    <div id="hintbar">Press <span style="color:var(--bright)">/</span> to open command menu</div>
   </div>
 
   <!-- Windows 98 - Browser -->
@@ -866,11 +854,17 @@
       <div class="w98-title-text">SHREY-Web</div>
       <div class="w98-close" onclick="closeWindow('browserWindow')">X</div>
     </div>
-    <div class="w98-content">
+    <div class="w98-content" style="display:flex;flex-direction:column;">
       <div class="browser-toolbar">
+        <button class="browser-btn" title="Back" style="font-size:10px;">&#9664;</button>
+        <button class="browser-btn" title="Forward" style="font-size:10px;">&#9654;</button>
+        <button class="browser-btn" title="Refresh" style="font-size:9px;">&#8635;</button>
         <div class="browser-address">file:///C:/www/portfolio/index.html</div>
       </div>
-      <div class="browser-content" id="browserBody" style="overflow-y:auto;flex:1;"></div>
+      <div style="background:#c0c0c0;display:flex;border-bottom:1px solid #808080;padding:0 4px;">
+        <div class="browser-tab active" style="background:#fff;border-bottom:none;margin-bottom:-1px;">Shrey's Portfolio</div>
+      </div>
+      <div class="browser-content" id="browserBody" style="overflow-y:auto;flex:1;background:#fff;min-height:0;"></div>
     </div>
     <div class="w98-resize" onmousedown="startResize(event, 'browserWindow')"></div>
   </div>
@@ -892,27 +886,28 @@
           "SM-BIOS (C) 2026 Mistry Systems, Inc.",
           "BIOS Date: 04/19/26  Ver: 4.2.0",
           "",
-          "CPU: AMD Ryzen 9 7950X @ 5.7 GHz",
-          "Memory Test: 16384M OK",
+          "CPU: AMD Ryzen 7 5800X3D @ 4.5 GHz",
+          "Memory Test: 49152M (48GB DDR4-3200) OK",
           "",
-          "Detecting Primary Master... SM-SSD 2TB",
-          "Detecting Primary Slave... None",
+          "Detecting Primary Master... Samsung 970 EVO 1TB NVMe",
+          "Detecting Primary Slave... WD Black 2TB",
           "",
           "PCI Device Listing...",
-          "  GPU: AMD Radeon RX 7900 XTX         [OK]",
-          "  NIC: Realtek RTL8125 2.5GbE          [OK]",
+          "  GPU: NVIDIA GeForce RTX 3080 10GB     [OK]",
+          "  NIC: Intel AX210 Wi-Fi 6E             [OK]",
+          "  NET: Connected @ 7 Tbps               [OK]",
           "",
           "Loading OS...",
           "",
           "Loading modules:",
           "  > personality.ko .............. [OK]",
-          "  > skills.db: 14 entries ....... [OK]",
+          "  > skills.db: 18 entries ....... [OK]",
           "  > experience.log: 5 entries ... [OK]",
           "  > projects.idx: 2 entries ..... [OK]",
           "  > humor.mod ................... [QUESTIONABLE]",
           "",
           "System ready.",
-          "Type 'help' for available commands."
+          "Press / for commands."
         ]
       },
       "name": "Shrey Mistry",
@@ -922,11 +917,13 @@
       "linkedin": "https://linkedin.com/in/shreymistry",
       "github": "https://github.com/shreywy",
       "about": "Computer Science student at Toronto Metropolitan University. Done a few internships and always looking to broaden my horizons before graduation.",
+      "theme": { "active": "green" },
       "skills": {
-        "Languages": ["Python", "JavaScript", "TypeScript", "Java", "SQL"],
-        "Frontend": ["React", "HTML/CSS"],
-        "Backend": ["Flask", "Docker", "BigQuery"],
-        "Tools": ["Jira", "Google Apps Script", "VBA", "Git"]
+        "Languages": ["Python", "JavaScript", "TypeScript", "Java", "SQL", "HTML/CSS", "VBA"],
+        "Frameworks": ["React", "Flask", "Node.js"],
+        "Cloud/Data": ["Google BigQuery", "Google Apps Script", "Firebase", "Azure", "Docker"],
+        "Tools": ["Jira", "Git", "PowerBI", "Arduino", "Oracle DB"],
+        "Other": ["Product Management", "Agile/Scrum", "Technical Writing", "Data Analysis"]
       },
       "experience": [
         {
@@ -987,13 +984,13 @@
           "name": "Media Store DBMS",
           "description": "Dynamic media store DBMS with CustomTkinter UI, real-time Oracle DB interactions, and custom SQL execution.",
           "skills": ["Python", "Oracle DB", "SQL"],
-          "link": null
+          "link": "https://github.com/shreywy"
         },
         {
           "name": "Cuttt: URL Shortener",
           "description": "URL shortening platform with React frontend, Flask backend, and Firebase storage via Docker and Azure.",
           "skills": ["React", "Flask", "Firebase", "Docker"],
-          "link": null
+          "link": "https://github.com/shreywy"
         }
       ]
     };
@@ -1124,6 +1121,13 @@
       bootSkipped = true;
     }
 
+    function applyTheme() {
+      const t = D.theme && D.theme.active;
+      if (t === 'amber' || t === 'blue') {
+        document.documentElement.setAttribute('data-color', t);
+      }
+    }
+
     function startTerminal() {
       document.getElementById('boot').style.display = 'none';
       const term = document.getElementById('terminal');
@@ -1135,11 +1139,10 @@
         term.style.opacity = '1';
       }, 20);
       document.getElementById('input').focus();
-      // Update prompt from data
       if (D.terminal && D.terminal.prompt) {
         document.getElementById('prompt').textContent = D.terminal.prompt;
       }
-      renderQuickbar();
+      applyTheme();
       // Print banner from data
       const banner = (D.terminal && D.terminal.banner) || ['=== SHREY OS v1.0 ==='];
       banner.forEach(l => printOutput(l));
@@ -1498,6 +1501,31 @@
         await typeLinesSlow([{ t: 'Follow the white rabbit.', c: 'a' }], 30);
         addLine('');
       }
+      else if (cmd === 'restart' || cmd === 'reboot') {
+        await typeLinesSlow([{ t: 'System shutting down...', c: 'd' }], 20);
+        await sleep(600);
+        const blackout = document.createElement('div');
+        blackout.style.cssText = 'position:fixed;inset:0;background:#000;z-index:9999;transition:opacity 0.4s;opacity:0;';
+        document.body.appendChild(blackout);
+        await sleep(50);
+        blackout.style.opacity = '1';
+        await sleep(700);
+        // Clear terminal and restart boot
+        document.getElementById('output').innerHTML = '';
+        bootIndex = 0;
+        bootSkipped = false;
+        busy = false;
+        document.getElementById('terminal').hidden = true;
+        document.getElementById('terminal').style.display = 'none';
+        document.getElementById('boot').style.display = '';
+        document.getElementById('boot').innerHTML = '';
+        await sleep(300);
+        blackout.style.opacity = '0';
+        await sleep(500);
+        blackout.remove();
+        powerOn();
+        return;
+      }
       else if (cmd === 'sudo') { addLine('Nice try.'); addLine(''); }
       else if (cmd === 'rm' || cmd === 'del') {
         addLine('Deleting all files...', 'a');
@@ -1548,61 +1576,37 @@
       }
     });
 
-    // ============ QUICKBAR ============
-    function renderQuickbar() {
-      const quickbar = document.getElementById('quickbar');
-      const buttons = ['about', 'experience', 'skills', 'projects', 'contact', 'browse', 'paint', 'notepad', 'explorer'];
-      buttons.forEach(btn => {
-        const el = document.createElement('button');
-        el.className = 'quickbar-btn';
-        el.textContent = `[${btn}]`;
-        el.onclick = () => {
-          input.value = btn;
-          typeCommand(btn, 0);
-        };
-        quickbar.appendChild(el);
-      });
-    }
-
-    function typeCommand(cmd, idx) {
-      if (idx < cmd.length) {
-        input.value = cmd.substring(0, idx + 1);
-        sndType();
-        setTimeout(() => typeCommand(cmd, idx + 1), 18);
-      } else {
-        setTimeout(() => {
-          input.value = '';
-          handleCommand(cmd);
-        }, 100);
-      }
-    }
+    // Quickbar removed - use / command palette instead
 
     // ============ COMMAND PALETTE ============
-    const commands = {
-      'about': true,
-      'experience': true,
-      'skills': true,
-      'education': true,
-      'projects': true,
-      'contact': true,
-      'browse': true,
-      'paint': true,
-      'notepad': true,
-      'explorer': true,
-      'help': true,
-      'clear': true,
-      'history': true
-    };
+    const cmdList = [
+      { cmd: 'about', desc: 'Bio & system info' },
+      { cmd: 'experience', desc: 'Work history timeline' },
+      { cmd: 'skills', desc: 'Technical skills' },
+      { cmd: 'education', desc: 'Education' },
+      { cmd: 'projects', desc: 'Portfolio projects' },
+      { cmd: 'contact', desc: 'Email & social links' },
+      { cmd: 'browse', desc: 'Open portfolio page' },
+      { cmd: 'paint', desc: 'Open MS Paint' },
+      { cmd: 'notepad', desc: 'Open Notepad' },
+      { cmd: 'explorer', desc: 'Open File Explorer' },
+      { cmd: 'dir', desc: 'Directory listing' },
+      { cmd: 'neofetch', desc: 'System info' },
+      { cmd: 'restart', desc: 'Reboot the terminal' },
+      { cmd: 'cls', desc: 'Clear screen' },
+      { cmd: 'history', desc: 'Command history' },
+      { cmd: 'cowsay', desc: 'Cow says moo' },
+      { cmd: 'matrix', desc: 'Follow the rabbit' },
+    ];
 
     function showCommandPalette() {
       const palette = document.getElementById('commandPalette');
-      const allCommands = Object.keys(commands);
-      palette.innerHTML = '';
-      allCommands.forEach((cmd, idx) => {
+      palette.innerHTML = '<div class="palette-header">Commands - press Enter to run, Esc to close</div>';
+      cmdList.forEach((c, idx) => {
         const item = document.createElement('div');
         item.className = 'palette-item' + (idx === 0 ? ' selected' : '');
-        item.textContent = cmd;
-        item.onclick = () => selectCommand(cmd);
+        item.innerHTML = '<span class="pi-cmd">' + c.cmd + '</span><span class="pi-desc">' + c.desc + '</span>';
+        item.onclick = () => selectCommand(c.cmd);
         palette.appendChild(item);
       });
       palette.style.display = 'block';
@@ -1611,15 +1615,19 @@
       const handlePaletteKey = (e) => {
         if (e.key === 'ArrowUp') {
           e.preventDefault();
-          selectedIdx = (selectedIdx - 1 + allCommands.length) % allCommands.length;
+          selectedIdx = (selectedIdx - 1 + cmdList.length) % cmdList.length;
           updatePaletteSelection(selectedIdx);
+          const items = palette.querySelectorAll('.palette-item');
+          if (items[selectedIdx]) items[selectedIdx].scrollIntoView({ block: 'nearest' });
         } else if (e.key === 'ArrowDown') {
           e.preventDefault();
-          selectedIdx = (selectedIdx + 1) % allCommands.length;
+          selectedIdx = (selectedIdx + 1) % cmdList.length;
           updatePaletteSelection(selectedIdx);
+          const items = palette.querySelectorAll('.palette-item');
+          if (items[selectedIdx]) items[selectedIdx].scrollIntoView({ block: 'nearest' });
         } else if (e.key === 'Tab' || e.key === 'Enter') {
           e.preventDefault();
-          selectCommand(allCommands[selectedIdx]);
+          selectCommand(cmdList[selectedIdx].cmd);
         } else if (e.key === 'Escape') {
           e.preventDefault();
           closePalette();
@@ -1812,13 +1820,15 @@
     function spawnPaint() {
       const colors = ['#000','#fff','#f00','#0f0','#00f','#ff0','#0ff','#f0f','#f80','#80f','#888','#840'];
       const id = spawnWin('untitled - Paint',
-        '<div style="display:flex;flex:1;min-height:0;">' +
+        '<div style="display:flex;flex:1;min-height:0;overflow:hidden;">' +
           '<div class="paint-tools-left">' +
             '<button class="paint-tool active" title="Pencil" data-tool="pencil">&#9998;</button>' +
             '<button class="paint-tool" title="Eraser" data-tool="eraser">&#9633;</button>' +
             '<button class="paint-tool" title="Clear" data-tool="clear">&#10005;</button>' +
           '</div>' +
-          '<canvas class="paint-canvas" style="flex:1;background:#fff;cursor:crosshair;border:2px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;"></canvas>' +
+          '<div style="flex:1;position:relative;overflow:hidden;">' +
+            '<canvas style="position:absolute;inset:0;cursor:crosshair;border:2px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;"></canvas>' +
+          '</div>' +
         '</div>' +
         '<div class="paint-colors-bottom">' + colors.map(c => '<div class="paint-color" style="background:' + c + ';width:14px;height:14px;border:2px outset;cursor:pointer;" data-color="' + c + '"></div>').join('') + '</div>',
         520, 420
@@ -1827,7 +1837,11 @@
       const canvas = win.querySelector('canvas');
       const ctx = canvas.getContext('2d');
       let tool = 'pencil', color = '#000', drawing = false;
-      function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; ctx.fillStyle = '#fff'; ctx.fillRect(0,0,canvas.width,canvas.height); }
+      function resize() {
+        const c = canvas.parentElement;
+        canvas.width = c.offsetWidth; canvas.height = c.offsetHeight;
+        ctx.fillStyle = '#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+      }
       setTimeout(resize, 50);
       canvas.addEventListener('mousedown', e => { drawing = true; ctx.beginPath(); const r = canvas.getBoundingClientRect(); ctx.moveTo(e.clientX-r.left, e.clientY-r.top); });
       canvas.addEventListener('mousemove', e => { if (!drawing) return; const r = canvas.getBoundingClientRect(); const x = e.clientX-r.left, y = e.clientY-r.top; if (tool === 'eraser') { ctx.fillStyle='#fff'; ctx.fillRect(x-8,y-8,16,16); } else { ctx.strokeStyle=color; ctx.lineWidth=2; ctx.lineCap='round'; ctx.lineTo(x,y); ctx.stroke(); } });

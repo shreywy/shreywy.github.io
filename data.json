@@ -1,38 +1,67 @@
 {
+  "_instructions": [
+    "=== HOW TO USE THIS FILE ===",
+    "Edit values below to update your portfolio. Save and refresh the page.",
+    "All terminal content, boot messages, and portfolio data is pulled from here.",
+    "",
+    "TERMINAL SECTION: Customize boot text, banner, prompt, and welcome message.",
+    "  - bootMessages: Array of strings shown during the boot-up sequence.",
+    "  - banner: Array shown after boot (your OS title).",
+    "  - welcomeMessage: Shown after the banner.",
+    "  - prompt: The command prompt prefix (e.g. C:\\Users\\you> ).",
+    "",
+    "THEME SECTION: Customize terminal colors.",
+    "  - Set 'active' to: 'green' (default), 'amber', or 'blue'.",
+    "  - Or leave blank/omit for green.",
+    "",
+    "SKILLS: Grouped by category. Add/remove categories freely.",
+    "EXPERIENCE: Array of jobs. Each shows as a timeline card.",
+    "PROJECTS: Array of projects. Set 'link' to a URL or null to hide the button.",
+    "EDUCATION: Array of schools/degrees.",
+    "",
+    "This field (_instructions) is ignored by the site."
+  ],
+
   "terminal": {
     "banner": [
       "===========================================",
       "  SHREY OS v1.0 - Portfolio Terminal Shell",
       "==========================================="
     ],
-    "welcomeMessage": "System ready. Type 'help' for available commands.",
+    "welcomeMessage": "System ready. Press / to see all commands.",
     "prompt": "C:\\Users\\shrey> ",
     "bootMessages": [
       "SM-BIOS (C) 2026 Mistry Systems, Inc.",
       "BIOS Date: 04/19/26  Ver: 4.2.0",
       "",
-      "CPU: AMD Ryzen 9 7950X @ 5.7 GHz",
-      "Memory Test: 16384M OK",
+      "CPU: AMD Ryzen 7 5800X3D @ 4.5 GHz",
+      "Memory Test: 49152M (48GB DDR4-3200) OK",
       "",
-      "Detecting Primary Master... SM-SSD 2TB",
-      "Detecting Primary Slave... None",
+      "Detecting Primary Master... Samsung 970 EVO 1TB NVMe",
+      "Detecting Primary Slave... WD Black 2TB",
       "",
       "PCI Device Listing...",
-      "  GPU: AMD Radeon RX 7900 XTX         [OK]",
-      "  NIC: Realtek RTL8125 2.5GbE          [OK]",
+      "  GPU: NVIDIA GeForce RTX 3080 10GB     [OK]",
+      "  NIC: Intel AX210 Wi-Fi 6E             [OK]",
+      "  NET: Connected @ 7 Tbps               [OK]",
       "",
       "Loading OS...",
       "",
       "Loading modules:",
       "  > personality.ko .............. [OK]",
-      "  > skills.db: 14 entries ....... [OK]",
+      "  > skills.db: 18 entries ....... [OK]",
       "  > experience.log: 5 entries ... [OK]",
       "  > projects.idx: 2 entries ..... [OK]",
       "  > humor.mod ................... [QUESTIONABLE]",
       "",
       "System ready.",
-      "Type 'help' for available commands."
+      "Press / for commands."
     ]
+  },
+
+  "theme": {
+    "active": "green",
+    "_options": "green | amber | blue"
   },
 
   "name": "Shrey Mistry",
@@ -44,10 +73,11 @@
   "about": "Computer Science student at Toronto Metropolitan University. Done a few internships and always looking to broaden my horizons before graduation.",
 
   "skills": {
-    "Languages": ["Python", "JavaScript", "TypeScript", "Java", "SQL"],
-    "Frontend": ["React", "HTML/CSS"],
-    "Backend": ["Flask", "Docker", "BigQuery"],
-    "Tools": ["Jira", "Google Apps Script", "VBA", "Git"]
+    "Languages": ["Python", "JavaScript", "TypeScript", "Java", "SQL", "HTML/CSS", "VBA"],
+    "Frameworks": ["React", "Flask", "Node.js"],
+    "Cloud/Data": ["Google BigQuery", "Google Apps Script", "Firebase", "Azure", "Docker"],
+    "Tools": ["Jira", "Git", "PowerBI", "Arduino", "Oracle DB"],
+    "Other": ["Product Management", "Agile/Scrum", "Technical Writing", "Data Analysis"]
   },
 
   "experience": [
@@ -56,40 +86,40 @@
       "company": "Geotab",
       "period": "May 2025 - Present",
       "location": "Oakville, ON",
-      "description": "Led new product development efforts by building tools and automations to streamline processes for upcoming telematics devices.",
-      "skills": ["Jira", "PM", "GAS", "BigQuery", "HTML/CSS/JS"]
+      "description": "Leading new product development by building internal dashboards and automation tools with Google Apps Script, BigQuery, and HTML/JS. Standardized Jira workflows for new product introduction across firmware, compliance, and marketing stages. Built an AI-powered BigQuery search tool and managed agile scrums for firmware-over-the-air launches. Hands-on prototype testing including voltage checks and PCBA verification.",
+      "skills": ["Jira", "Product Management", "Google Apps Script", "BigQuery", "HTML/CSS/JS", "Agile"]
     },
     {
       "title": "Automation Engineering Intern",
       "company": "AMD",
       "period": "Jan 2024 - Aug 2024",
       "location": "Markham, ON",
-      "description": "Developed automated benchmarking frameworks with Python, SQL, and custom tools to test GPU performance.",
-      "skills": ["Python", "SQL", "Data Analysis", "Java"]
+      "description": "Built Python benchmarking frameworks to automate GPU performance testing across Steam, Epic, EA, and Ubisoft, cutting manual testing by 60%. Assembled test benches from scratch with hardware swaps and BIOS flashing. Led competitive analysis comparing AMD GPUs against NVIDIA RTX lineups. Built visualization dashboards and CLI tools for telemetry and FPS data. Used Arduino-based frame capture for regression testing.",
+      "skills": ["Python", "SQL", "Java", "Data Analysis", "Arduino", "3DMark"]
     },
     {
       "title": "Automation & Data Tools Intern",
       "company": "Bombardier",
       "period": "May 2023 - Aug 2023",
       "location": "Toronto, ON",
-      "description": "Led development of internal dashboards using TypeScript and PowerBI for real-time supplier KPI tracking.",
-      "skills": ["TypeScript", "PowerBI", "VBA", "Excel"]
+      "description": "Built internal dashboards using TypeScript and PowerBI for real-time supplier KPI tracking, reducing report generation by 70%. Created automated Excel/VBA scripts saving 2.5 hours of manual work per week. Managed Excel databases for a 92-person team and worked with Engineering, Procurement, and Quality teams to translate pain points into tech solutions.",
+      "skills": ["TypeScript", "PowerBI", "VBA", "Excel", "Automation"]
     },
     {
       "title": "Coding Camp Instructor",
       "company": "Peel District School Board",
       "period": "Jul 2022 - Aug 2022",
       "location": "Brampton, ON",
-      "description": "Designed and taught a two-week Python programming camp for middle school students.",
-      "skills": ["Python", "Teaching"]
+      "description": "Designed and taught a two-week Python camp for middle school students covering programming fundamentals and Turtle graphics. Provided one-on-one support and developed structured curriculum with other instructors.",
+      "skills": ["Python", "Teaching", "Curriculum Design"]
     },
     {
       "title": "Flight Sergeant",
       "company": "Royal Canadian Air Cadets",
       "period": "Sep 2018 - Jun 2022",
       "location": "Brampton, ON",
-      "description": "Flight Sergeant at Air Cadets with 132 Spitfire Squadron.",
-      "skills": ["Leadership", "Public Speaking"]
+      "description": "Flight Sergeant at 132 Spitfire Squadron. Training in aircraft navigation, air traffic control, and aerodynamics. Community outreach and fundraising for Canadian Forces veterans. Developed leadership through ongoing training and leadership roles.",
+      "skills": ["Leadership", "Public Speaking", "Presentation Skills"]
     }
   ],
 
@@ -97,7 +127,8 @@
     {
       "school": "Toronto Metropolitan University",
       "degree": "BSc Computer Science",
-      "period": "Sep 2022 - May 2026"
+      "period": "Sep 2022 - May 2026",
+      "coursework": "Databases, Cyber Security, Web Development, Unix, Assembly"
     },
     {
       "school": "Fletcher's Meadow Secondary School",
@@ -109,15 +140,15 @@
   "projects": [
     {
       "name": "Media Store DBMS",
-      "description": "Dynamic media store DBMS with CustomTkinter UI, real-time Oracle DB interactions, and custom SQL execution.",
-      "skills": ["Python", "Oracle DB", "SQL"],
-      "link": null
+      "description": "Dynamic media store database management system with CustomTkinter UI, real-time Oracle DB interactions, and custom SQL execution for movie and music records.",
+      "skills": ["Python", "Oracle DB", "SQL", "CustomTkinter"],
+      "link": "https://github.com/shreywy"
     },
     {
       "name": "Cuttt: URL Shortener",
-      "description": "URL shortening platform with React frontend, Flask backend, and Firebase storage via Docker and Azure.",
-      "skills": ["React", "Flask", "Firebase", "Docker"],
-      "link": null
+      "description": "URL shortening platform with React frontend, Flask backend, and Firebase storage, containerized with Docker and deployed on Azure.",
+      "skills": ["React", "Flask", "Firebase", "Docker", "Azure"],
+      "link": "https://github.com/shreywy"
     }
   ]
 }

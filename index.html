@@ -1119,7 +1119,7 @@
         o.connect(g); g.connect(audioContext.destination);
         o.frequency.setValueAtTime(420, t);
         o.frequency.exponentialRampToValueAtTime(120, t + 0.18);
-        g.gain.setValueAtTime(0.22, t);
+        g.gain.setValueAtTime(0.09, t);
         g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
         o.start(t); o.stop(t + 0.18);
       } catch(e) {}
@@ -1294,62 +1294,49 @@
         const t = audioContext.currentTime;
         const sr = audioContext.sampleRate;
 
-        // Power surge noise burst
-        const surgeBuf = audioContext.createBuffer(1, sr * 0.12, sr);
+        // Quick power surge
+        const surgeBuf = audioContext.createBuffer(1, sr * 0.1, sr);
         const sd = surgeBuf.getChannelData(0);
-        for (let i = 0; i < sd.length; i++) sd[i] = (Math.random() * 2 - 1) * Math.exp(-i / (sr * 0.04));
+        for (let i = 0; i < sd.length; i++) sd[i] = (Math.random() * 2 - 1) * Math.exp(-i / (sr * 0.03));
         const surgeS = audioContext.createBufferSource(), surgeG = audioContext.createGain();
         surgeS.buffer = surgeBuf; surgeS.connect(surgeG); surgeG.connect(audioContext.destination);
-        surgeG.gain.setValueAtTime(0.4, t);
-        surgeG.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+        surgeG.gain.setValueAtTime(0.35, t);
+        surgeG.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
         surgeS.start(t);
 
-        // 60Hz hum spins up then fades (continues under boot lines)
+        // Brief 60Hz hum that fades quickly
         const humO = audioContext.createOscillator(), humG = audioContext.createGain();
         humO.frequency.value = 60;
         humO.connect(humG); humG.connect(audioContext.destination);
-        humG.gain.setValueAtTime(0.001, t + 0.08);
-        humG.gain.linearRampToValueAtTime(0.06, t + 0.55);
-        humG.gain.exponentialRampToValueAtTime(0.001, t + 2.5);
-        humO.start(t + 0.08); humO.stop(t + 2.5);
-
-        // Initial disk seek clicks before lines appear
-        [0.16, 0.26, 0.37].forEach(delay => {
-          const clickBuf = audioContext.createBuffer(1, sr * 0.018, sr);
-          const cd = clickBuf.getChannelData(0);
-          for (let i = 0; i < cd.length; i++) cd[i] = (Math.random() * 2 - 1) * Math.exp(-i / (sr * 0.004));
-          const clickS = audioContext.createBufferSource(), clickHP = audioContext.createBiquadFilter(), clickG = audioContext.createGain();
-          clickHP.type = 'highpass'; clickHP.frequency.value = 600 + Math.random() * 600;
-          clickS.buffer = clickBuf; clickS.connect(clickHP); clickHP.connect(clickG); clickG.connect(audioContext.destination);
-          clickG.gain.setValueAtTime(0.2, t + delay);
-          clickG.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.018);
-          clickS.start(t + delay);
-        });
+        humG.gain.setValueAtTime(0.001, t + 0.05);
+        humG.gain.linearRampToValueAtTime(0.04, t + 0.3);
+        humG.gain.exponentialRampToValueAtTime(0.001, t + 0.8);
+        humO.start(t + 0.05); humO.stop(t + 0.8);
       } catch(e) {}
     }
 
-    // Short mechanical click for each boot line appearing
+    // Click per boot line - same character as sndType but slightly louder
     function sndBootLine(index) {
       try {
         if (!audioContext) initAudio();
         const t = audioContext.currentTime;
-        const sr = audioContext.sampleRate;
-        // Alternate between slightly different click characters
-        const cutoff = 900 + (index % 4) * 180;
-        const decay = 0.003 + (index % 3) * 0.0015;
-        const buf = audioContext.createBuffer(1, sr * 0.016, sr);
+        const freq  = 1600 + Math.random() * 1200;
+        const gain  = 0.06 + Math.random() * 0.04;
+        const decay = 0.003 + Math.random() * 0.003;
+        const dur   = 0.013 + Math.random() * 0.005;
+        const buf = audioContext.createBuffer(1, audioContext.sampleRate * dur, audioContext.sampleRate);
         const d = buf.getChannelData(0);
-        for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (sr * decay));
+        for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioContext.sampleRate * decay));
         const src = audioContext.createBufferSource(), hp = audioContext.createBiquadFilter(), g = audioContext.createGain();
-        hp.type = 'highpass'; hp.frequency.value = cutoff;
+        hp.type = 'highpass'; hp.frequency.value = freq;
         src.buffer = buf; src.connect(hp); hp.connect(g); g.connect(audioContext.destination);
-        g.gain.setValueAtTime(0.1, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.016);
+        g.gain.setValueAtTime(gain, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
         src.start(t);
       } catch(e) {}
     }
 
-    // Triple ascending chime when boot completes
+    // Triple ascending chime right when boot finishes
     function sndBootSuccess() {
       try {
         if (!audioContext) initAudio();
@@ -1358,9 +1345,9 @@
           const o = audioContext.createOscillator(), g = audioContext.createGain();
           o.frequency.value = freq;
           o.connect(g); g.connect(audioContext.destination);
-          g.gain.setValueAtTime(0.22, t + i * 0.13);
-          g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.13 + 0.12);
-          o.start(t + i * 0.13); o.stop(t + i * 0.13 + 0.12);
+          g.gain.setValueAtTime(0.2, t + i * 0.09);
+          g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.09 + 0.1);
+          o.start(t + i * 0.09); o.stop(t + i * 0.09 + 0.1);
         });
       } catch(e) {}
     }

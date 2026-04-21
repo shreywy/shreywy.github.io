@@ -1676,7 +1676,7 @@
           '        /::\\    \\                /::\\____\\        ',
           '       /::::\\    \\             /:::::|   |        ',
           '      /::::::\\    \\           /::::::|   |        ',
-          '     /:::/\\:::\\    \\          /::::::|   |        ',
+          '     /:::/\\:::\\    \\         /:::::::|   |        ',
           '    /:::/__\\:::\\    \\        /:::/|::|   |        ',
           '    \\:::\\   \\:::\\    \\      /:::/ |::|   |        ',
           '  ___\\:::\\   \\:::\\    \\    /:::/  |::|___|______  ',
@@ -1846,6 +1846,23 @@
           { t: '  LinkedIn: ' + D.linkedin, c: 'a' },
           { t: '  GitHub:   ' + D.github, c: 'a' }, ''
         ]);
+      }
+      else if (cmd === 'resume') {
+        addLine('Checking for resume.pdf...', 'd');
+        try {
+          const res = await fetch('resume.pdf', { method: 'HEAD' });
+          if (res.ok) {
+            addLine('Opening resume.pdf...', 'a');
+            await sleep(200);
+            window.open('resume.pdf', '_blank');
+          } else {
+            addLine('resume.pdf not found.', 'd');
+            addLine('Drop a resume.pdf in the repo root to enable this command.', 'd');
+          }
+        } catch(e) {
+          addLine('resume.pdf not found.', 'd');
+          addLine('Drop a resume.pdf in the repo root to enable this command.', 'd');
+        }
       }
       else if (cmd === 'browse') {
         addLine('Opening browser...', 'a');
@@ -2019,6 +2036,7 @@
         { cmd: 'education', desc: 'Education' },
         { cmd: 'projects', desc: 'Portfolio projects' },
         { cmd: 'contact', desc: 'Email & social links' },
+        { cmd: 'resume', desc: 'View resume PDF' },
         { cmd: 'browse', desc: 'Open portfolio page' },
       ],
       'Apps': [
@@ -2136,9 +2154,8 @@
         await new Promise(r => setTimeout(r, 40));
       }
       await new Promise(r => setTimeout(r, 120));
-      const val = input.value;
       input.value = '';
-      handleCommand(val);
+      handleCommand(cmd);
     }
 
     function closePalette() {

@@ -8,119 +8,125 @@ Interactive CRT terminal portfolio deployed on GitHub Pages.
 
 ## Architecture
 - **Single file**: `index.html` — all HTML, CSS, JS in one file, no build tools
-- **Content**: `data.json` — user edits this file to update all portfolio content. The JS fetches it on load with an inline fallback, so it works from both `file://` and `https://`.
-- **Fonts**: VT323 (terminal text), JetBrains Mono (neofetch logo only), DM Sans / Tahoma (Win98 UI), Instrument Serif (browser Noir view), Playfair Display (browser Editorial view)
+- **Content**: `data.json` — all portfolio data. Fetched on load with an inline fallback so it works from both `file://` and `https://`.
+- **Fonts**: VT323 (terminal text), JetBrains Mono (neofetch logo pre), DM Sans / Tahoma (Win98 UI), Instrument Serif / Playfair Display (browser views)
 - **No external JS/CSS dependencies** — pure HTML/CSS/JS
 
 ## Current State
 
 ### Visual: Fullscreen CRT Terminal
-- The entire viewport IS the CRT screen — no bezel, no frame
+- Entire viewport IS the CRT screen — no bezel, no frame
 - `border-radius: 14px`, scanlines overlay (`::before`), vignette (`::after`), phosphor glow inset box-shadow, subtle flicker animation
 - Chromatic aberration: text-shadow with slight RGB offset on all terminal text
-- Power-on: **flicker boot** animation (screen flickers black/green 6x then settles)
-- All text: `VT323`, `1.15rem`, inherits from body. Everything is the same font/size.
-- Green phosphor theme (`--text: #33ff33`). Amber and blue themes exist in CSS but no UI toggle (accessible via `color` terminal command... actually this may have been removed)
+- Power-on: flicker boot animation (screen flickers black/green 6x then settles, with BIOS beep)
+- Background: `--bg: #000800` (near-black). Text: `--text: #33ff33`. All text VT323 1.15rem.
+- Text selection: `::selection` styled with `rgba(51,255,51,0.25)` background and `--bright` green text
 
 ### Terminal Behavior
-- Windows-style prompt: `C:\Users\shrey> ` (configurable in `data.json` under `terminal.prompt`)
-- Input row follows output naturally (not pinned to bottom) — flows like a real terminal
-- `#terminal` div is the scroll container (`overflow-y: auto`), `#output` and `#inputRow` are plain block children
-- Click anywhere on screen to focus input
+- Windows-style prompt: `C:\Users\shrey> ` (configurable via `data.json → terminal.prompt`)
+- Input row follows output naturally — not pinned to bottom
+- Click anywhere on the CRT to focus input
 - Arrow Up/Down for command history
-- **`/` key**: opens/closes command palette. Press again to close.
-- No bottom quickbar (removed). Hint text is gone. Boot message tells user to press `/` or type `help`.
+- **`/` key**: opens/closes command palette
+- App focus isolation: clicking a Win98 window blurs the terminal input; closing a window refocuses it
+- `selectCommand()`: types the selected palette command char-by-char (40ms/char) into the input for visual effect, then runs it
 
 ### Command Palette (`/` key)
 Four tabs, navigate with Left/Right arrows:
-- **Portfolio**: about, experience, skills, education, projects, contact, browse
+- **Portfolio**: about, experience, skills, education, projects, contact, resume, browse
 - **Apps**: paint, notepad, explorer
 - **Games**: snake, tetris, minesweeper
 - **System**: dir, neofetch, restart, cls, history, cowsay, matrix
 
 ### Terminal Commands
-- `about` / `neofetch` — neofetch layout: ASCII `SM` logo (made of `#` chars, left col) + info table (right col). Row by row with 50ms delay.
-- `experience` — timeline layout (vertical line on left with dots, dates on far left, cards on right). Cards appear one-by-one with slide+fade + blip sound. 3D tilt on hover.
-- `skills` — compact horizontal grouped display (Languages, Frameworks, Cloud/Data, Tools, Other)
-- `education` — typewriter output
-- `projects` — cards with `[open]` link buttons if `link` is set in data.json. 3D tilt on hover.
-- `contact` — email, LinkedIn, GitHub
-- `browse` — opens portfolio browser window (no terminal scroll, no split)
-- `paint` — spawns MS Paint (multiple instances OK)
-- `notepad` — spawns Notepad (multiple instances OK)
-- `explorer` — spawns File Explorer (multiple instances OK)
-- `snake` — spawns Snake game
-- `tetris` — spawns Tetris game
-- `minesweeper` — spawns Minesweeper
-- `dir` — fake directory listing
-- `restart` — screen blacks out, terminal reboots with full boot sequence
-- `cls` / `clear` — clear terminal
-- `history` — command history
-- `date` — current date
-- `echo [msg]` — echo
-- `cowsay [msg]`, `matrix`, `sudo`, `rm`, `del`, `exit` — easter eggs
+- `about` / `neofetch` — 3D ASCII SM logo (from `data.json → neofetch.logo`, 21 lines x 50 chars) in left column + info table in right column. Both columns typed in parallel left-to-right.
+- `experience` — vertical timeline, cards appear one-by-one with slide+fade + blip sound. 3D tilt on hover (disabled while mouse button held, so text selection works).
+- `skills` — compact horizontal grouped display. Lines typed in parallel.
+- `education` — parallel left-to-right typing per entry.
+- `projects` — cards with `[open]` link buttons. 3D tilt on hover (same tilt guard as experience).
+- `contact` — email, LinkedIn, GitHub via typeLinesSlow.
+- `resume` — HEAD-fetches `resume.pdf`; opens in new tab if found (200), else prints "not found" message in terminal.
+- `browse` — opens the Win98 portfolio browser window.
+- `paint` — spawns MS Paint window (multiple instances OK).
+- `notepad` — spawns Notepad window (multiple instances OK).
+- `explorer` — spawns File Explorer window (multiple instances OK).
+- `snake` — spawns Snake game window.
+- `tetris` — spawns Tetris game window.
+- `minesweeper` — spawns Minesweeper window.
+- `dir` — fake directory listing (from `data.json → dir`).
+- `restart` / `reboot` — blacks out, reboots with full boot sequence.
+- `cls` / `clear` — clear terminal output.
+- `history` — show command history.
+- `date` — current date.
+- `echo [msg]` — echo.
+- `cowsay [msg]`, `matrix`, `sudo`, `rm`, `del`, `exit` — easter eggs. Matrix uses first name from `D.name`.
 
 ### Sounds (Web Audio API)
-All sounds synthesized, no external files:
-- `sndType()` — tiny click per keypress, `sndBeep()` — BIOS POST beep
+All synthesized, no external files:
+- `sndType()` — click per keypress, `sndBeep()` — BIOS POST beep
 - `sndZap()` — noise burst (power-on), `sndHum()` — 60Hz hum
 - `sndEnter()` — command submit, `sndBlip()` — card appear
-- All wrapped in try/catch so no sound crash can freeze the terminal
+- `sndPaletteOpen()` — palette open tone
+- All wrapped in try/catch so audio errors never freeze the terminal
 
 ### Win98 Popup Windows
 Generic window system via `spawnWin(title, contentHTML, w, h)`:
 - Each call appends a new `.w98` div to `document.body`
-- Windows are draggable (title bar), resizable (bottom-right handle), close with shrink animation
+- Draggable (title bar), resizable (bottom-right handle), close with shrink animation
 - Z-index management — each new window gets `++zIndex`
-- Paint, Notepad, Explorer, Snake, Tetris, Minesweeper all spawn as independent windows
-- Diagonal offset: each new window is 28px down-right from the previous
+- Diagonal offset: each new window is 28px down-right from previous
+- Clicking a window blurs the terminal input; closing a window refocuses it
 
 **Browser window** (`#browserWindow`):
 - Fixed HTML element (not dynamically spawned), positioned top-right (~55% width)
-- Has Win98 browser chrome: back/fwd/refresh buttons, address bar
-- Tab management: add tabs (`+`), close tabs (x per tab), close last tab = close browser
-- New tab shows "This page can't be reached" page
-- Refresh fakes a reload (600ms loading screen then re-render)
+- Win98 browser chrome: back/fwd/refresh buttons, address bar (shows `data.json → meta.siteUrl`)
+- Tab management: `+` adds tab, x closes tab, closing last tab closes browser
+- New tab shows "This page can't be reached" error page
+- Refresh fakes a 600ms reload then re-renders
 - Portfolio page content rendered from `data.json`
 
-**Paint**: Vertical tool panel (left), color palette (bottom), canvas fills remaining space. Uses `position: absolute` canvas with `offsetX/offsetY` for drawing. Tools: pencil (✏), eraser (◻), clear (✕). 12 colors.
+**Paint**: Vertical tool panel (left), color palette (bottom), canvas fills remaining space. `offsetX/offsetY` for drawing. Tools: pencil, eraser, clear. 12 colors.
 
-**Notepad**: Win98 menu bar (File/Edit/Format/Help), File clears textarea. `Courier New` textarea.
+**Notepad**: Win98 menu bar (File/Edit/Format/Help). File menu clears textarea. `Courier New` textarea.
 
-**File Explorer**: Left panel folder tree (click to navigate), right panel files. Double-click file opens Notepad with funny content (readme.txt, todo.txt, resume.pdf, cover_letter.docx all have jokes/easter eggs).
+**File Explorer**: Left panel folder tree, right panel files. Double-click opens Notepad with easter egg content.
 
-**Snake**: 20x20 grid. Wraps around all edges (no wall death). Speeds up from 140ms to 70ms over first 5 dots. WASD/arrows. Ctrl+C to quit.
+**Snake**: 20x20 grid. Wraps all edges. Speeds up from 140ms to 70ms over first 5 dots. WASD/arrows. Ctrl+C to quit.
 
-**Tetris**: 10x20 grid, 25px cells. Arrow keys move/rotate, Space hard drop, C to hold/swap block. Side panel shows HOLD preview, score. Grid lines drawn. Ctrl+C to quit.
+**Tetris**: 10x20 grid, 25px cells. Arrow keys move/rotate, Space hard drop, C to hold. HOLD preview + score panel. Ctrl+C to quit.
 
-**Minesweeper**: 9x9 grid, 10 mines, 30px cells. Uses `e.offsetX/e.offsetY` for click coordinates. First click is always safe (3x3 safe zone). Win98 LCD mine counter + timer. Left-click reveal, right-click flag. Reset button with emoji faces.
+**Minesweeper**: 9x9 grid, 10 mines, 30px cells. `offsetX/offsetY` for clicks. Safe first click (3x3 zone). Win98 LCD counter + timer. Left-click reveal, right-click flag. Reset button.
 
 ### Data-Driven Content (`data.json`)
+Every piece of visible content is here — edit this file to update the portfolio.
+
 Top-level keys:
 - `_instructions` — human-readable docs (ignored by site)
-- `terminal` — `bootMessages`, `banner`, `welcomeMessage`, `prompt` (all customizable)
+- `terminal` — `banner`, `welcomeMessage`, `prompt`, `bootMessages`
 - `theme` — `active: "green" | "amber" | "blue"`
-- `meta` — `title`, `description`, `ogTitle`, `ogDescription`, `siteUrl` (page title, SEO, Discord embed)
-- `neofetch` — `userhost`, `role`, `school`, `uptime`, `shell`, `terminal`, `logo` (21-line ASCII art, each exactly 50 chars)
-- `dir` — `volume`, `serial`, `path`, `listing` (fake dir command output)
+- `meta` — `title`, `description`, `ogTitle`, `ogDescription`, `siteUrl`
+  - Applied to `document.title`, `<meta>` tags, browser address bar, and initial browser tab after data loads
+- `neofetch` — `userhost`, `role`, `school`, `uptime`, `shell`, `terminal`, `logo`
+  - `logo`: array of exactly 21 strings, each exactly 50 chars wide (pad with spaces)
+- `dir` — `volume`, `serial`, `path`, `listing` (array of dir entry strings)
 - `name`, `tagline`, `location`, `email`, `linkedin`, `github`, `about`
-- `skills` — object of category: string[] arrays
-- `experience` — array of `{title, company, period, location, description, skills[]}`
-- `education` — array of `{school, degree, period}`
-- `projects` — array of `{name, description, skills[], link}` (link null = no button)
+- `skills` — object of `{ category: string[] }` pairs
+- `experience` — array of `{ title, company, period, location, description, skills[] }`
+- `education` — array of `{ school, degree, period }`
+- `projects` — array of `{ name, description, skills[], link }` (`link: null` hides button)
 
 ### Boot Sequence
-Custom specs (Shrey's real PC): RTX 3080, 5800X3D, 48GB DDR4-3200, 7 Tbps Wi-Fi (joke).
-All boot lines come from `data.json` `terminal.bootMessages`. Skippable with any key/click.
+All lines from `data.json → terminal.bootMessages`. Skippable with any key/click.
+Custom fake specs: RTX 3080, 5800X3D, 48GB DDR4-3200, 7 Tbps Wi-Fi.
 
 ### Meta / SEO
-- Title: "Shrey's Terminal"
-- Favicon: `>_` SVG (green on dark)
-- OpenGraph tags for Discord embed (title, description, `theme-color: #33ff33`)
+- All driven by `data.json → meta`. Static HTML head has defaults; JS overwrites after fetch.
+- Favicon: `>_` SVG inline (green on dark)
+- `theme-color: #33ff33` for Discord/mobile browser chrome
 
 ## Files
 - `index.html` — entire portfolio (all code)
-- `data.json` — all content: terminal, meta, neofetch, dir, skills, experience, education, projects
+- `data.json` — all content (the only file to edit for content changes)
 - `.gitignore` — ignores `.playwright-mcp/`, `*.png`, `*.log`
 - `CLAUDE.md` — this file
 
@@ -129,15 +135,15 @@ All boot lines come from `data.json` `terminal.bootMessages`. Skippable with any
 remote: origin = https://github.com/shreywy/shreywy.github.io.git
 branch: terminal-portfolio  (GitHub Pages serves from here)
 ```
-Always commit both `index.html` and `data.json` and push to `terminal-portfolio`.
+Always commit `index.html` and/or `data.json` together and push to `terminal-portfolio`.
 
-## Known Issues / TODO
-- Browser `close` button calls `closeBrowser()` (not `closeWindow()`) — already handled in closeWindow
-- `renderQuickbar()` function was removed but `#quickbar` div still exists in HTML (hidden via CSS) — fine to leave
+## Known Issues / Quirks
+- `renderQuickbar()` was removed but `#quickbar` div still exists in HTML (hidden via CSS) — harmless
+- Browser window `close` button calls `closeBrowser()` directly (not `closeWindow()`) — intentional, already handled
 
 ## User Preferences
 - Likes: authentic terminal feel, Win98 aesthetic, easter eggs, personality
 - Dislikes: cursor effects, unnecessary clutter, bottom bars
-- Wants content super easy to edit (just edit `data.json`)
+- Content should be editable only via `data.json` — nothing hardcoded in index.html
 - No em-dashes anywhere — use regular hyphens only
 - Every push goes to `terminal-portfolio` branch

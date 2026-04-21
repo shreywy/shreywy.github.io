@@ -1515,12 +1515,14 @@
         try { initAudio(); } catch(x) {}
         return;
       }
-      // Focus input when clicking CRT area (not inside a Win98 window or quickbar)
+      // Focus management: blur terminal when a Win98 app is active, focus it when clicking CRT
       if (term && !term.hidden && term.style.display !== 'none') {
-        const isWin = e.target.closest('.w98');
+        const isWin = e.target.closest('.w98') || e.target.closest('#browserWindow');
         const isBar = e.target.closest('#quickbar');
         const isInput = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
-        if (!isWin && !isBar && !isInput) {
+        if (isWin) {
+          document.getElementById('input').blur();
+        } else if (!isBar && !isInput) {
           document.getElementById('input').focus();
         }
       }
@@ -1667,11 +1669,27 @@
       else if (cmd === 'about' || cmd === 'neofetch') {
         addLine('');
         const logo = [
-          ' ██████  ██   ██',
-          ' ██      ███ ███',
-          ' ██████  ██ █ ██',
-          '     ██  ██   ██',
-          ' ██████  ██   ██',
+          '          _____                    _____          ',
+          '         /\\    \\                  /\\    \\         ',
+          '        /:::\\    \\                /:::\\____\\        ',
+          '       /:::::\\    \\              /:::::|   |        ',
+          '      /:::::::\\    \\            /::::::|   |        ',
+          '     /:::/\\:::\\    \\          /::::::|   |        ',
+          '    /:::/__\\:::\\    \\        /:::/|::|   |        ',
+          '    \\:::\\   \\:::\\    \\      /:::/ |::|   |        ',
+          '  ___\\:::\\   \\:::\\    \\    /:::/  |::|___|______  ',
+          ' /\\   \\:::\\   \\:::\\    \\  /:::/   |:::::::::\\    \\ ',
+          '/::\\   \\:::\\   \\:::\\____\\/:::/    |:::::::::\\____\\',
+          '\\:::\\   \\:::\\   \\::/    /\\::/    / ~~~~~/:::/    /',
+          ' \\:::\\   \\:::\\   \\/____/  \\/____/      /:::/    / ',
+          '  \\:::\\   \\:::\\    \\                  /:::/    /  ',
+          '   \\:::\\   \\:::\\____\\                /:::/    /   ',
+          '    \\:::\\  /:::/    /               /:::/    /    ',
+          '     \\:::\\/:::/    /               /:::/    /     ',
+          '      \\::::::/    /               /:::/    /      ',
+          '       \\::::/    /               /:::/    /       ',
+          '        \\::/    /                \\::/    /        ',
+          '         \\/____/                  \\/____/         ',
         ];
         const info = [
           'shrey@SHREY-PC',
@@ -1780,10 +1798,11 @@
         addLine('--- Education ---', 'b');
         addLine('');
         for (const ed of D.education) {
-          await typeLinesSlow([
+          await typeLinesParallel([
             { t: '  ' + ed.school, c: 'b' },
-            '  ' + ed.degree,
-            { t: '  ' + ed.period, c: 'd' }, ''
+            { t: '  ' + ed.degree, c: '' },
+            { t: '  ' + ed.period, c: 'd' },
+            ''
           ], 6);
         }
       }
@@ -2147,6 +2166,7 @@
         setTimeout(() => {
           win.style.display = 'none';
           win.classList.remove('closing');
+          document.getElementById('input').focus();
         }, 250);
       }
     }
@@ -2225,6 +2245,7 @@
       setTimeout(() => {
         bw.style.display = 'none';
         bw.classList.remove('closing');
+        document.getElementById('input').focus();
       }, 250);
     }
 

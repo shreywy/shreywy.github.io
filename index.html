@@ -166,16 +166,19 @@
     #inputRow {
       display: flex;
       align-items: baseline;
+      min-width: 0;
     }
 
     #prompt {
       color: var(--bright);
       user-select: none;
       white-space: pre;
+      flex-shrink: 0;
     }
 
     #input {
       flex: 1;
+      min-width: 0;
       background: transparent;
       border: none;
       color: var(--text);
@@ -1291,7 +1294,7 @@
         const t = audioContext.currentTime;
         const sr = audioContext.sampleRate;
 
-        // 1. Power surge noise burst
+        // Power surge noise burst
         const surgeBuf = audioContext.createBuffer(1, sr * 0.12, sr);
         const sd = surgeBuf.getChannelData(0);
         for (let i = 0; i < sd.length; i++) sd[i] = (Math.random() * 2 - 1) * Math.exp(-i / (sr * 0.04));
@@ -1301,47 +1304,127 @@
         surgeG.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
         surgeS.start(t);
 
-        // 2. 60Hz hum spins up then fades
+        // 60Hz hum spins up then fades (continues under boot lines)
         const humO = audioContext.createOscillator(), humG = audioContext.createGain();
         humO.frequency.value = 60;
         humO.connect(humG); humG.connect(audioContext.destination);
         humG.gain.setValueAtTime(0.001, t + 0.08);
-        humG.gain.linearRampToValueAtTime(0.07, t + 0.55);
-        humG.gain.exponentialRampToValueAtTime(0.001, t + 1.3);
-        humO.start(t + 0.08); humO.stop(t + 1.3);
+        humG.gain.linearRampToValueAtTime(0.06, t + 0.55);
+        humG.gain.exponentialRampToValueAtTime(0.001, t + 2.5);
+        humO.start(t + 0.08); humO.stop(t + 2.5);
 
-        // 3. Mechanical disk clicks staggered
-        [0.16, 0.24, 0.33, 0.43].forEach(delay => {
+        // Initial disk seek clicks before lines appear
+        [0.16, 0.26, 0.37].forEach(delay => {
           const clickBuf = audioContext.createBuffer(1, sr * 0.018, sr);
           const cd = clickBuf.getChannelData(0);
           for (let i = 0; i < cd.length; i++) cd[i] = (Math.random() * 2 - 1) * Math.exp(-i / (sr * 0.004));
           const clickS = audioContext.createBufferSource(), clickHP = audioContext.createBiquadFilter(), clickG = audioContext.createGain();
-          clickHP.type = 'highpass'; clickHP.frequency.value = 700 + Math.random() * 500;
+          clickHP.type = 'highpass'; clickHP.frequency.value = 600 + Math.random() * 600;
           clickS.buffer = clickBuf; clickS.connect(clickHP); clickHP.connect(clickG); clickG.connect(audioContext.destination);
-          clickG.gain.setValueAtTime(0.18, t + delay);
+          clickG.gain.setValueAtTime(0.2, t + delay);
           clickG.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.018);
           clickS.start(t + delay);
         });
+      } catch(e) {}
+    }
 
-        // 4. Rising BIOS POST tone sequence
-        [523, 659, 784, 1047].forEach((freq, i) => {
+    // Short mechanical click for each boot line appearing
+    function sndBootLine(index) {
+      try {
+        if (!audioContext) initAudio();
+        const t = audioContext.currentTime;
+        const sr = audioContext.sampleRate;
+        // Alternate between slightly different click characters
+        const cutoff = 900 + (index % 4) * 180;
+        const decay = 0.003 + (index % 3) * 0.0015;
+        const buf = audioContext.createBuffer(1, sr * 0.016, sr);
+        const d = buf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (sr * decay));
+        const src = audioContext.createBufferSource(), hp = audioContext.createBiquadFilter(), g = audioContext.createGain();
+        hp.type = 'highpass'; hp.frequency.value = cutoff;
+        src.buffer = buf; src.connect(hp); hp.connect(g); g.connect(audioContext.destination);
+        g.gain.setValueAtTime(0.1, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.016);
+        src.start(t);
+      } catch(e) {}
+    }
+
+    // Triple ascending chime when boot completes
+    function sndBootSuccess() {
+      try {
+        if (!audioContext) initAudio();
+        const t = audioContext.currentTime;
+        [523, 659, 784].forEach((freq, i) => {
           const o = audioContext.createOscillator(), g = audioContext.createGain();
           o.frequency.value = freq;
           o.connect(g); g.connect(audioContext.destination);
-          g.gain.setValueAtTime(0.18, t + 0.6 + i * 0.13);
-          g.gain.exponentialRampToValueAtTime(0.001, t + 0.6 + i * 0.13 + 0.1);
-          o.start(t + 0.6 + i * 0.13); o.stop(t + 0.6 + i * 0.13 + 0.1);
+          g.gain.setValueAtTime(0.22, t + i * 0.13);
+          g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.13 + 0.12);
+          o.start(t + i * 0.13); o.stop(t + i * 0.13 + 0.12);
         });
+      } catch(e) {}
+    }
 
-        // 5. Success double-beep chime
-        [{ freq: 900, at: 1.18 }, { freq: 1200, at: 1.32 }].forEach(({ freq, at }) => {
-          const o = audioContext.createOscillator(), g = audioContext.createGain();
-          o.frequency.value = freq;
-          o.connect(g); g.connect(audioContext.destination);
-          g.gain.setValueAtTime(0.28, t + at);
-          g.gain.exponentialRampToValueAtTime(0.001, t + at + 0.15);
-          o.start(t + at); o.stop(t + at + 0.15);
-        });
+    // Soft descending tone for window close
+    function sndClose() {
+      try {
+        if (!audioContext) initAudio();
+        const t = audioContext.currentTime;
+        const o = audioContext.createOscillator(), g = audioContext.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(700, t);
+        o.frequency.exponentialRampToValueAtTime(250, t + 0.14);
+        o.connect(g); g.connect(audioContext.destination);
+        g.gain.setValueAtTime(0.14, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+        o.start(t); o.stop(t + 0.14);
+      } catch(e) {}
+    }
+
+    // Quick blip for opening command palette
+    function sndPaletteOpen() {
+      try {
+        if (!audioContext) initAudio();
+        const t = audioContext.currentTime;
+        const o = audioContext.createOscillator(), g = audioContext.createGain();
+        o.frequency.setValueAtTime(500, t);
+        o.frequency.exponentialRampToValueAtTime(900, t + 0.07);
+        o.connect(g); g.connect(audioContext.destination);
+        g.gain.setValueAtTime(0.1, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+        o.start(t); o.stop(t + 0.07);
+      } catch(e) {}
+    }
+
+    // Subtle tick for navigating palette items
+    function sndPaletteNav() {
+      try {
+        if (!audioContext) initAudio();
+        const t = audioContext.currentTime;
+        const buf = audioContext.createBuffer(1, audioContext.sampleRate * 0.012, audioContext.sampleRate);
+        const d = buf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioContext.sampleRate * 0.003));
+        const src = audioContext.createBufferSource(), hp = audioContext.createBiquadFilter(), g = audioContext.createGain();
+        hp.type = 'highpass'; hp.frequency.value = 2500;
+        src.buffer = buf; src.connect(hp); hp.connect(g); g.connect(audioContext.destination);
+        g.gain.setValueAtTime(0.05, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.012);
+        src.start(t);
+      } catch(e) {}
+    }
+
+    // Slightly different tick for tab switch in palette
+    function sndPaletteTab() {
+      try {
+        if (!audioContext) initAudio();
+        const t = audioContext.currentTime;
+        const o = audioContext.createOscillator(), g = audioContext.createGain();
+        o.frequency.setValueAtTime(700, t);
+        o.frequency.exponentialRampToValueAtTime(900, t + 0.05);
+        o.connect(g); g.connect(audioContext.destination);
+        g.gain.setValueAtTime(0.08, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+        o.start(t); o.stop(t + 0.05);
       } catch(e) {}
     }
 
@@ -1368,6 +1451,7 @@
             bootEl.appendChild(line);
           }
         }
+        sndBootSuccess();
         setTimeout(startTerminal, 300);
         return;
       }
@@ -1377,7 +1461,7 @@
       line.textContent = bl[bootIndex];
       bootEl.appendChild(line);
       bootEl.scrollTop = bootEl.scrollHeight;
-      if (bootIndex === 0) sndBeep(1000, 0.15);
+      sndBootLine(bootIndex);
       bootIndex++;
       setTimeout(displayBootLine, 60);
     }
@@ -1849,7 +1933,7 @@
         if (cmd) handleCommand(cmd);
       } else if (e.key === '/') {
         e.preventDefault();
-        if (document.getElementById('commandPalette').style.display === 'block') { closePalette(); } else { showCommandPalette(); }
+        if (document.getElementById('commandPalette').style.display === 'block') { closePalette(); } else { sndPaletteOpen(); showCommandPalette(); }
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         historyIndex = Math.min(historyIndex + 1, commandHistory.length - 1);
@@ -1936,18 +2020,21 @@
         const list = getCmdList();
         if (e.key === 'ArrowUp') {
           e.preventDefault();
+          sndPaletteNav();
           selectedIdx = (selectedIdx - 1 + list.length) % list.length;
           updatePaletteSelection(selectedIdx);
           const items = palette.querySelectorAll('.palette-item');
           if (items[selectedIdx]) items[selectedIdx].scrollIntoView({ block: 'nearest' });
         } else if (e.key === 'ArrowDown') {
           e.preventDefault();
+          sndPaletteNav();
           selectedIdx = (selectedIdx + 1) % list.length;
           updatePaletteSelection(selectedIdx);
           const items = palette.querySelectorAll('.palette-item');
           if (items[selectedIdx]) items[selectedIdx].scrollIntoView({ block: 'nearest' });
         } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
           e.preventDefault();
+          sndPaletteTab();
           const tabs = Object.keys(cmdTabs);
           let ti = tabs.indexOf(paletteTab);
           ti = e.key === 'ArrowRight' ? (ti + 1) % tabs.length : (ti - 1 + tabs.length) % tabs.length;
@@ -2001,6 +2088,7 @@
       if (id === 'browserWindow') { closeBrowser(); return; }
       const win = document.getElementById(id);
       if (win) {
+        sndClose();
         win.classList.add('closing');
         setTimeout(() => {
           win.style.display = 'none';
@@ -2077,6 +2165,7 @@
     }
 
     function closeBrowser() {
+      sndClose();
       const bw = document.getElementById('browserWindow');
       bw.classList.add('closing');
       setTimeout(() => {

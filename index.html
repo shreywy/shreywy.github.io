@@ -22,7 +22,7 @@
 
     :root {
       --text: #33ff33;
-      --bg: #001a00;
+      --bg: #000800;
       --dim: #0a6b0a;
       --bright: #66ff66;
       --accent: #00cc00;
@@ -1609,7 +1609,7 @@
       const r = el.getBoundingClientRect();
       const x = (e.clientX - r.left) / r.width - 0.5;
       const y = (e.clientY - r.top) / r.height - 0.5;
-      el.style.transform = 'perspective(800px) rotateY(' + (x*4) + 'deg) rotateX(' + (-y*4) + 'deg) scale(1.01)';
+      el.style.transform = 'perspective(1200px) rotateY(' + (x*2.5) + 'deg) rotateX(' + (-y*2.5) + 'deg) scale(1.01)';
     }
 
     function untilt(el) { el.style.transform = ''; }
@@ -1667,11 +1667,11 @@
       else if (cmd === 'about' || cmd === 'neofetch') {
         addLine('');
         const logo = [
-          ' ███████ ███   ███',
-          ' ██      ████ ████',
-          ' ███████ ██ ███ ██',
-          '      ██ ██  █  ██',
-          ' ███████ ██     ██',
+          ' ██████  ██   ██',
+          ' ██      ███ ███',
+          ' ██████  ██ █ ██',
+          '     ██  ██   ██',
+          ' ██████  ██   ██',
         ];
         const info = [
           'shrey@SHREY-PC',
@@ -1684,23 +1684,57 @@
           'Shell:    cmd.exe 1.0',
           'Terminal: SM-CRT',
         ];
-        let logoHTML = '<pre class="nf-logo-pre">' + logo.map(l => esc(l)).join('\n') + '</pre>';
-        let infoHTML = '<div class="nf-info-col">';
-        for (const r of info) {
-          if (r.includes(':')) {
-            const idx = r.indexOf(':');
-            infoHTML += '<div><span class="nf-key">' + esc(r.substring(0, idx + 1)) + '</span><span class="nf-val">' + esc(r.substring(idx + 1)) + '</span></div>';
-          } else if (r.startsWith('---')) {
-            infoHTML += '<div class="nf-sep">' + esc(r) + '</div>';
-          } else {
-            infoHTML += '<div>' + esc(r) + '</div>';
-          }
-        }
-        infoHTML += '</div>';
-        addHTML('<div class="neofetch-wrap">' + logoHTML + infoHTML + '</div>');
+        // Build wrapper with logo; info column typed in parallel
+        const wrap = document.createElement('div');
+        wrap.className = 'neofetch-wrap';
+        const logoPre = document.createElement('pre');
+        logoPre.className = 'nf-logo-pre';
+        logoPre.textContent = logo.join('\n');
+        const infoCol = document.createElement('div');
+        infoCol.className = 'nf-info-col';
+        wrap.appendChild(logoPre);
+        wrap.appendChild(infoCol);
+        document.getElementById('output').appendChild(wrap);
         sndBlip();
+        scrollT();
+        const rows = info.map(text => {
+          const el = document.createElement('div');
+          const colonIdx = text.indexOf(':');
+          if (text.startsWith('---')) {
+            el.className = 'nf-sep';
+          } else if (colonIdx >= 0) {
+            const ks = document.createElement('span'); ks.className = 'nf-key';
+            const vs = document.createElement('span'); vs.className = 'nf-val';
+            el.appendChild(ks); el.appendChild(vs);
+          }
+          infoCol.appendChild(el);
+          return { el, text, colonIdx };
+        });
+        const maxLen = Math.max(...rows.map(r => r.text.length));
+        for (let i = 0; i < maxLen; i++) {
+          rows.forEach(({ el, text, colonIdx }) => {
+            if (i >= text.length) return;
+            const partial = text.substring(0, i + 1);
+            if (text.startsWith('---')) {
+              el.textContent = partial;
+            } else if (colonIdx >= 0) {
+              if (i <= colonIdx) {
+                el.querySelector('.nf-key').textContent = partial;
+                el.querySelector('.nf-val').textContent = '';
+              } else {
+                el.querySelector('.nf-key').textContent = text.substring(0, colonIdx + 1);
+                el.querySelector('.nf-val').textContent = text.substring(colonIdx + 1, i + 1);
+              }
+            } else {
+              el.textContent = partial;
+            }
+          });
+          if (i % 3 === 0) sndType();
+          scrollT();
+          await new Promise(r => setTimeout(r, 6));
+        }
         addLine('');
-        addLine(D.about, 'd');
+        await typeLinesParallel([{ t: D.about, c: 'd' }], 6);
         addLine('');
       }
       else if (cmd === 'experience' || cmd === 'cat' && args[0] === 'experience.log') {
@@ -1987,6 +2021,7 @@
       ]
     };
     let paletteTab = 'Portfolio';
+    let _paletteKeyHandler = null;
 
     function getCmdList() {
       return cmdTabs[paletteTab] || [];
@@ -2024,6 +2059,7 @@
       palette.style.display = 'block';
 
       let selectedIdx = 0;
+      if (_paletteKeyHandler) { document.removeEventListener('keydown', _paletteKeyHandler); _paletteKeyHandler = null; }
       const handlePaletteKey = (e) => {
         const list = getCmdList();
         if (e.key === 'ArrowUp') {
@@ -2056,10 +2092,10 @@
         } else if (e.key === 'Escape') {
           e.preventDefault();
           closePalette();
-          document.removeEventListener('keydown', handlePaletteKey);
         }
       };
 
+      _paletteKeyHandler = handlePaletteKey;
       document.addEventListener('keydown', handlePaletteKey);
     }
 
@@ -2086,6 +2122,7 @@
 
     function closePalette() {
       document.getElementById('commandPalette').style.display = 'none';
+      if (_paletteKeyHandler) { document.removeEventListener('keydown', _paletteKeyHandler); _paletteKeyHandler = null; }
     }
 
     // ============ WINDOW SYSTEM ============

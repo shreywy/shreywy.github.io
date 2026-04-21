@@ -100,6 +100,9 @@ Top-level keys:
 - `_instructions` — human-readable docs (ignored by site)
 - `terminal` — `bootMessages`, `banner`, `welcomeMessage`, `prompt` (all customizable)
 - `theme` — `active: "green" | "amber" | "blue"`
+- `meta` — `title`, `description`, `ogTitle`, `ogDescription`, `siteUrl` (page title, SEO, Discord embed)
+- `neofetch` — `userhost`, `role`, `school`, `uptime`, `shell`, `terminal`, `logo` (21-line ASCII art, each exactly 50 chars)
+- `dir` — `volume`, `serial`, `path`, `listing` (fake dir command output)
 - `name`, `tagline`, `location`, `email`, `linkedin`, `github`, `about`
 - `skills` — object of category: string[] arrays
 - `experience` — array of `{title, company, period, location, description, skills[]}`
@@ -117,9 +120,8 @@ All boot lines come from `data.json` `terminal.bootMessages`. Skippable with any
 
 ## Files
 - `index.html` — entire portfolio (all code)
-- `data.json` — all content (edit this to update portfolio)
-- `style-explorer.html` — old style exploration tool (no longer needed, can delete)
-- `poweron-preview.html`, `crt-preview.html` — old preview tools (no longer needed)
+- `data.json` — all content: terminal, meta, neofetch, dir, skills, experience, education, projects
+- `.gitignore` — ignores `.playwright-mcp/`, `*.png`, `*.log`
 - `CLAUDE.md` — this file
 
 ## Git
@@ -130,10 +132,8 @@ branch: terminal-portfolio  (GitHub Pages serves from here)
 Always commit both `index.html` and `data.json` and push to `terminal-portfolio`.
 
 ## Known Issues / TODO
-- Minesweeper was recently fully rewritten (fixed grid init, offsetX/Y coords, Win98 LCD, safe first click)
 - Browser `close` button calls `closeBrowser()` (not `closeWindow()`) — already handled in closeWindow
 - `renderQuickbar()` function was removed but `#quickbar` div still exists in HTML (hidden via CSS) — fine to leave
-- `style-explorer.html`, `poweron-preview.html`, `crt-preview.html` can be cleaned up from the repo
 
 ## User Preferences
 - Likes: authentic terminal feel, Win98 aesthetic, easter eggs, personality

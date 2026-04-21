@@ -12,7 +12,25 @@
     "",
     "THEME SECTION: Customize terminal colors.",
     "  - Set 'active' to: 'green' (default), 'amber', or 'blue'.",
-    "  - Or leave blank/omit for green.",
+    "",
+    "META SECTION: Page title, SEO, and OpenGraph (Discord embed) tags.",
+    "  - title: Browser tab title and initial browser window tab label.",
+    "  - description: Meta description used by search engines.",
+    "  - ogTitle / ogDescription: OpenGraph tags for Discord/social embeds.",
+    "  - siteUrl: Canonical URL shown in the built-in browser address bar.",
+    "",
+    "NEOFETCH SECTION: Controls the 'neofetch' / 'about' command output.",
+    "  - userhost: The 'user@hostname' line at the top.",
+    "  - role, school, uptime, shell, terminal: Info sidebar fields.",
+    "  - logo: Array of exactly 21 strings, each exactly 50 characters wide.",
+    "    All lines must be the same length for the logo to render correctly.",
+    "    Use spaces to pad shorter lines.",
+    "",
+    "DIR SECTION: Output of the 'dir' command (fake directory listing).",
+    "  - volume: Drive label shown as 'Volume in drive C is ...'.",
+    "  - serial: Serial number line.",
+    "  - path: Directory path shown in the listing header.",
+    "  - listing: Array of strings, one per line of directory entries.",
     "",
     "SKILLS: Grouped by category. Add/remove categories freely.",
     "EXPERIENCE: Array of jobs. Each shows as a timeline card.",
@@ -62,6 +80,61 @@
   "theme": {
     "active": "green",
     "_options": "green | amber | blue"
+  },
+
+  "meta": {
+    "title": "Shrey's Terminal",
+    "description": "Shrey Mistry - PM @ Geotab | CS Student | Builder of things",
+    "ogTitle": "Shrey Mistry - Terminal Portfolio",
+    "ogDescription": "Interactive CRT terminal portfolio - type commands to explore. Built with vanilla HTML/CSS/JS.",
+    "siteUrl": "https://shreywy.github.io"
+  },
+
+  "neofetch": {
+    "userhost": "shrey@SHREY-PC",
+    "role": "PM @ Geotab",
+    "school": "TMU (CS)",
+    "uptime": "since 2022",
+    "shell": "cmd.exe 1.0",
+    "terminal": "SM-CRT",
+    "logo": [
+      "          _____                    _____          ",
+      "         /\\    \\                  /\\    \\         ",
+      "        /::\\    \\                /::\\____\\        ",
+      "       /::::\\    \\             /:::::|   |        ",
+      "      /::::::\\    \\           /::::::|   |        ",
+      "     /:::/\\:::\\    \\         /:::::::|   |        ",
+      "    /:::/__\\:::\\    \\        /:::/|::|   |        ",
+      "    \\:::\\   \\:::\\    \\      /:::/ |::|   |        ",
+      "  ___\\:::\\   \\:::\\    \\    /:::/  |::|___|______  ",
+      " /\\   \\:::\\   \\:::\\    \\  /:::/   |::::::::\\    \\ ",
+      "/::\\   \\:::\\   \\:::\\____\\/:::/    |:::::::::\\____\\",
+      "\\:::\\   \\:::\\   \\::/    /\\::/    / ~~~~~/:::/    /",
+      " \\:::\\   \\:::\\   \\/____/  \\/____/      /:::/    / ",
+      "  \\:::\\   \\:::\\    \\                  /:::/    /  ",
+      "   \\:::\\   \\:::\\____\\                /:::/    /   ",
+      "    \\:::\\  /:::/    /               /:::/    /    ",
+      "     \\:::\\/:::/    /               /:::/    /     ",
+      "      \\::::::/    /               /:::/    /      ",
+      "       \\::::/    /               /:::/    /       ",
+      "        \\::/    /                \\::/    /        ",
+      "         \\/____/                  \\/____/         "
+    ]
+  },
+
+  "dir": {
+    "volume": "SHREY",
+    "serial": "1337-DEAD",
+    "path": "C:\\Users\\shrey",
+    "listing": [
+      "04/15/2026  09:15 AM    <DIR>          .",
+      "04/15/2026  09:15 AM    <DIR>          ..",
+      "04/15/2026  09:14 AM    <DIR>          Desktop",
+      "04/15/2026  09:13 AM    <DIR>          Documents",
+      "04/15/2026  09:12 AM    <DIR>          Downloads",
+      "04/10/2026  02:30 PM           123,456 resume.pdf",
+      "04/15/2026  01:45 PM               456 readme.txt"
+    ]
   },
 
   "name": "Shrey Mistry",

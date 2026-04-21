@@ -1011,7 +1011,59 @@
           "skills": ["React", "Flask", "Firebase", "Docker"],
           "link": "https://github.com/shreywy"
         }
-      ]
+      ],
+      "meta": {
+        "title": "Shrey's Terminal",
+        "description": "Shrey Mistry - Terminal Portfolio",
+        "ogTitle": "Shrey Mistry - Terminal Portfolio",
+        "ogDescription": "Interactive CRT terminal portfolio.",
+        "siteUrl": "https://shreywy.github.io"
+      },
+      "neofetch": {
+        "userhost": "shrey@SHREY-PC",
+        "role": "PM @ Geotab",
+        "school": "TMU (CS)",
+        "uptime": "since 2022",
+        "shell": "cmd.exe 1.0",
+        "terminal": "SM-CRT",
+        "logo": [
+          "          _____                    _____          ",
+          "         /\\    \\                  /\\    \\         ",
+          "        /::\\    \\                /::\\____\\        ",
+          "       /::::\\    \\             /:::::|   |        ",
+          "      /::::::\\    \\           /::::::|   |        ",
+          "     /:::/\\:::\\    \\         /:::::::|   |        ",
+          "    /:::/__\\:::\\    \\        /:::/|::|   |        ",
+          "    \\:::\\   \\:::\\    \\      /:::/ |::|   |        ",
+          "  ___\\:::\\   \\:::\\    \\    /:::/  |::|___|______  ",
+          " /\\   \\:::\\   \\:::\\    \\  /:::/   |::::::::\\    \\ ",
+          "/::\\   \\:::\\   \\:::\\____\\/:::/    |:::::::::\\____\\",
+          "\\:::\\   \\:::\\   \\::/    /\\::/    / ~~~~~/:::/    /",
+          " \\:::\\   \\:::\\   \\/____/  \\/____/      /:::/    / ",
+          "  \\:::\\   \\:::\\    \\                  /:::/    /  ",
+          "   \\:::\\   \\:::\\____\\                /:::/    /   ",
+          "    \\:::\\  /:::/    /               /:::/    /    ",
+          "     \\:::\\/:::/    /               /:::/    /     ",
+          "      \\::::::/    /               /:::/    /      ",
+          "       \\::::/    /               /:::/    /       ",
+          "        \\::/    /                \\::/    /        ",
+          "         \\/____/                  \\/____/         "
+        ]
+      },
+      "dir": {
+        "volume": "SHREY",
+        "serial": "1337-DEAD",
+        "path": "C:\\Users\\shrey",
+        "listing": [
+          "04/15/2026  09:15 AM    <DIR>          .",
+          "04/15/2026  09:15 AM    <DIR>          ..",
+          "04/15/2026  09:14 AM    <DIR>          Desktop",
+          "04/15/2026  09:13 AM    <DIR>          Documents",
+          "04/15/2026  09:12 AM    <DIR>          Downloads",
+          "04/10/2026  02:30 PM           123,456 resume.pdf",
+          "04/15/2026  01:45 PM               456 readme.txt"
+        ]
+      }
     };
 
     async function loadData() {
@@ -1021,6 +1073,17 @@
       } catch(e) {
         console.log('Using fallback data');
       }
+      const m = D.meta || {};
+      if (m.title) document.title = m.title;
+      const qs = (sel) => document.querySelector(sel);
+      if (m.description) { const el = qs('meta[name="description"]'); if (el) el.content = m.description; }
+      if (m.ogTitle)      { const el = qs('meta[property="og:title"]'); if (el) el.content = m.ogTitle; }
+      if (m.ogDescription){ const el = qs('meta[property="og:description"]'); if (el) el.content = m.ogDescription; }
+      if (m.siteUrl)      { const el = qs('meta[property="og:url"]'); if (el) el.content = m.siteUrl; }
+      const bAddr = document.getElementById('bAddr');
+      if (bAddr && m.siteUrl) bAddr.textContent = m.siteUrl;
+      if (m.siteUrl) bTabs[0].url = m.siteUrl;
+      if (m.title)   bTabs[0].title = m.title;
       powerOn();
     }
 
@@ -1610,6 +1673,7 @@
     function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
     function tilt(e, el) {
+      if (e.buttons !== 0) return;
       const r = el.getBoundingClientRect();
       const x = (e.clientX - r.left) / r.width - 0.5;
       const y = (e.clientY - r.top) / r.height - 0.5;
@@ -1670,39 +1734,19 @@
       }
       else if (cmd === 'about' || cmd === 'neofetch') {
         addLine('');
-        const logo = [
-          '          _____                    _____          ',
-          '         /\\    \\                  /\\    \\         ',
-          '        /::\\    \\                /::\\____\\        ',
-          '       /::::\\    \\             /:::::|   |        ',
-          '      /::::::\\    \\           /::::::|   |        ',
-          '     /:::/\\:::\\    \\         /:::::::|   |        ',
-          '    /:::/__\\:::\\    \\        /:::/|::|   |        ',
-          '    \\:::\\   \\:::\\    \\      /:::/ |::|   |        ',
-          '  ___\\:::\\   \\:::\\    \\    /:::/  |::|___|______  ',
-          ' /\\   \\:::\\   \\:::\\    \\  /:::/   |::::::::\\    \\ ',
-          '/::\\   \\:::\\   \\:::\\____\\/:::/    |:::::::::\\____\\',
-          '\\:::\\   \\:::\\   \\::/    /\\::/    / ~~~~~/:::/    /',
-          ' \\:::\\   \\:::\\   \\/____/  \\/____/      /:::/    / ',
-          '  \\:::\\   \\:::\\    \\                  /:::/    /  ',
-          '   \\:::\\   \\:::\\____\\                /:::/    /   ',
-          '    \\:::\\  /:::/    /               /:::/    /    ',
-          '     \\:::\\/:::/    /               /:::/    /     ',
-          '      \\::::::/    /               /:::/    /      ',
-          '       \\::::/    /               /:::/    /       ',
-          '        \\::/    /                \\::/    /        ',
-          '         \\/____/                  \\/____/         ',
-        ];
+        const nf = D.neofetch || {};
+        const logo = nf.logo || [];
+        const sep = '-'.repeat((nf.userhost || D.name).length);
         const info = [
-          'shrey@SHREY-PC',
-          '-------------------',
+          nf.userhost || D.name,
+          sep,
           'Name:     ' + D.name,
-          'Role:     PM @ Geotab',
-          'School:   TMU (CS)',
+          'Role:     ' + (nf.role || ''),
+          'School:   ' + (nf.school || ''),
           'Location: ' + D.location,
-          'Uptime:   since 2022',
-          'Shell:    cmd.exe 1.0',
-          'Terminal: SM-CRT',
+          'Uptime:   ' + (nf.uptime || ''),
+          'Shell:    ' + (nf.shell || ''),
+          'Terminal: ' + (nf.terminal || ''),
         ];
         // Build wrapper with logo; info column typed in parallel
         const wrap = document.createElement('div');
@@ -1902,20 +1946,13 @@
         spawnExplorer();
       }
       else if (cmd === 'dir') {
-        addLine(' Volume in drive C is SHREY');
-        addLine(' Volume Serial Number is 1337-DEAD');
+        const dv = D.dir || {};
+        addLine(' Volume in drive C is ' + (dv.volume || 'C'));
+        addLine(' Volume Serial Number is ' + (dv.serial || '0000-0000'));
         addLine('');
-        addLine(' Directory of C:\\Users\\shrey');
+        addLine(' Directory of ' + (dv.path || 'C:\\'));
         addLine('');
-        addLine('04/15/2026  09:15 AM    <DIR>          .');
-        addLine('04/15/2026  09:15 AM    <DIR>          ..');
-        addLine('04/15/2026  09:14 AM    <DIR>          Desktop');
-        addLine('04/15/2026  09:13 AM    <DIR>          Documents');
-        addLine('04/15/2026  09:12 AM    <DIR>          Downloads');
-        addLine('04/10/2026  02:30 PM           123,456 resume.pdf');
-        addLine('04/15/2026  01:45 PM               456 readme.txt');
-        addLine('               2 File(s)        123,912 bytes');
-        addLine('               3 Dir(s)   512,000,000,000 bytes free');
+        (dv.listing || []).forEach(l => addLine(l));
         addLine('');
       }
       else if (cmd === 'cls' || cmd === 'clear') {
@@ -1942,7 +1979,7 @@
         addLine('');
       }
       else if (cmd === 'matrix') {
-        await typeLinesSlow([{ t: 'Wake up, Shrey...', c: 'b' }], 50);
+        await typeLinesSlow([{ t: 'Wake up, ' + (D.name ? D.name.split(' ')[0] : 'human') + '...', c: 'b' }], 50);
         await sleep(600);
         await typeLinesSlow([{ t: 'The Matrix has you...', c: 'b' }], 50);
         await sleep(400);

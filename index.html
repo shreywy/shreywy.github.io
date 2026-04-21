@@ -1581,6 +1581,28 @@
       }
     }
 
+    async function typeLinesParallel(lines, spd) {
+      spd = spd || 8;
+      const output = document.getElementById('output');
+      const entries = lines.map(line => {
+        const cls  = (typeof line === 'object') ? line.c  : '';
+        const text = (typeof line === 'object') ? line.t  : (line || '');
+        const el = document.createElement('div');
+        el.className = 'tl' + (cls ? ' ' + cls : '');
+        if (!text) el.textContent = '\u00A0';
+        output.appendChild(el);
+        return { el, text };
+      });
+      scrollT();
+      const maxLen = Math.max(...entries.map(e => e.text.length), 0);
+      for (let i = 0; i < maxLen; i++) {
+        entries.forEach(({ el, text }) => { if (i < text.length) el.textContent += text[i]; });
+        if (i % 3 === 0) sndType();
+        scrollT();
+        await new Promise(r => setTimeout(r, spd));
+      }
+    }
+
     function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
     function tilt(e, el) {
@@ -1715,9 +1737,8 @@
         addLine('');
         addLine('--- Technical Skills ---', 'b');
         addLine('');
-        for (const [cat, skills] of Object.entries(D.skills)) {
-          addLine(cat + ': ' + skills.join(', '), 'a');
-        }
+        const skillLines = Object.entries(D.skills).map(([cat, skills]) => ({ t: cat + ': ' + skills.join(', '), c: 'a' }));
+        await typeLinesParallel(skillLines, 6);
         addLine('');
       }
       else if (cmd === 'education') {
@@ -2048,10 +2069,19 @@
       });
     }
 
-    function selectCommand(cmd) {
+    async function selectCommand(cmd) {
       closePalette();
       input.value = '';
-      handleCommand(cmd);
+      input.focus();
+      for (const ch of cmd) {
+        input.value += ch;
+        sndType();
+        await new Promise(r => setTimeout(r, 40));
+      }
+      await new Promise(r => setTimeout(r, 120));
+      const val = input.value;
+      input.value = '';
+      handleCommand(val);
     }
 
     function closePalette() {

@@ -1,75 +1,73 @@
-# Shrey Mistry - Portfolio Website
+# Shrey Mistry
 
-![Portfolio Screenshot](https://i.imgur.com/gKooiyK.png)
+My portfolio, built as a small gallery you walk through: **[shreywy.github.io](https://shreywy.github.io)**
 
-A responsive personal portfolio website showcasing my projects, experience, and skills as a Computer Science student and developer.
+![The projects room](assets/og.jpg)
 
-## Features
+I'm a Computer Science student at Toronto Metropolitan University, graduating May 2027. The site hangs my internships at Geotab, AMD, and Bombardier, the projects I'm proudest of, my education, and my resume as pieces in a dark exhibition hall. Scroll or drag to walk through it, and click anything to look closer.
 
-- **Modern UI Design**: Clean, responsive layout with light/dark theme support
-- **Interactive Elements**:
-  - Theme switcher (light/dark mode)
-  - Color scheme cycler
-  - Animated buttons and links
-- **Sections**:
-  - About me
-  - Professional experience timeline
-  - Project showcase
-  - Skills categorization
-  - Contact information
-- **Performance Optimized**: Smooth animations and transitions
-- **Accessibility**: Semantic HTML and ARIA labels
+## What's in the hall
 
-## Technologies Used
+- **Entrance.** Just my name, and a short walk into the room.
+- **Internships.** Each role is a paper object on the wall: a framed certificate, a page of graph paper, a report folder. A timeline above runs newest to oldest. Click a role for what I did, the team, and the tools.
+- **Projects.** Screenshots hang in gilt, walnut, ebony, and silver frames on one size system. Hover a frame and the cursor becomes a loupe that magnifies it. Click one and the frame slides away on a rail to show the story, a scrolling preview of the project's own site or its repo, and links.
+- **Education.** A diploma, with honors and coursework behind it.
+- **Resume.** A stack of pages that opens the current PDF.
+- **Guestbook.** Leave a note and it lands in my inbox.
 
-- **Frontend**:
-  - HTML5, CSS3 (with CSS Variables)
-  - JavaScript (ES6)
-- **Design**:
-  - Custom SVG elements
-  - Responsive grid layouts
-  - CSS transitions and animations
-- **Icons**: Font Awesome
-- **Fonts**: Google Fonts (Poppins)
+The progress bar at the bottom shows where each room starts when you hover it. Click a dot or drag the bar to skip ahead. On phones the hall becomes a vertical walk.
 
-## Theme Options
+## How it's built
 
-1. **Default Theme**
-   - Light: Clean white background with blue accents
-   - Dark: Dark navy background with light blue accents
+Plain HTML, CSS, and JavaScript. No framework, no build step, no dependencies. Everything is served as static files from GitHub Pages.
 
-2. **Nord Theme**
-   - Light: Arctic-inspired light theme
-   - Dark: Polar night dark theme
+```
+index.html          the hall: layout, motion, and the closer-look pages
+gallery-data.js     every project, role, and degree on the walls
+assets/             screenshots, site and repo previews, company logos
+resumes/            the resume PDF
+tools/guestbook/    the Google Apps Script behind the guestbook form
+```
 
-3. **Dracula Theme**
-   - Light: Soft off-white background
-   - Dark: Dark purple background
+All the motion is hand-written: springs for the frames and loupe, the Web Animations API for the frame-on-a-rail reveal, and `prefers-reduced-motion` turns it all off.
 
-## Installation
+## Adding a project
 
-No installation required - simply open `index.html` in any modern browser.
+Everything on the walls comes from `gallery-data.js`, so the wall, the caption, and the closer look never drift apart.
 
-## How to Customize
+1. Put screenshots in `assets/`.
+2. Copy a block in `window.PROJECTS` and fill it in. The comments at the top of the file explain each field.
+3. If the project has a live site, add `page: { url, poster, full }`, where `full` is a full-page screenshot. The closer look scrolls through it and can switch to the live site. Otherwise add a cropped GitHub capture as `gh`.
+4. Set `hidden: true` to take a piece down without deleting it.
 
-1. **Content**:
-   - Edit the HTML files to update your information
-   - Add/remove projects in the projects section
+Roles and education work the same way in `window.EXPERIENCE` and `window.EDUCATION`.
 
-2. **Styling**:
-   - Modify colors in `styles.css` (look for `--clr-` variables)
-   - Adjust transitions by changing `--theme-transition-time`
+## Updating the resume
 
-3. **Images**:
-   - Replace `images/icon.png` for the favicon
-   - Update project screenshots in the `images/` folder
+Drop the new PDF in `resumes/` and update the file name and date in `window.RESUME` at the bottom of `gallery-data.js`.
 
-## Future Improvements
+## The guestbook
 
-- [ ] Implement project filtering by tags/skills
-- [ ] Integrate a contact form
+The form posts to a Google Apps Script web app that writes each note to a Google Sheet and emails it to me, with a hidden spam field, a one-note-per-minute limit for each email address, and a daily cap. The source is in `tools/guestbook/`. To change it:
 
----
+```bash
+cd tools/guestbook
+clasp push
+clasp deploy --deploymentId <the existing deployment id>
+```
 
-**Created by Shrey Mistry**  
-[GitHub](https://github.com/shreywy) | [LinkedIn](https://linkedin.com/in/shreymistry) | [Email](mailto:shrey.d.mistry@gmail.com)
+Redeploying to the same deployment keeps the URL in `index.html` working.
+
+## Running it locally
+
+Any static server works:
+
+```bash
+python -m http.server 8000
+```
+
+Then open `http://localhost:8000`.
+
+## Earlier versions
+
+Previous versions of the site live on their own branches: `terminal-portfolio`, `old-portfolio`, and `archive-portfolio-1` to `-3`. The design drafts that led to this one are on `design-drafts`.

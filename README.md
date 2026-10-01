@@ -70,4 +70,4 @@ Then open `http://localhost:8000`.
 
 ## Earlier versions
 
-Previous versions of the site live on their own branches: `terminal-portfolio`, `old-portfolio`, and `archive-portfolio-1` to `-3`. The design drafts that led to this one are on `design-drafts`.
+Previous versions of the site live on their own branches: `terminal-portfolio`, `old-portfolio`, and `archive-portfolio-1` to `-4`. The design drafts that led to this one are on `design-drafts`.

@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>08 The Book · Shrey Mistry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..600&display=swap" rel="stylesheet">
+<script src="nav.js"></script>
+<style>
+  :root { --desk:#c9c1b1; --page:#f8f3e8; --ink:#231f1a; --mid:#857b6c; --red:#9b2d20; }
+  * { box-sizing:border-box; margin:0; padding:0 }
+  html, body { height:100% }
+  body { background:var(--desk); color:var(--ink); font:400 17px/1.5 'EB Garamond', Garamond, serif; font-feature-settings:'onum', 'kern', 'liga'; display:grid; place-items:center; overflow:hidden;
+    background-image:radial-gradient(ellipse at 50% 40%, #d6cfc0, #b9b09f 80%) }
+  a { color:inherit }
+
+  .stage { --ph:min(84vh, 760px, calc(92vw / 1.36)); --pw:calc(var(--ph) * .68); perspective:2600px }
+  .book { position:relative; width:calc(var(--pw) * 2); height:var(--ph); transform:rotateX(4deg); transform-style:preserve-3d }
+  .book::before { content:""; position:absolute; inset:-1.2% -1.2% -1.6%; background:#5a2a20; border-radius:4px; transform:translateZ(-6px); box-shadow:0 40px 60px -20px rgba(40,25,10,.5) }
+
+  .page { position:absolute; top:0; width:var(--pw); height:var(--ph); background:var(--page); padding:9% 11% 8%; overflow:hidden; backface-visibility:hidden; display:flex; flex-direction:column }
+  .page.l { left:0; box-shadow:inset -30px 0 40px -30px rgba(60,40,15,.28) }
+  .page.r { left:var(--pw); box-shadow:inset 30px 0 40px -30px rgba(60,40,15,.28) }
+  .leaf { position:absolute; left:var(--pw); top:0; width:var(--pw); height:var(--ph); transform-origin:0 50%; transform-style:preserve-3d; transition:transform 1.05s cubic-bezier(.42,.05,.28,1); cursor:pointer }
+  .leaf .page { left:0 }
+  .leaf .back { transform:rotateY(180deg); box-shadow:inset -30px 0 40px -30px rgba(60,40,15,.28) }
+  .leaf.turned { transform:rotateY(-180deg) }
+  .leaf.live { transition:none }
+  /* Shade that sweeps across a page as it lifts */
+  .page .shade { position:absolute; inset:0; pointer-events:none; background:linear-gradient(90deg, rgba(40,25,5,var(--s, 0)), rgba(255,255,255,calc(var(--s, 0) * .4)) 60%, transparent) }
+
+  /* Dog-ear: lift the corner when you reach for it */
+  .leaf:not(.turned) .front::after { content:""; position:absolute; right:0; bottom:0; width:var(--ear, 0px); height:var(--ear, 0px);
+    background:linear-gradient(315deg, var(--desk) 45%, #e9e1d0 50%, #fbf7ee 70%); box-shadow:-2px -2px 6px rgba(0,0,0,.15); transition:width .3s, height .3s }
+
+  .rh { display:flex; justify-content:space-between; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--mid); margin-bottom:6% }
+  .body { flex:1; text-align:justify; hyphens:auto; font-size:clamp(13.5px, 2.2vh, 19.5px); line-height:1.46 }
+  .body p + p { text-indent:1.4em }
+  .folio { text-align:center; font-size:13px; color:var(--mid); margin-top:4% }
+  .chap { text-align:center; margin:4% 0 7% }
+  .chap small { display:block; font-size:12px; letter-spacing:.3em; color:var(--red) }
+  .chap h2 { font-weight:400; font-size:clamp(22px, 3.6vh, 34px); line-height:1.1; margin-top:6px }
+  .drop::first-letter { float:left; font-size:3.7em; line-height:.82; padding:.06em .08em 0 0; color:var(--red) }
+  sup { font-size:.62em; color:var(--red); line-height:0 }
+  .notes { margin-top:auto; font-size:.8em; line-height:1.4 }
+  .notes::before { content:""; display:block; width:34%; border-top:1px solid var(--mid); margin-bottom:6px }
+  .notes p { text-indent:0 !important }
+  .plate { margin:2% 0 4%; border:1px solid #ddd3bf; padding:3%; background:#fff }
+  .plate img { display:block; width:100%; aspect-ratio:16/10; object-fit:cover; object-position:top left; filter:sepia(.15) }
+  .plate figcaption { font-style:italic; font-size:.82em; color:var(--mid); text-align:center; margin-top:6px }
+  .title { flex:1; display:flex; flex-direction:column; justify-content:center; text-align:center }
+  .title h1 { font-weight:400; font-size:clamp(34px, 6vh, 58px); line-height:1; letter-spacing:.02em }
+  .title .orn { color:var(--red); margin:18px 0; letter-spacing:.6em }
+  .title p { font-style:italic; font-size:clamp(14px, 2vh, 19px) }
+  .toc { list-style:none; margin-top:6% }
+  .toc li { display:flex; align-items:baseline; gap:8px; padding:5px 0; cursor:pointer }
+  .toc li::after { content:""; order:2; flex:1; border-bottom:1px dotted var(--mid) }
+  .toc li span:first-child { order:1 } .toc li span:last-child { order:3; color:var(--mid) }
+  .toc li:hover span:first-child { color:var(--red) }
+  .hint { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); font-style:italic; font-size:14px; color:#4b4337 }
+
+  /* Phones: no spread, just the pages in order */
+  @media (max-width: 760px) {
+    body { overflow:auto; display:block; padding:16px 16px 100px }
+    .stage { perspective:none } .book { width:auto; height:auto; transform:none; display:flex; flex-direction:column } .book::before { display:none }
+    .page.r { order:99 }
+    .book .page { left:0 }
+    .page, .leaf, .leaf .page { position:relative; left:auto; width:auto; height:auto; min-height:80vh; transform:none !important; margin-bottom:14px; box-shadow:0 2px 10px rgba(0,0,0,.12) }
+    .leaf { display:contents }
+    .body { font-size:16px }
+    .hint { display:none }
+  }
+</style>
+</head>
+<body>
+<div class="stage"><div class="book" id="book"></div></div>
+<p class="hint">Drag a page edge to turn it, or click either page.</p>
+
+<script>
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const rh = (l, r) => `<div class="rh"><span>${l}</span><span>${r}</span></div>`;
+const pages = [
+  `<div class="title"><h1>Shrey Mistry</h1><div class="orn">&middot; &middot; &middot;</div><p>Computer Science, Toronto Metropolitan University</p><p style="margin-top:6px">Brampton, Ontario, 2026</p></div>`,
+  `${rh('Contents', '')}<div class="body"><ol class="toc">
+    <li data-go="1"><span>I. &nbsp;Geotab</span><span>2</span></li>
+    <li data-go="2"><span>II. &nbsp;AMD</span><span>4</span></li>
+    <li data-go="2"><span>III. &nbsp;Bombardier</span><span>5</span></li>
+    <li data-go="3"><span>IV. &nbsp;Things I built</span><span>6</span></li>
+    <li data-go="4"><span>Colophon and correspondence</span><span>9</span></li></ol>
+    <p style="margin-top:12%; font-style:italic; text-align:center">I graduate in May 2027 with a 3.96 out of 4.33 and a spot on the Dean&rsquo;s List. These are the 28 months of internships before that, and what I built on the side.</p></div><div class="folio">1</div>`,
+  `${rh('Shrey Mistry', 'Geotab')}<div class="chap"><small>CHAPTER I</small><h2>Sixteen months on telematics</h2></div>
+    <div class="body"><p class="drop">I joined Geotab in Oakville in May 2025 as a Software Engineering Intern and stayed through August 2026. The work centred on three flagship devices: GO Anywhere, which we called 90k, GO10, which we called trinity, and GO Anywhere Lite.</p>
+    <p>I wrote harness product requirements documents and took one device from PRD to launch in six months, through EVT, DVT, and PVT.<sup>1</sup> I also helped lead launch readiness across engineering, legal, security, and certification.</p></div>
+    <div class="notes"><p><sup>1</sup> Engineering, design, and production validation.</p></div><div class="folio">2</div>`,
+  `${rh('Chapter I', 'Shrey Mistry')}<div class="body">
+    <p>On the software side I built telemetry dashboards on BigQuery for 1,000+ IoT units, used by 40 to 50 staff including executives, and moved them from Apps Script to GCP containers with a GitLab CI pipeline.<sup>2</sup></p>
+    <p>My Chrome extensions crawled and validated firmware test pages and cut manual verification time by 80%. In January 2026 I was named Intern of the Month.</p>
+    <p style="text-indent:0; margin-top:8%; font-style:italic; text-align:center">&ldquo;Shrey was instrumental in taking a new hardware product from early concept to market.&rdquo;<br><span style="font-style:normal; font-size:.85em; color:var(--mid)">Rob Wyatt</span></p></div>
+    <div class="notes"><p><sup>2</sup> Built on BigQuery SQL across thousands of tables processing terabytes daily.</p></div><div class="folio">3</div>`,
+  `${rh('Shrey Mistry', 'AMD')}<div class="chap"><small>CHAPTER II</small><h2>Measuring a millisecond</h2></div>
+    <div class="body"><p class="drop">From January to August 2024 I was a Performance Engineering Intern in AMD&rsquo;s Technical Marketing Labs in Markham. I built a modular Python benchmark framework, tested with pytest, that launches games through Steam and Epic and finds its way through menus by image matching. It cut runtimes by 60%.</p>
+    <p>I also programmed an Arduino tool in C and C++ that measures sub-millisecond input latency, syncing simulated inputs with photoelectric sensors to validate Anti-Lag.</p></div><div class="folio">4</div>`,
+  `${rh('Chapter III', 'Bombardier')}<div class="chap"><small>CHAPTER III</small><h2>Fewer tabs, faster meetings</h2></div>
+    <div class="body"><p class="drop">My first internship was with Supplier Quality at Bombardier Aerospace in Toronto, in the summer of 2023. I built TypeScript and Node.js pipelines feeding Power BI, with validation that flags anomalies in audit records, and compliance reports took over 70% less time to generate.</p>
+    <p>I replaced a many-tab review workbook with a one-sheet summary, which sped up the daily quality meetings.</p></div><div class="folio">5</div>`,
+  `${rh('Shrey Mistry', 'Things I built')}<div class="chap"><small>CHAPTER IV</small><h2>Things I built</h2></div>
+    <div class="body"><figure class="plate"><img src="assets/forkable-home.png" alt="Forkable"><figcaption>Plate I. Forkable, 2026</figcaption></figure>
+    <p class="drop">Forkable is version control for recipes. You fork a recipe, commit tweaks, and see a structural diff between versions. Suggestions come in as Taste Tests, which are pull requests you merge with one click. It runs on a 21-model Postgres schema with 83 tests in CI.</p></div><div class="folio">6</div>`,
+  `${rh('Chapter IV', 'Shrey Mistry')}<div class="body">
+    <p style="text-indent:0"><i>TrainTripTime.</i> Tell it when you need to be downtown and it tells you when to wake up. It works backwards from your arrival time across GO trains and buses, and streams a 118MB timetable into a 1MB index on a Raspberry Pi.</p>
+    <figure class="plate"><img src="assets/speckle-search.jpg" alt="Speckle"><figcaption>Plate II. Speckle, searching for a red sports car</figcaption></figure>
+    <p style="text-indent:0"><i>Speckle.</i> A local-first photo library in Rust. CLIP runs on your own machine at about 13 photos a second on CPU. Type boats, get boats.</p></div><div class="folio">7</div>`,
+  `${rh('Shrey Mistry', 'Things I built')}<div class="body">
+    <p style="text-indent:0"><i>firefox-tabs.</i> My desktop&rsquo;s open Firefox tabs on any device, served from a Raspberry Pi. I wrote LZ4 and Snappy decompression in pure Python to read the session files, and the server uses no memory when idle.</p>
+    <p style="text-indent:0; margin-top:1em"><i>GridMacro.</i> A calorie and weight log that lives in your own Google Sheet. I built it for my own cut. The sheet stays the database, and logging takes two taps.</p>
+    <p style="text-indent:0; margin-top:1em"><i>drizzy-drake.</i> A Discord bot for friends that grew into music playback, embed fixing, and text to speech with 93 voices.</p></div><div class="folio">8</div>`,
+  `${rh('Colophon', '')}<div class="title"><p style="font-style:normal; font-size:clamp(15px,2.1vh,19px)">Write to me at</p><h1 style="font-size:clamp(20px,3.2vh,30px); margin:10px 0 18px"><a href="mailto:shrey.d.mistry@gmail.com">shrey.d.mistry@gmail.com</a></h1>
+    <p><a href="https://github.com/shreywy">GitHub</a> &nbsp;&middot;&nbsp; <a href="https://linkedin.com/in/shreymistry">LinkedIn</a></p>
+    <div class="orn">&middot; &middot; &middot;</div><p style="font-size:14px; color:var(--mid)">Set in EB Garamond.</p></div><div class="folio">9</div>`,
+];
+
+const book = document.getElementById('book');
+const make = (html, cls) => { const d = document.createElement('div'); d.className = 'page ' + cls; d.innerHTML = html + '<div class="shade"></div>'; return d };
+book.appendChild(make(pages[0], 'l'));
+book.appendChild(make(pages[pages.length - 1], 'r'));
+const leaves = [];
+for (let k = 0; k < (pages.length - 2) / 2; k++) {
+  const leaf = document.createElement('div'); leaf.className = 'leaf';
+  leaf.append(make(pages[2 * k + 1], 'front'), make(pages[2 * k + 2], 'back'));
+  book.appendChild(leaf); leaves.push(leaf);
+}
+let turned = 0;
+function stack() { leaves.forEach((l, i) => l.style.zIndex = i < turned ? 10 + i : 100 - i) }
+stack();
+
+function setTurned(n) {
+  n = Math.max(0, Math.min(leaves.length, n));
+  const step = n > turned ? 1 : -1;
+  const go = () => {
+    if (turned === n) return;
+    const leaf = leaves[step > 0 ? turned : turned - 1];
+    leaf.style.zIndex = 200;
+    leaf.classList.toggle('turned', step > 0);
+    sweep(leaf);
+    turned += step;
+    setTimeout(stack, reduce ? 0 : 560);
+    setTimeout(go, reduce ? 0 : 260);
+  };
+  go();
+}
+// The lifting page darkens then brightens as it passes the vertical.
+function sweep(leaf) {
+  if (reduce) return;
+  const t0 = performance.now();
+  const f = () => {
+    const p = Math.min(1, (performance.now() - t0) / 1050);
+    const s = Math.sin(p * Math.PI) * .32;
+    leaf.querySelectorAll('.shade').forEach(el => el.style.setProperty('--s', s));
+    if (p < 1) requestAnimationFrame(f);
+  };
+  f();
+}
+
+// Drag to turn: the page follows your hand, then completes or falls back.
+let drag = null;
+book.addEventListener('pointerdown', e => {
+  if (innerWidth <= 760) return;
+  const toc = e.target.closest('[data-go]');
+  if (toc) { setTurned(+toc.dataset.go); return }
+  if (e.target.closest('a')) return;
+  const r = book.getBoundingClientRect(), right = e.clientX > r.left + r.width / 2;
+  const leaf = right ? leaves[turned] : leaves[turned - 1];
+  if (!leaf) return;
+  drag = { leaf, right, sx:e.clientX, w:r.width / 2, moved:false };
+  leaf.classList.add('live'); leaf.style.zIndex = 200;
+  book.setPointerCapture(e.pointerId);
+});
+book.addEventListener('pointermove', e => {
+  const r = book.getBoundingClientRect();
+  // Reach for the outer corner and it lifts.
+  const near = Math.hypot(r.right - e.clientX, r.bottom - e.clientY) < 120 && !drag;
+  leaves[turned] && leaves[turned].style.setProperty('--ear', near ? '34px' : '0px');
+  if (!drag) return;
+  const dx = e.clientX - drag.sx;
+  if (Math.abs(dx) > 4) drag.moved = true;
+  let a = drag.right ? Math.max(-180, Math.min(0, dx / drag.w * 120)) : Math.max(-180, Math.min(0, -180 + dx / drag.w * 120));
+  drag.a = a;
+  drag.leaf.style.transform = `rotateY(${a}deg)`;
+  drag.leaf.querySelectorAll('.shade').forEach(el => el.style.setProperty('--s', Math.sin(-a / 180 * Math.PI) * .32));
+});
+book.addEventListener('pointerup', () => {
+  if (!drag) return;
+  const { leaf, right, moved, a } = drag;
+  leaf.classList.remove('live'); leaf.style.transform = '';
+  leaf.querySelectorAll('.shade').forEach(el => el.style.setProperty('--s', 0));
+  const commit = !moved || (right ? a < -50 : a > -130);
+  if (commit) { leaf.classList.toggle('turned', right); turned += right ? 1 : -1; sweep(leaf) }
+  setTimeout(stack, 560);
+  drag = null;
+});
+addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') setTurned(turned + 1);
+  if (e.key === 'ArrowLeft') setTurned(turned - 1);
+});
+</script>
+</body>
+</html>

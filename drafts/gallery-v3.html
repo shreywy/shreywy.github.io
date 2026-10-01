@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="en" class="intro at-door">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gallery v3 · Shrey Mistry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script src="nav.js"></script>
+<style>
+  :root {
+    --wall:#1c1a17; --text:#ece5d6; --soft:#cfc6b4; --mid:#958c7b; --mat:#f1ece0; --brass:#c9a45c; --ivory:#ece5d6;
+    --mx:50vw; --my:50vh;
+    /* One size system for every piece: a large unit, and a small unit that stacks two-high to match it */
+    --L:min(44vh, 440px); --fb:16px; --bd:4px; --mp:18px; --g:22px;
+    --T:calc(var(--fb) + var(--bd) + var(--mp));
+    --S:calc((var(--L) - 2 * var(--T) - var(--g)) / 2);
+  }
+  * { box-sizing:border-box; margin:0; padding:0 }
+  html, body { height:100% }
+  body { background:var(--wall); color:var(--text); font:500 19px/1.5 'Cormorant Garamond', Garamond, serif; overflow:hidden }
+  a { color:inherit }
+  button, input, textarea { font:inherit; color:inherit }
+
+  /* Header: hidden at the entrance, appears once you walk in */
+  header { position:fixed; top:0; left:0; right:0; z-index:20; display:flex; justify-content:space-between; align-items:center; padding:22px 4vw 30px; font-size:14px; letter-spacing:.2em; text-transform:uppercase;
+    transition:opacity .5s, transform .5s cubic-bezier(.2,.8,.1,1) }
+  .at-door header { opacity:0; transform:translateY(-10px); pointer-events:none }
+  header a { text-decoration:none; cursor:pointer }
+  header nav { display:flex; gap:28px; align-items:center }
+  header .room { color:var(--mid) }
+
+  .hall { position:fixed; inset:0; cursor:grab; overflow:hidden }
+  .hall.drag { cursor:grabbing }
+  .scene { position:absolute; inset:0; transform-origin:50% 55% }
+  .track { position:absolute; top:0; bottom:0; left:0; display:flex; gap:10vw; padding:0 12vw 0 10vw; will-change:transform }
+  .bay { position:relative; flex:none; height:100%; display:flex; align-items:center; padding-top:4vh }
+
+  /* Track light above each bay. The cone starts at the very top of the screen so it never shows an edge. */
+  .lamp { position:absolute; top:0; left:-22%; right:-22%; height:100%; pointer-events:none;
+    background:radial-gradient(ellipse 50% 110% at 50% 0%, rgba(255,231,190,.19), rgba(255,231,190,.075) 50%, transparent 82%) }
+
+  /* Entrance: fills the screen on its own (padding 10vw + 80vw + gap 10vw) */
+  .bay:first-child { width:80vw }
+  .entrance { width:min(56vw, 760px) }
+  .entrance h1 { --lit:1; --reach:100%; font-weight:400; font-size:clamp(64px, 8.6vw, 140px); line-height:.9; letter-spacing:-.01em; padding-bottom:.14em; margin-bottom:-.14em; color:var(--text);
+    background:linear-gradient(180deg, rgba(255,247,230,var(--lit)) 0%, rgba(236,229,214,calc(var(--lit) * .92)) var(--reach), rgba(236,229,214,calc(var(--lit) * .06)) calc(var(--reach) + 28%));
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent }
+  .entrance p { font-style:italic; font-size:clamp(20px, 1.9vw, 26px); color:var(--soft); margin-top:24px; max-width:30ch; line-height:1.35 }
+  .entrance .loc { max-width:none; font-style:normal; font-size:13px; letter-spacing:.24em; text-transform:uppercase; color:var(--mid); margin-top:20px }
+
+  .roomsign { width:auto; height:46vh; align-self:center; display:flex; align-items:center; border-left:1px solid rgba(236,229,214,.2); padding-left:18px }
+  .roomsign span { writing-mode:vertical-rl; transform:rotate(180deg); font-size:13px; letter-spacing:.32em; text-transform:uppercase; color:var(--mid) }
+
+  /* Wall text for experience and education */
+  .vinyl { width:min(30vw, 400px) }
+  .vinyl h2 { font-weight:500; font-size:clamp(44px, 4.2vw, 68px); line-height:1 }
+  .vinyl .role { font-style:italic; color:var(--soft); margin-top:10px; font-size:22px; line-height:1.25 }
+  .vinyl .where { font-size:13px; letter-spacing:.18em; text-transform:uppercase; color:var(--mid); margin:8px 0 18px }
+  .vinyl .sum { font-size:20px; color:#ddd5c4 }
+  .actions { display:flex; flex-direction:column; align-items:center; gap:16px; margin-top:24px }
+  .plaque { display:inline-block; padding:9px 18px 8px; font:700 13.5px/1.2 'Cormorant Garamond'; letter-spacing:.16em; text-transform:uppercase; color:#1d1408;
+    background:linear-gradient(135deg, #efd592, #c49a4e 55%, #e7cb86); box-shadow:inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(0,0,0,.2), 0 6px 14px rgba(0,0,0,.45) }
+  .vinyl .more { display:inline-flex; gap:10px; align-items:center; padding:11px 18px 10px; background:none; border:1px solid rgba(236,229,214,.45); cursor:pointer;
+    font:600 13px/1 'Cormorant Garamond'; letter-spacing:.18em; text-transform:uppercase; color:var(--text); transition:background .25s, color .25s, border-color .25s }
+  .vinyl .more:hover { background:var(--ivory); color:#1c1a17; border-color:var(--ivory) }
+  .bay.xp { align-items:center; padding-top:4vh }
+
+  /* Experience and education hang as paper objects, so they can slide off the wall like the frames do */
+  .doc { position:relative; width:min(30vw, 410px); padding:34px 34px 30px; color:#2b2620; font:400 18px/1.5 'EB Garamond', serif;
+    box-shadow:0 30px 50px -18px rgba(0,0,0,.78), 0 6px 14px rgba(0,0,0,.42) }
+  .doc h2 { font:500 clamp(38px, 3.3vw, 54px)/1 'Cormorant Garamond', serif; color:#1f1b16 }
+  .doc .role { font:italic 500 21px/1.25 'Cormorant Garamond', serif; color:#4a4238; margin-top:8px }
+  .doc .where { font:600 12px/1 'Cormorant Garamond', serif; letter-spacing:.18em; text-transform:uppercase; color:#857a68; margin:10px 0 16px }
+  .doc .sum { font-size:17.5px; color:#332d26 }
+  .doc .more { display:inline-flex; gap:10px; align-items:center; padding:11px 18px 10px; background:none; border:1px solid rgba(43,38,32,.45); cursor:pointer;
+    font:700 12.5px/1 'Cormorant Garamond', serif; letter-spacing:.18em; text-transform:uppercase; color:#2b2620; transition:background .25s, color .25s }
+  .doc .more:hover { background:#2b2620; color:#f3ede0 }
+  /* Geotab: a certificate in a thin gilt frame */
+  .look-certificate { background:#f5efe1; border:12px solid; border-color:#ecd38c #d2ae5e #94702e #76561f; text-align:center;
+    box-shadow:inset 0 0 0 10px #f5efe1, inset 0 0 0 11px #b8975a, inset 0 0 0 14px #f5efe1, inset 0 0 0 15px #b8975a, 0 30px 50px -18px rgba(0,0,0,.78), 0 6px 14px rgba(0,0,0,.42) }
+  .look-certificate .sum { text-align:left }
+  /* AMD: a page of graph paper held by a binder clip */
+  .look-notebook { background-color:#f6f6f1; transform:rotate(.7deg);
+    background-image:linear-gradient(rgba(70,110,160,.14) 1px, transparent 1px), linear-gradient(90deg, rgba(70,110,160,.14) 1px, transparent 1px); background-size:18px 18px; background-position:-1px -1px }
+  .look-notebook::before { content:""; position:absolute; top:-14px; left:50%; width:74px; height:26px; margin-left:-37px; border-radius:3px 3px 6px 6px; background:linear-gradient(#2c2c2c, #111); box-shadow:0 3px 6px rgba(0,0,0,.4) }
+  .look-notebook::after { content:""; position:absolute; top:-30px; left:50%; width:50px; height:22px; margin-left:-25px; border:3px solid #a7a9ac; border-bottom:0; border-radius:12px 12px 0 0 }
+  /* Bombardier: a manila report folder with a labelled tab and a paper clip */
+  .look-report { background:linear-gradient(160deg, #ead8ad, #dcc58f); transform:rotate(-.5deg); margin-top:22px }
+  .look-report::before { content:attr(data-tab); position:absolute; top:-26px; left:22px; height:27px; padding:0 18px; border-radius:6px 6px 0 0; background:#ead8ad;
+    font:700 11px/27px 'Cormorant Garamond', serif; letter-spacing:.18em; text-transform:uppercase; color:#6b5a35 }
+  .look-report::after { content:""; position:absolute; top:-16px; right:36px; width:15px; height:50px; border:2.5px solid #9ea3a8; border-radius:9px; transform:rotate(8deg) }
+  /* TMU: a diploma on parchment with a seal */
+  .look-diploma { background:radial-gradient(ellipse at 50% 40%, #f6edd6, #e9dbb8); text-align:center;
+    box-shadow:inset 0 0 0 8px #f3e8cd, inset 0 0 0 9px #31507e, inset 0 0 0 12px #f3e8cd, inset 0 0 0 13px #31507e, 0 30px 50px -18px rgba(0,0,0,.78), 0 6px 14px rgba(0,0,0,.42) }
+  .look-diploma::after { content:""; position:absolute; left:26px; bottom:-18px; width:58px; height:58px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #c2463a, #7d1f18 70%); box-shadow:inset 0 -3px 6px rgba(0,0,0,.35), 0 4px 10px rgba(0,0,0,.4) }
+  /* Resume: a small stack of pages */
+  .look-stack { background:#fbfaf6; }
+  .look-stack::before, .look-stack::after { content:""; position:absolute; inset:0; background:#f1eee6; z-index:-1; box-shadow:0 10px 24px rgba(0,0,0,.45) }
+  .look-stack::before { transform:rotate(-3deg) translate(-6px, 4px) } .look-stack::after { transform:rotate(2.2deg) translate(5px, 6px); background:#f6f3ec }
+  .doc .plaque { margin-top:4px }
+
+  /* Timeline above the internships: a dimension line per role, dashed rail for school terms between */
+  .tl { position:absolute; left:0; right:0; top:var(--tl-top, 20vh); height:0; --w:100% }
+  .tl .rail { position:absolute; left:-10vw; right:0; top:0; border-top:1px dashed rgba(236,229,214,.22) }
+  .tl .gap { position:absolute; left:-10vw; width:10vw; top:8px; text-align:center; font-style:italic; font-size:14px; color:var(--mid) }
+  .tl .span { position:absolute; left:0; top:-1px; width:var(--w); height:2px; background:var(--brass) }
+  .tl.first .rail { left:0 }
+  .tl .span::before { content:""; position:absolute; top:-4px; left:-8px; border:5px solid transparent; border-right:8px solid var(--brass); border-left:0 }
+  .tl .span::after { content:""; position:absolute; top:-4px; right:-5px; width:10px; height:10px; border-radius:50%; background:var(--brass); box-shadow:0 0 0 3px var(--wall) }
+  .tl .s, .tl .e { position:absolute; bottom:12px; font:700 12px/1 'Cormorant Garamond'; letter-spacing:.16em; text-transform:uppercase; color:var(--text); white-space:nowrap }
+  .tl .e { left:0 } .tl .s { right:0 }
+  .tl small { position:absolute; top:10px; left:0; right:0; text-align:center; font-style:italic; font-size:14px; color:var(--soft) }
+
+  .quote { width:min(40vw, 560px) }
+  .quote blockquote { font-style:italic; font-weight:400; font-size:clamp(30px, 2.8vw, 44px); line-height:1.2 }
+  .quote cite { display:block; font-style:normal; font-size:13px; letter-spacing:.24em; text-transform:uppercase; color:var(--mid); margin-top:20px }
+
+  /* Exhibits */
+  .exhibit { display:flex; flex-direction:column; align-items:center; gap:30px; padding-top:2vh }
+  .art { display:flex; align-items:flex-end; gap:var(--g); cursor:none }
+  .col { display:flex; flex-direction:column; gap:var(--g) }
+  .frame { position:relative; border:var(--fb) solid; transform-style:preserve-3d; will-change:transform;
+    box-shadow:0 34px 50px -18px rgba(0,0,0,.8), 0 8px 14px rgba(0,0,0,.45) }
+  /* A sheen over the moulding only, not the picture */
+  .frame::after { content:""; position:absolute; inset:calc(-1 * var(--fb)); border:var(--fb) solid transparent; pointer-events:none;
+    background:linear-gradient(125deg, rgba(255,255,255,.28), transparent 35%, transparent 65%, rgba(0,0,0,.22)) border-box;
+    -webkit-mask:linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask:linear-gradient(#000 0 0) padding-box exclude, linear-gradient(#000 0 0) }
+  .bead { padding:var(--bd) }
+  .mat { padding:var(--mp); background:var(--mat); box-shadow:inset 0 2px 6px rgba(0,0,0,.25) }
+  .mat img { display:block; object-fit:cover; object-position:top; box-shadow:0 0 0 3px #fbf8f1, 0 0 0 4px rgba(0,0,0,.12) }
+  .ls { aspect-ratio:16 / 10 } .pt { aspect-ratio:9 / 19 }
+  .L img { height:var(--L); width:auto } .S img { height:var(--S); width:auto }
+
+  .gilt { border-color:#ecd38c #d2ae5e #94702e #76561f }
+  .gilt .bead { background:radial-gradient(circle, #f7e6a8 0 1.4px, #6f5220 1.9px) 0 0 / 5px 5px; box-shadow:inset 0 0 0 1px rgba(60,40,10,.5) }
+  .walnut { border-color:#6b4a30 #573b25 #3a2717 #2c1d11 }
+  .walnut .bead { background:linear-gradient(135deg, #e8cd86, #a8823d); box-shadow:inset 0 0 0 1px rgba(40,25,5,.6) }
+  .ebony { border-color:#3a3632 #2a2724 #141210 #0b0a09 }
+  .ebony .bead { background:linear-gradient(#d9bb72, #9d7b37); padding:2px; margin:2px 0; box-shadow:0 0 0 2px #121110 }
+  .silver { border-color:#e2e2df #c3c3bf #87877f #6c6c66 }
+  .silver .bead { background:radial-gradient(circle, #f4f4f1 0 1.4px, #66665f 1.9px) 0 0 / 5px 5px }
+
+  .placard { --r:0; width:min(560px, 100%); text-align:center; opacity:var(--r); transform:translateY(calc((1 - var(--r)) * 22px)); will-change:transform, opacity }
+  .placard::before { content:""; display:block; width:40px; height:1px; margin:0 auto 14px; background:rgba(236,229,214,.35) }
+  .placard b { font-weight:500; font-size:30px; line-height:1; color:var(--text) }
+  .placard i { color:var(--mid); font-size:17px; margin-left:8px }
+  .placard p { font-size:19px; line-height:1.4; color:#ddd5c4; margin:8px auto 0; max-width:44ch }
+  .placard .med { font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--mid); margin-top:10px }
+  .placard .more { display:inline-flex; gap:10px; align-items:center; margin-top:16px; padding:11px 18px 10px; background:none; border:1px solid rgba(236,229,214,.45); cursor:pointer;
+    font:700 12.5px/1 'Cormorant Garamond'; letter-spacing:.18em; text-transform:uppercase; color:var(--text); transition:background .25s, color .25s, border-color .25s }
+  .placard .more:hover { background:var(--ivory); color:#1c1a17; border-color:var(--ivory) }
+
+  /* Guestbook */
+  .guest { width:min(36vw, 480px) }
+  .guest h2 { font-weight:400; font-size:clamp(44px, 4.4vw, 72px); line-height:1 }
+  .guest > p { font-style:italic; color:var(--soft); margin:10px 0 22px; font-size:21px }
+  .book { position:relative; background:#efe9db; color:#2b2721; padding:24px 26px 22px; box-shadow:0 30px 50px -20px rgba(0,0,0,.8); cursor:auto }
+  .book label { display:block; font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:#857c6b; margin-top:12px }
+  .book input, .book textarea { display:block; width:100%; background:transparent; border:0; border-bottom:1px solid #b9b09d; padding:6px 0 5px; font-size:20px; outline:none; resize:none; color:#2b2721 }
+  .book textarea { height:84px; background:repeating-linear-gradient(transparent 0 27px, #cfc6b2 27px 28px); border-bottom:0; line-height:28px; font-family:'EB Garamond', serif; font-size:18px }
+  .book input:focus, .book textarea:focus { border-color:#7b5c22 }
+  .book .hp { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden }
+  .book button { margin-top:18px; padding:12px 22px; border:0; cursor:pointer; letter-spacing:.18em; text-transform:uppercase; font-size:13px; font-weight:700; color:#1d1408;
+    background:linear-gradient(135deg, #efd592, #c49a4e 55%, #e7cb86); box-shadow:inset 0 1px 0 rgba(255,255,255,.5), 0 4px 10px rgba(0,0,0,.3); transition:transform .12s }
+  .book button:active { transform:translateY(1px) scale(.98) }
+  .book .err { min-height:20px; margin-top:8px; font-size:15px; color:#8b2a1f }
+  .ink { position:absolute; inset:0; display:grid; place-items:center; align-content:center; gap:10px; background:rgba(239,233,219,.95); opacity:0; pointer-events:none; transition:opacity .3s; text-align:center }
+  .book.sending .ink { opacity:1; pointer-events:auto }
+  .ink svg { width:230px; height:70px; overflow:visible }
+  .ink path { fill:none; stroke:#2b2721; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:340; stroke-dashoffset:340 }
+  .ink circle { fill:#2b2721 }
+  /* starts fresh on every send */
+  .book.sending .ink path { animation:write 1.5s cubic-bezier(.5,.1,.4,1) infinite }
+  .book.sending .ink circle { animation:blot 1.5s ease-out infinite }
+  @keyframes write { 0% { stroke-dashoffset:340; opacity:1 } 75% { stroke-dashoffset:0; opacity:1 } 92%, 100% { stroke-dashoffset:0; opacity:0 } }
+  @keyframes blot { 0%, 70% { r:0 } 76% { r:4px } 90%, 100% { r:4px; opacity:0 } }
+  .ink p { font:italic 500 20px/1.2 'Cormorant Garamond'; color:#5f574a }
+  .seal { position:absolute; inset:0; display:grid; place-items:center; text-align:center; background:#efe9db; opacity:0; pointer-events:none; padding:30px }
+  .seal .wax { width:86px; height:86px; border-radius:50%; margin:0 auto 14px; display:grid; place-items:center; color:#f3d9c9; font-size:30px; font-style:italic;
+    background:radial-gradient(circle at 35% 30%, #c2463a, #7d1f18 70%); box-shadow:inset 0 -4px 8px rgba(0,0,0,.35), 0 4px 10px rgba(0,0,0,.25) }
+  .elsewhere { margin-top:22px; font-size:18px; color:var(--soft) }
+  .elsewhere a { text-decoration:none; border-bottom:1px solid rgba(236,229,214,.35); margin-right:18px }
+  .offclock { margin-top:14px; font-style:italic; font-size:17px; color:var(--mid); max-width:40ch }
+
+  /* Spotlight on the cursor */
+  .beam { position:fixed; inset:0; pointer-events:none; z-index:5; background:radial-gradient(circle 44vmax at var(--mx) var(--my), transparent 0%, rgba(8,7,6,.1) 38%, rgba(8,7,6,.55) 100%) }
+
+  /* Hint, bottom centre */
+  .hint { position:fixed; left:50%; bottom:46px; transform:translateX(-50%); z-index:15; display:flex; align-items:center; gap:14px; font-size:13px; letter-spacing:.24em; text-transform:uppercase; color:var(--soft); opacity:0; transition:opacity .8s; pointer-events:none; white-space:nowrap }
+  .hint.on { opacity:1 }
+  .hint i { position:relative; width:56px; height:1px; background:rgba(236,229,214,.3); overflow:hidden }
+  .hint i::after { content:""; position:absolute; left:0; top:-1px; width:14px; height:3px; border-radius:2px; background:var(--text); animation:walk 1.8s cubic-bezier(.5,0,.3,1) infinite }
+  @keyframes walk { from { transform:translateX(-14px) } to { transform:translateX(56px) } }
+  .progress { position:fixed; left:4vw; right:4vw; bottom:12px; height:28px; z-index:16; cursor:pointer; touch-action:none }
+  .progress::before, .progress i { position:absolute; left:0; right:0; top:14px; height:1px; border-radius:2px; transition:top .25s, height .25s }
+  .progress::before { content:""; background:rgba(236,229,214,.14) }
+  .progress i { background:var(--text); transform-origin:left; transform:scaleX(var(--p, 0)) }
+  .progress:hover::before, .progress:hover i, .progress.drag::before, .progress.drag i { top:12px; height:5px }
+  .marks button { position:absolute; top:14px; left:var(--at); width:13px; height:13px; margin:-6px 0 0 -6px; padding:0; border-radius:50%; cursor:pointer;
+    background:var(--wall); border:2px solid var(--ivory); opacity:0; transform:scale(.3); transition:opacity .25s, transform .3s cubic-bezier(.3,1.5,.5,1) }
+  .progress:hover .marks button, .progress.drag .marks button { opacity:1; transform:none }
+  .marks button:hover { background:var(--ivory) }
+  .marks span { position:absolute; bottom:20px; left:50%; translate:-50% 0; white-space:nowrap; padding:6px 11px 5px; border-radius:999px; pointer-events:none;
+    background:rgba(20,18,16,.9); color:var(--text); font:700 11px/1 'Cormorant Garamond'; letter-spacing:.18em; text-transform:uppercase; opacity:0; transition:opacity .2s }
+  .marks button:hover span { opacity:1 }
+
+  /* Loupe: an ivory-rimmed lens on a slim charcoal handle */
+  .loupe { position:fixed; left:0; top:0; z-index:60; pointer-events:none; opacity:0; transition:opacity .2s }
+  .loupe.on { opacity:1 }
+  .loupe .lens { position:absolute; left:-78px; top:-78px; width:156px; height:156px; border-radius:50%; background-color:#0e0d0c; background-repeat:no-repeat;
+    box-shadow:0 0 0 1px rgba(0,0,0,.6), 0 0 0 4px var(--ivory), 0 0 0 5px rgba(0,0,0,.35), 0 16px 34px rgba(0,0,0,.55); transform:scale(.6); transition:transform .35s cubic-bezier(.3,1.5,.5,1) }
+  .loupe.on .lens { transform:scale(1) }
+  .loupe .lens::after { content:""; position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 30% 24%, rgba(255,255,255,.16), transparent 28%), radial-gradient(circle, transparent 84%, rgba(0,0,0,.16)) }
+  .loupe .handle { position:absolute; left:57px; top:57px; width:10px; height:76px; border-radius:5px; transform-origin:top center; transform:rotate(-45deg);
+    background:linear-gradient(90deg, #262422, #45413d 50%, #1d1b19); box-shadow:0 6px 12px rgba(0,0,0,.45) }
+  .loupe .handle::before { content:""; position:absolute; top:0; left:-2px; right:-2px; height:13px; border-radius:2px; background:var(--ivory) }
+  .loupe .cue { position:absolute; left:-95px; top:-116px; width:190px; white-space:nowrap; text-align:center; font:700 11px/1 'Cormorant Garamond'; letter-spacing:.18em; text-transform:uppercase; color:#1c1a17; background:var(--ivory); padding:7px 0 6px; border-radius:999px; opacity:0; transition:opacity .4s .5s; box-shadow:0 4px 10px rgba(0,0,0,.35) }
+  .loupe.on .cue { opacity:1 }
+
+  /* Detail view: the piece slides away along a rail to reveal what's behind it */
+  .detail { position:fixed; inset:0; z-index:40; pointer-events:none }
+  .detail.on { pointer-events:auto }
+  .detail .backdrop { position:absolute; inset:0; background:rgba(10,9,8,.86); backdrop-filter:blur(6px); opacity:0; transition:opacity .5s }
+  .detail.on .backdrop { opacity:1 }
+  .panel { position:absolute; inset:6vh 5vw; background:#24211d; box-shadow:inset 0 0 0 1px rgba(236,229,214,.08), inset 0 30px 60px -30px rgba(0,0,0,.6), 0 40px 80px rgba(0,0,0,.5);
+    display:grid; grid-template-columns:minmax(320px, 0.85fr) 1.15fr; gap:4vw; padding:84px 4vw 5vh; visibility:hidden; overflow:hidden }
+  .panel, .panel .info, .panel .aside, .thumbs { scrollbar-width:thin; scrollbar-color:rgba(236,229,214,.25) transparent }
+  .glimpse .win { scrollbar-width:thin; scrollbar-color:#c9c3b6 #f4f2ee }
+  .panel .info, .panel .aside { overflow:auto; padding-right:14px; font:400 17.5px/1.6 'EB Garamond', serif; color:#ddd5c4 }
+  .panel .aside { display:none }
+  .panel.text { inset:auto; left:50%; top:50%; translate:-50% -50%; width:min(1120px, 90vw); max-height:88vh; grid-template-columns:1.3fr .7fr; align-items:start; padding:84px 48px 40px }
+  .panel.text .view { display:none } .panel.text .aside { display:block; margin-top:6px }
+  .panel.text .info, .panel.text .aside { max-height:calc(88vh - 124px) }
+  .panel .logo { display:flex; align-items:center; justify-content:center; height:84px; padding:16px 26px; margin:20px 0 4px; background:#efe9db; border-radius:8px }
+  .panel .logo img { height:52px; width:auto; max-width:100%; object-fit:contain; display:block }
+  .courses { display:grid; grid-template-columns:1fr 1fr; gap:2px 22px; font-size:15.5px }
+  .courses span { padding:5px 0; border-bottom:1px solid rgba(236,229,214,.08) }
+  .courses b { font:600 12px/1 'Cormorant Garamond'; letter-spacing:.08em; color:var(--mid); margin-right:6px }
+  .courses em { display:none; font:700 11px/1 'Cormorant Garamond'; font-style:normal; color:#1d1408; background:var(--brass); padding:2px 5px 1px; margin-left:6px; vertical-align:2px }
+  .glimpse .win.pdf { overflow:hidden; background:#525659 }
+  .glimpse .win.pdf iframe { width:100%; height:100%; transform:none; opacity:1 }
+  .panel .kick { font:500 12px/1 'Cormorant Garamond'; letter-spacing:.26em; text-transform:uppercase; color:var(--mid) }
+  .panel h2 { font:400 clamp(44px, 4.6vw, 76px)/1 'Cormorant Garamond'; color:var(--text); margin:12px 0 8px }
+  .panel .tag { font:italic 400 24px/1.3 'Cormorant Garamond'; color:var(--soft) }
+  .panel .where { font:600 13px/1 'Cormorant Garamond'; letter-spacing:.18em; text-transform:uppercase; color:var(--mid); margin:12px 0 4px }
+  .panel h3 { font:600 12px/1 'Cormorant Garamond'; letter-spacing:.24em; text-transform:uppercase; color:var(--brass); margin:24px 0 10px }
+  .panel ul { list-style:none }
+  .panel li { position:relative; padding-left:20px; margin-bottom:10px }
+  .panel li::before { content:""; position:absolute; left:0; top:.78em; width:8px; height:1px; background:var(--brass) }
+  .panel table { border-collapse:collapse; font-size:15.5px; width:100% }
+  .panel td { padding:5px 0; border-bottom:1px solid rgba(236,229,214,.1) }
+  .panel td:first-child { color:var(--mid); width:42% }
+  .chips { display:flex; flex-wrap:wrap; gap:8px }
+  .chips span { padding:5px 10px 4px; font-size:14.5px; border:1px solid rgba(236,229,214,.18); color:#e4dccb }
+  .panel .card { background:rgba(255,255,255,.025); border:1px solid rgba(236,229,214,.08); padding:4px 24px 22px }
+  .panel blockquote { font:italic 400 24px/1.3 'Cormorant Garamond'; color:var(--text) }
+  .panel blockquote + p { font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:var(--mid); margin-top:8px }
+  .links { display:flex; gap:12px; flex-wrap:wrap; margin-top:26px }
+  .links a { text-decoration:none; padding:10px 16px; font:600 13px/1 'Cormorant Garamond'; letter-spacing:.18em; text-transform:uppercase; border:1px solid rgba(201,164,92,.6); color:var(--text); transition:background .25s, color .25s }
+  .links a:hover { background:var(--brass); color:#1c1a17 }
+  .close { position:absolute; top:18px; right:22px; z-index:3; display:inline-flex; align-items:center; gap:10px; padding:13px 22px 12px; border:0; border-radius:999px; cursor:pointer;
+    background:var(--ivory); color:#1c1a17; font:700 13.5px/1 'Cormorant Garamond'; letter-spacing:.18em; text-transform:uppercase; box-shadow:0 8px 20px rgba(0,0,0,.45); transition:background .2s, transform .2s }
+  .close:hover { background:#fff; transform:translateX(-3px) }
+  .close span { font-size:18px; line-height:0; letter-spacing:0 }
+  .view { display:flex; flex-direction:column; gap:16px; min-height:0 }
+  .glimpse { flex:1; min-height:0; display:flex; flex-direction:column; background:#fff; box-shadow:0 20px 40px rgba(0,0,0,.5); border-radius:6px; overflow:hidden }
+  .glimpse .bar { display:flex; align-items:center; gap:10px; padding:9px 12px; background:#e9e6df; font:13px/1 ui-sans-serif, system-ui, sans-serif; color:#555 }
+  .glimpse .bar span { flex:1; background:#fff; border-radius:5px; padding:6px 10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+  .glimpse .bar a, .glimpse .bar button { text-decoration:none; color:#333; padding:6px 9px; border-radius:5px; border:0; background:none; cursor:pointer; font:inherit; white-space:nowrap }
+  .glimpse .bar a:hover, .glimpse .bar button:hover { background:#fff }
+  .glimpse .bar button.on { background:#2b2721; color:#f3ede0 }
+  .glimpse .win { position:relative; flex:1; overflow:auto; background:#fff center top / cover no-repeat }
+  .glimpse .win img { display:block; width:100% }
+  .glimpse .win.dark { background:#111; display:grid; place-items:center }
+  .glimpse .win.dark img { width:auto; max-width:100%; max-height:100% }
+  .glimpse .win.live { overflow:hidden }
+  .glimpse .win iframe { position:absolute; left:0; top:0; border:0; transform-origin:0 0; background:#fff; opacity:0; transition:opacity .5s }
+  .glimpse .win iframe.ready { opacity:1 }
+  .thumbs { display:flex; gap:12px; overflow-x:auto; padding-bottom:4px }
+  .thumbs button { flex:none; border:0; padding:4px; background:#14120f; cursor:pointer; opacity:.6; transition:opacity .25s; box-shadow:0 0 0 1px rgba(236,229,214,.15) }
+  .thumbs button.on, .thumbs button:hover { opacity:1 }
+  .thumbs button.on { box-shadow:0 0 0 2px var(--brass) }
+  .thumbs img { display:block; height:58px; width:auto }
+  .thumbs .word { height:58px; padding:0 16px; display:grid; place-items:center; font:700 12px/1 'Cormorant Garamond'; letter-spacing:.18em; text-transform:uppercase; color:var(--text) }
+  .ghost { position:fixed; z-index:45; margin:0; pointer-events:none; transform-origin:0 0 }
+
+  /* Intro curtain */
+  .intro .entrance > *, .intro .progress { opacity:0 }
+
+  @media (max-width: 760px), (pointer: coarse) and (max-width: 1024px) {
+    :root { --fb:11px; --bd:3px; --mp:10px; --g:14px }
+    body { overflow-x:hidden; overflow-y:auto }
+    /* On phones the header blurs whatever scrolls beneath it */
+    header { padding:16px 16px 24px; font-size:12px }
+    header::before { content:""; position:absolute; inset:0; z-index:-1; backdrop-filter:blur(14px) saturate(1.1); -webkit-backdrop-filter:blur(14px); background:rgba(28,26,23,.35);
+      -webkit-mask:linear-gradient(#000 55%, transparent); mask:linear-gradient(#000 55%, transparent) }
+    header nav { gap:16px } header .room { display:none }
+    .hall { position:relative; inset:auto; cursor:auto; overflow:visible }
+    .scene { position:relative; inset:auto }
+    .track { position:relative; flex-direction:column; align-items:center; gap:0; padding:0 16px 140px; transform:none !important }
+    .bay, .bay.xp { height:auto; min-height:auto; width:100%; padding:16vh 0 4vh; justify-content:center; flex-direction:column; align-items:center }
+    .lamp { left:-16px; right:-16px; background:radial-gradient(ellipse closest-side at 50% 30%, rgba(255,231,190,.12), transparent) }
+    .bay:first-child { width:100%; min-height:100svh; padding:0; justify-content:center }
+    .entrance, .vinyl, .quote, .guest { width:100%; text-align:center }
+    .entrance p { margin-left:auto; margin-right:auto }
+    .roomsign { height:auto; border-left:0; padding:0; width:100%; justify-content:center; border-top:1px solid rgba(236,229,214,.2); padding-top:14px }
+    .roomsign span { writing-mode:horizontal-tb; transform:none }
+    /* Phones: the timeline runs down the left edge. Newest at the top, arrow pointing up. */
+    .bay.xp.has-tl { padding-left:40px }
+    .tl { position:absolute; left:12px; top:0; bottom:0; width:0; height:auto; margin:0 }
+    .tl .rail { left:0; right:auto; top:0; bottom:0; border-top:0; border-left:1px dashed rgba(236,229,214,.25) }
+    .tl.first .rail { top:calc(16vh + 20px) }
+    .tl .gap { display:none }
+    .tl .span { left:-1px; top:calc(16vh + 20px); bottom:calc(4vh + 20px); width:2px; height:auto; transform:none }
+    .tl .span::before { left:-4px; top:-8px; border:5px solid transparent; border-bottom:8px solid var(--brass); border-top:0 }
+    .tl .span::after { left:-4px; right:auto; top:auto; bottom:-5px }
+    .tl .e, .tl .s { left:7px; right:auto; font-size:10px; letter-spacing:.12em; writing-mode:vertical-rl; transform:rotate(180deg) }
+    .tl .e { top:6px; bottom:auto } .tl .s { bottom:8px; top:auto }
+    .tl small { display:none }
+    .doc { width:100%; text-align:left }
+    .look-certificate, .look-diploma { text-align:center }
+    .close { position:fixed; top:auto; right:auto; left:50%; bottom:16px; translate:-50% 0; padding:15px 28px 14px; background:var(--ivory); color:#1c1a17; border-radius:999px; font-size:13.5px; box-shadow:0 10px 24px rgba(0,0,0,.55); z-index:5 }
+    .close:hover { color:#1c1a17 }
+    .close, .doc .more { white-space:nowrap }
+    .doc .more { font-size:11.5px; letter-spacing:.14em; padding:11px 14px 10px }
+    .doc { padding:28px 22px 26px }
+    .courses { grid-template-columns:1fr }
+    .panel.resume .glimpse { display:none }
+    .exhibit { flex-direction:column; align-items:center; gap:22px; width:100% }
+    /* Phones: the lead piece spans the width, the rest pair up beneath it */
+    .art { display:grid; grid-template-columns:1fr 1fr; gap:var(--g); width:100%; align-items:start; cursor:pointer }
+    .col { display:contents }
+    .art .frame { justify-self:center; max-width:100% }
+    .art .frame.lead { grid-column:1 / -1 }
+    .art .frame img.ls { width:100%; height:auto }
+    .art .frame img.pt { width:min(100%, 150px); height:auto }
+    .art .frame.lead img.pt { width:auto; height:min(56vh, 480px) }
+    .placard { width:100%; max-width:420px }
+    .book { text-align:left }
+    .beam, .loupe, .progress { display:none }
+    .hint { bottom:22px }
+    .hint i { width:1px; height:30px } .hint i::after { width:3px; height:10px; left:-1px; top:0; animation:fall 1.8s cubic-bezier(.5,0,.3,1) infinite }
+    @keyframes fall { from { transform:translateY(-10px) } to { transform:translateY(30px) } }
+    .panel, .panel.text { inset:0; translate:none; width:auto; max-height:none; grid-template-columns:1fr; padding:40px 18px 96px; overflow:auto; display:block }
+    .panel.text .info, .panel.text .aside { max-height:none }
+    .panel .info, .panel .aside { overflow:visible; padding-right:0 }
+    .panel.text .aside { margin-top:28px }
+    .view { margin-top:28px }
+    .glimpse { height:66vh; flex:none }
+  }
+  @media (prefers-reduced-motion: reduce) { .hint i::after { animation:none } }
+</style>
+</head>
+<body>
+<header>
+  <a id="home">Shrey Mistry</a>
+  <nav><span class="room" id="where">Entrance</span><a id="toResume">Resume</a><a id="toGuest">Guestbook</a></nav>
+</header>
+
+<div class="hall" id="hall"><div class="scene" id="scene"><div class="track" id="track">
+  <section class="bay" data-room="Entrance">
+    <div class="lamp"></div>
+    <div class="entrance">
+      <h1>Shrey Mistry</h1>
+      <p>Computer Science student, graduating May 2027.</p>
+      <p class="loc">Toronto, Ontario</p>
+    </div>
+  </section>
+
+  <section class="bay" data-room="Internships"><div class="roomsign"><span>Room one, Internships</span></div></section>
+  <section class="bay" data-room="Internships" id="quoteBay"><div class="lamp"></div><div class="quote">
+    <blockquote>&ldquo;Shrey was instrumental in taking a new hardware product from early concept to market.&rdquo;</blockquote>
+    <cite>Rob Wyatt, Geotab</cite></div></section>
+
+  <!-- experience is inserted here, newest first -->
+  <section class="bay" data-room="Projects" id="projSign"><div class="roomsign"><span>Room two, Projects</span></div></section>
+  <!-- projects are inserted here -->
+  <section class="bay" data-room="Education" id="eduSign"><div class="roomsign"><span>Room three, Education</span></div></section>
+  <!-- education is inserted here -->
+  <section class="bay" data-room="Guestbook" id="guestBay"><div class="roomsign"><span>Guestbook</span></div></section>
+  <section class="bay" data-room="Guestbook"><div class="lamp"></div><div class="guest">
+    <h2>Sign the guestbook</h2>
+    <p>Leave a note and I&rsquo;ll write back.</p>
+    <form class="book" id="book" novalidate>
+      <label for="gname">Name</label><input id="gname" name="name" autocomplete="name" maxlength="100" required>
+      <label for="gmail">Email</label><input id="gmail" name="email" type="email" autocomplete="email" maxlength="200" required>
+      <label for="gnote">Note</label><textarea id="gnote" name="message" maxlength="4000" required></textarea>
+      <div class="hp" aria-hidden="true"><label for="gsite">Website</label><input id="gsite" name="website" tabindex="-1" autocomplete="off"></div>
+      <button type="submit">Sign</button>
+      <div class="ink" aria-hidden="true"><svg viewBox="0 0 230 70"><path d="M8 48 C 22 20, 38 14, 40 34 S 34 60, 52 44 S 74 12, 82 30 S 80 58, 98 44 S 118 22, 128 36 S 136 56, 152 40 S 172 18, 182 34 S 196 50, 222 30"/><circle cx="222" cy="30" r="0"/></svg><p>Signing the book</p></div>
+      <p class="err" id="gerr" role="status"></p>
+      <div class="seal" id="seal"><div><div class="wax">S</div><p style="font-size:22px">Thanks, it&rsquo;s in the book.</p><p id="sealNote" style="font-size:14px; color:#857c6b; margin-top:6px"></p></div></div>
+    </form>
+    <p class="elsewhere"><a href="https://github.com/shreywy">GitHub</a><a href="https://linkedin.com/in/shreymistry">LinkedIn</a></p>
+    <p class="offclock">Off the clock: F1 and all things cars, 3D printing functional parts, and self-hosting on Raspberry Pis.</p>
+  </div></section>
+</div></div></div>
+
+<div class="beam"></div>
+<div class="hint" id="hint"><span id="hintText">Scroll or drag to walk through</span><i></i></div>
+<div class="progress" id="prog" title="Drag to move through the gallery"><i id="bar"></i><div class="marks" id="marks"></div></div>
+<div class="loupe" id="loupe"><span class="handle"></span><div class="lens" id="lens"></div><span class="cue">Click to look closer</span></div>
+
+<div class="detail" id="detail" aria-hidden="true">
+  <div class="backdrop" id="backdrop"></div>
+  <article class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="dTitle">
+    <button class="close" id="close"><span>&larr;</span> Back to the wall</button>
+    <div class="info" id="dInfo"></div>
+    <div class="view">
+      <div class="glimpse"><div class="bar"><span id="dUrl"></span><button id="dLive" type="button">Use it live</button><a id="dOpen" target="_blank" rel="noopener">Open &#8599;</a></div>
+        <div class="win" id="dWin"><img id="dImg" alt=""><iframe id="dFrame" title="Live project" referrerpolicy="no-referrer"></iframe></div></div>
+      <div class="thumbs" id="dThumbs"></div>
+    </div>
+    <div class="aside" id="dAside"></div>
+  </article>
+</div>
+
+<script src="gallery-data.js"></script>
+<script>
+// Where guestbook notes go: the Apps Script web app in tools/guestbook.
+const GUESTBOOK_URL = 'https://script.google.com/macros/s/AKfycby7GUXekrNdq14cuBK8Gye6sLbpgpy92DeFtFXu9eBBZ1A4-lx9SP_EdN2m2NTDhPfg/exec';
+
+const A = 'assets/';
+const P = window.PROJECTS.filter(p => !p.hidden), X = window.EXPERIENCE, E = window.EDUCATION;
+const ITEMS = {};
+P.forEach(d => ITEMS[d.id] = { kind:'project', d });
+X.forEach(d => ITEMS[d.id] = { kind:'xp', d });
+E.forEach(d => ITEMS[d.id] = { kind:'edu', d });
+const RES = window.RESUME;
+ITEMS.resume = { kind:'resume', d:{ id:'resume' } };
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const mobile = () => matchMedia('(max-width: 760px), (pointer: coarse) and (max-width: 1024px)').matches;
+const $ = id => document.getElementById(id);
+const track = $('track'), hall = $('hall'), scene = $('scene'), root = document.documentElement;
+const bayEl = (room, html, cls = '') => { const b = document.createElement('section'); b.className = 'bay ' + cls; b.dataset.room = room; b.innerHTML = html; return b };
+
+/* ---------- Build the walls from the data ---------- */
+// Experience: wall text under a timeline. The brass span grows with the length of the role.
+const wallText = (d, i, room) => {
+  const w = Math.max(46, Math.min(100, d.months / 16 * 100));
+  // Newest role sits on the left, so time runs right to left: the dot is where a role started,
+  // the arrow is where it ended. Dashed rail between roles is time back at school.
+  const tl = room !== 'Internships' ? '' : `<div class="tl${i === 0 ? ' first' : ''}" style="--w:${w}%"><i class="rail"></i>${i ? '<em class="gap">Back at TMU</em>' : ''}
+      <span class="span"><b class="e">${d.end}</b><b class="s">${d.start}</b><small>${d.months} months</small></span></div>`;
+  return bayEl(room, `<div class="lamp"></div>${tl}
+    <div class="doc look-${d.look}" data-id="${d.id}"${d.tab ? ` data-tab="${d.tab}"` : ''}>
+      <h2>${d.company}</h2><p class="role">${d.role}</p><p class="where">${d.city} &middot; ${d.start} to ${d.end}</p>
+      <p class="sum">${d.summary}</p>
+      <div class="actions">${d.award ? `<span class="plaque">${d.award}</span>` : ''}
+      <button class="more" data-id="${d.id}">${room === 'Education' ? 'Courses and honors' : 'More on this role'} &rarr;</button></div>
+    </div>`, 'xp' + (tl ? ' has-tl' : ''));
+};
+[...X].reverse().forEach((d, i) => track.insertBefore(wallText(d, i, 'Internships'), $('projSign')));
+E.forEach((d, i) => track.insertBefore(wallText(d, i, 'Education'), $('guestBay')));
+// The resume hangs as a small stack of pages.
+track.insertBefore(bayEl('Resume', `<div class="lamp"></div><div class="doc look-stack" data-id="resume">
+  <h2>Resume</h2><p class="role">${RES.label}</p><p class="where">Updated ${RES.updated}</p>
+  <p class="sum">Kept current as I go, so it can change between visits.</p>
+  <div class="actions"><button class="more" data-id="resume">Read it &rarr;</button></div></div>`, 'xp'), $('guestBay'));
+
+const frameHTML = (p, [src, shape, size]) =>
+  `<div class="frame ${p.frame} ${size}"><div class="bead"><div class="mat"><img class="${shape}" src="${A + src}" alt="${p.title}" draggable="false"></div></div></div>`;
+P.forEach(p => {
+  let html = '', smalls = [];
+  const flush = () => { if (smalls.length) { html += `<div class="col">${smalls.join('')}</div>`; smalls = [] } };
+  p.art.forEach(a => { if (a[2] === 'S') smalls.push(frameHTML(p, a)); else { flush(); html += frameHTML(p, a) } });
+  flush();
+  const bay = bayEl('Projects', `<div class="lamp"></div><div class="exhibit"><div class="art" data-id="${p.id}">${html}</div>
+    <div class="placard"><b>${p.title}</b><i>${p.year}</i><p>${p.placard}</p><div class="med">${p.medium}</div><button class="more" data-id="${p.id}">Look closer &rarr;</button></div></div>`);
+  const fr = [...bay.querySelectorAll('.frame')];
+  fr[0].classList.add('lead');
+  if (fr.length % 2 === 0) fr[fr.length - 1].classList.add('lead');
+  track.insertBefore(bay, $('eduSign'));
+});
+track.insertBefore(bayEl('Projects', `<div class="lamp"></div><div class="vinyl"><h2 style="font-size:clamp(34px,3vw,48px)">The archive</h2>
+  <p class="role">Smaller things, school work, and experiments</p><p class="sum" style="margin-top:14px"><a href="https://github.com/shreywy" target="_blank" rel="noopener" style="text-decoration:none; border-bottom:1px solid rgba(236,229,214,.35)">github.com/shreywy &#8599;</a></p></div>`), $('eduSign'));
+
+/* ---------- Walking the hall (desktop) ---------- */
+let x = 0, tx = 0, max = 0, travelled = 0, introRunning = false, nudging = false;
+const measure = () => {
+  max = Math.max(0, track.scrollWidth - innerWidth);
+  // Keep the timeline one straight line, just clear of the tallest role piece.
+  const docs = [...track.querySelectorAll('.has-tl .doc')];
+  if (docs.length && !mobile()) {
+    const tallest = Math.max(...docs.map(d => d.offsetHeight));
+    track.style.setProperty('--tl-top', Math.max(84, (innerHeight - tallest) / 2 + innerHeight * .02 - 64) + 'px');
+  }
+};
+addEventListener('load', measure); addEventListener('resize', () => { measure(); fitFrame() }); measure();
+document.fonts.ready.then(measure);
+
+// Section markers on the progress bar: one dot where each room begins.
+const prog = $('prog'), marks = $('marks');
+function buildMarks() {
+  if (!max) return;
+  const all = [...track.querySelectorAll('.bay')];
+  const rooms = all.filter((b, i) => i === 0 || b.dataset.room !== all[i - 1].dataset.room)
+    .map(b => ({ room:b.dataset.room, t:clamp(b.offsetLeft - innerWidth * .08) }));
+  // The last rooms share the final screen, so their dots would stack; keep them at least 4% apart.
+  const at = rooms.map(r => r.t / max * 100);
+  for (let i = at.length - 2; i >= 0; i--) at[i] = Math.min(at[i], at[i + 1] - 4);
+  marks.innerHTML = rooms.map((r, i) => `<button type="button" style="--at:${Math.max(0, at[i]).toFixed(2)}%" data-t="${r.t}" aria-label="Go to ${r.room}"><span>${r.room}</span></button>`).join('');
+}
+addEventListener('load', buildMarks); addEventListener('resize', buildMarks); document.fonts.ready.then(buildMarks);
+let scrubbing = false;
+const seek = e => { const r = prog.getBoundingClientRect(); tx = clamp((e.clientX - r.left) / r.width * max) };
+prog.addEventListener('pointerdown', e => {
+  if (e.target.closest('.marks button')) return;
+  scrubbing = true; prog.classList.add('drag'); prog.setPointerCapture(e.pointerId); seek(e);
+});
+prog.addEventListener('pointermove', e => { if (scrubbing) seek(e) });
+prog.addEventListener('pointerup', () => { scrubbing = false; prog.classList.remove('drag') });
+marks.addEventListener('click', e => { const b = e.target.closest('button'); if (b) tx = clamp(+b.dataset.t) });
+const clamp = v => Math.max(0, Math.min(max, v));
+const detailOpen = () => $('detail').classList.contains('on');
+
+addEventListener('wheel', e => {
+  if (introRunning) finishIntro();
+  if (mobile() || detailOpen()) return;
+  e.preventDefault();
+  tx = clamp(tx + (Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * 1.1);
+}, { passive:false });
+
+const bays = () => [...track.querySelectorAll('.bay')];
+function stepBay(dir) {
+  const centres = bays().map(b => b.offsetLeft + b.offsetWidth / 2 - innerWidth / 2).map(clamp);
+  const next = dir > 0 ? centres.find(c => c > tx + 20) : [...centres].reverse().find(c => c < tx - 20);
+  tx = next ?? (dir > 0 ? max : 0);
+}
+addEventListener('keydown', e => {
+  if (introRunning) { finishIntro(); return }
+  if (e.key === 'Escape' && detailOpen()) history.back();
+  if (detailOpen() || mobile() || e.target.closest('input, textarea')) return;
+  if (e.key === 'ArrowRight') stepBay(1);
+  if (e.key === 'ArrowLeft') stepBay(-1);
+});
+
+let drag = null, moved = false, userMoved = false;
+['wheel', 'pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, () => { userMoved = true }, { capture:true, passive:true }));
+addEventListener('pointerdown', () => { moved = false }, true);
+hall.addEventListener('pointerdown', e => {
+  if (mobile() || e.target.closest('input, textarea, button, a, label')) return;
+  drag = { sx:e.clientX, st:tx, lx:e.clientX, v:0 }; moved = false; hall.classList.add('drag');
+});
+addEventListener('pointermove', e => {
+  root.style.setProperty('--mx', e.clientX + 'px'); root.style.setProperty('--my', e.clientY + 'px');
+  if (!drag) return;
+  if (Math.abs(e.clientX - drag.sx) > 5) moved = true;
+  drag.v = drag.lx - e.clientX; drag.lx = e.clientX;
+  tx = clamp(drag.st - (e.clientX - drag.sx));
+});
+addEventListener('pointerup', () => { if (drag) { tx = clamp(tx + drag.v * 14); drag = null; hall.classList.remove('drag') } });
+track.addEventListener('click', e => {
+  const t = e.target.closest('.art, .more');
+  if (!t || moved || !t.dataset.id) return;
+  const id = t.dataset.id;
+  const src = track.querySelector(ITEMS[id].kind === 'project' ? `.art[data-id="${id}"]` : `.doc[data-id="${id}"]`);
+  open(id, src);
+});
+// From the header, open the resume straight away; fly the stack in only if it's on screen.
+$('toResume').onclick = () => {
+  const el = track.querySelector('.doc[data-id="resume"]'), b = el.getBoundingClientRect();
+  open('resume', b.right > 0 && b.left < innerWidth && b.bottom > 0 && b.top < innerHeight ? el : null);
+};
+$('home').onclick = () => mobile() ? scrollTo({ top:0, behavior:'smooth' }) : (tx = 0);
+$('toGuest').onclick = () => { const b = $('guestBay').nextElementSibling; mobile() ? b.scrollIntoView({ behavior:'smooth', block:'center' }) : (tx = clamp(b.offsetLeft + b.offsetWidth / 2 - innerWidth / 2)) };
+
+/* ---------- Frames lean toward you; the loupe magnifies ---------- */
+const frames = [...document.querySelectorAll('.frame')].map(el => ({ el, rx:0, ry:0, trx:0, try:0 }));
+const loupe = $('loupe'), lens = $('lens');
+const Z = 2.4, R = 78;
+let lpx = 0, lpy = 0, ltx = 0, lty = 0;
+frames.forEach(f => {
+  const img = f.el.querySelector('img');
+  f.el.addEventListener('pointerenter', () => {
+    if (mobile()) return;
+    lens.style.backgroundImage = `url("${img.currentSrc || img.src}")`;
+    loupe.classList.add('on');
+  });
+  f.el.addEventListener('pointermove', e => {
+    if (mobile()) return;
+    const r = f.el.getBoundingClientRect();
+    f.try = ((e.clientX - r.left) / r.width - .5) * 5;
+    f.trx = -((e.clientY - r.top) / r.height - .5) * 5;
+    // Map the cursor onto the picture as object-fit: cover / object-position: top draws it.
+    const b = img.getBoundingClientRect();
+    const s = Math.max(b.width / img.naturalWidth, b.height / img.naturalHeight);
+    const dw = img.naturalWidth * s, dh = img.naturalHeight * s, ox = (b.width - dw) / 2;
+    const px = e.clientX - b.left - ox, py = e.clientY - b.top;
+    lens.style.backgroundSize = `${dw * Z}px ${dh * Z}px`;
+    lens.style.backgroundPosition = `${R - px * Z}px ${R - py * Z}px`;
+    ltx = e.clientX; lty = e.clientY;
+  });
+  f.el.addEventListener('pointerleave', () => { f.trx = f.try = 0; loupe.classList.remove('on') });
+});
+
+const placards = [...track.querySelectorAll('.placard')];
+const pieces = [...track.querySelectorAll('[data-room]')], where = $('where'), bar = $('bar'), hint = $('hint');
+(function tick() {
+  if (!mobile()) {
+    const before = x;
+    x += (tx - x) * (reduce ? 1 : .085);
+    travelled += Math.abs(x - before);
+    track.style.transform = `translate3d(${-x}px,0,0)`;
+    bar.style.setProperty('--p', max ? x / max : 0);
+    const here = pieces.filter(p => p.getBoundingClientRect().left < innerWidth * .5).pop();
+    if (here && where.textContent !== here.dataset.room) where.textContent = here.dataset.room;
+  }
+  // The header stays out of the way at the entrance.
+  const atDoor = mobile() ? scrollY < innerHeight * .6 : x < innerWidth * .35;
+  if (!introRunning) root.classList.toggle('at-door', atDoor);
+  if (travelled > 80 && !nudging) hint.classList.remove('on');
+  // Captions rise in as their painting reaches the middle of the screen.
+  placards.forEach(pl => {
+    const b = pl.parentElement.getBoundingClientRect();
+    const off = mobile() ? Math.abs(b.top + b.height / 2 - innerHeight / 2) / innerHeight : Math.abs(b.left + b.width / 2 - innerWidth / 2) / innerWidth;
+    const r = reduce ? 1 : Math.max(0, Math.min(1, 1.6 - off * 3.2));
+    pl.style.setProperty('--r', r.toFixed(3));
+  });
+  frames.forEach(f => {
+    f.rx += (f.trx - f.rx) * .1; f.ry += (f.try - f.ry) * .1;
+    if (!reduce) f.el.style.transform = `perspective(1100px) rotateX(${f.rx.toFixed(2)}deg) rotateY(${f.ry.toFixed(2)}deg)`;
+  });
+  lpx += (ltx - lpx) * .35; lpy += (lty - lpy) * .35;
+  loupe.style.transform = `translate(${lpx}px, ${lpy}px)`;
+  requestAnimationFrame(tick);
+})();
+addEventListener('scroll', () => { if (scrollY > 60) hint.classList.remove('on') }, { passive:true });
+
+/* ---------- Closer look ---------- */
+const detail = $('detail'), panel = $('panel');
+let ghost = null, srcArt = null, current = null;
+const ease = 'cubic-bezier(.65,0,.25,1)';
+const list = a => `<ul>${a.map(t => `<li>${t}</li>`).join('')}</ul>`;
+const chips = a => `<div class="chips">${a.map(t => `<span>${t}</span>`).join('')}</div>`;
+
+function fillProject(p) {
+  panel.classList.remove('text', 'resume'); $('dWin').classList.remove('pdf');
+  const sec = (h, t) => t ? `<h3>${h}</h3><p>${t}</p>` : '';
+  $('dInfo').innerHTML = `<div class="kick">Room two, Projects &middot; ${p.year}</div><h2 id="dTitle">${p.title}</h2><p class="tag">${p.tag}</p>
+    ${sec('What it is', p.what)}${sec('How it works', p.how)}${sec('Numbers', p.nums)}
+    ${p.map ? `<h3>Git, in the kitchen</h3><table>${p.map.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table>` : ''}
+    <h3>Built with</h3><p>${p.medium}</p>
+    <div class="links">${p.links.map(([t, u]) => `<a href="${u}" target="_blank" rel="noopener">${t} &#8599;</a>`).join('')}</div>`;
+  // The project's own site if it has one, otherwise a glimpse of the repo.
+  const first = p.page ? ['@page', 'Site'] : [p.gh, 'GitHub'];
+  const shots = p.art.map(a => a[0]).concat(p.extra || []);
+  $('dThumbs').innerHTML = `<button class="word" data-src="${first[0]}">${first[1]}</button>` + shots.map(s => `<button data-src="${s}"><img src="${A + s}" alt=""></button>`).join('');
+  show(p, first[0]);
+}
+function fillText(d, kind) {
+  panel.classList.add('text'); panel.classList.remove('resume');
+  const room = kind === 'xp' ? 'Room one, Internships' : 'Room three, Education';
+  const courses = a => `<div class="courses">${a.map(([c, n, g]) => `<span><b>${c}</b>${n}${g ? `<em>${g}</em>` : ''}</span>`).join('')}</div>`;
+  $('dInfo').innerHTML = `<div class="kick">${room}</div><h2 id="dTitle">${d.company}</h2><p class="tag">${d.role}</p>
+    <p class="where">${d.city} &middot; ${d.start} to ${d.end}${d.mode ? ' &middot; ' + d.mode : ''}</p>
+    ${kind === 'xp' ? `<h3>What I did</h3>${list(d.did)}` :
+      `<h3>Standing</h3><p>${d.gpa}</p><h3>Honors</h3>${list(d.honors)}<h3>Co-op</h3><p>${d.coop}</p>
+       <h3>Coursework</h3>${courses(d.coursework)}<h3>In progress, Fall 2026</h3>${list(d.inProgress)}`}`;
+  $('dAside').innerHTML = `<div class="card">
+    ${d.logo ? `<div class="logo"><img src="${A}logos/${d.logo}" alt="${d.company} logo"></div>` : ''}
+    <h3>${kind === 'xp' ? 'About ' + d.company : 'The program'}</h3><p>${d.about}</p>
+    ${d.team ? `<h3>Team</h3><p>${d.team}</p>` : ''}
+    ${d.award && kind === 'xp' ? `<h3>Recognition</h3><p>${d.award}</p>` : ''}
+    ${d.quote ? `<h3>Recommendation</h3><blockquote>&ldquo;${d.quote[0]}&rdquo;</blockquote><p>${d.quote[1]}</p>` : ''}
+    ${d.skills ? `<h3>Tools</h3>${chips(d.skills)}` : ''}
+    ${d.before ? `<h3>Before TMU</h3><p>${d.before[0]}<br>${d.before[1]}</p>` : ''}</div>`;
+}
+// Resume: a short note on the left, the PDF on the right.
+function fillResume() {
+  panel.classList.remove('text'); panel.classList.add('resume');
+  const url = 'resumes/' + RES.file;
+  $('dInfo').innerHTML = `<div class="kick">Resume</div><h2 id="dTitle">Resume</h2><p class="tag">${RES.label}</p>
+    <p class="where">Updated ${RES.updated}</p>
+    <p style="margin-top:18px">I keep this current as I go, so it may change between visits. If you need a version for a specific kind of role, ask in the guestbook.</p>
+    <div class="links"><a href="${url}" download>Download PDF &#8595;</a><a href="${url}" target="_blank" rel="noopener">Open in a new tab &#8599;</a></div>`;
+  $('dThumbs').innerHTML = '';
+  const win = $('dWin');
+  win.classList.remove('live', 'dark'); win.classList.add('pdf'); win.style.backgroundImage = '';
+  $('dImg').style.display = 'none'; frameEl.style.display = 'block'; $('dLive').style.display = 'none';
+  Object.assign(frameEl.style, { width:'100%', height:'100%', transform:'none' });
+  if (frameEl.dataset.url !== url) { frameEl.dataset.url = url; frameEl.src = url + '#view=FitH&toolbar=0' }
+  $('dUrl').textContent = RES.file; $('dOpen').href = url; $('dOpen').style.display = '';
+}
+
+let autoScroll = 0, userScrolled = false;
+const frameEl = $('dFrame');
+frameEl.addEventListener('load', () => { if (frameEl.src && frameEl.src !== 'about:blank') frameEl.classList.add('ready') });
+function fitFrame() {
+  const win = $('dWin');
+  if (!win.classList.contains('live')) return;
+  if (mobile()) { Object.assign(frameEl.style, { width:'100%', height:'100%', transform:'none' }); return }
+  // Render the site at a laptop width, then scale it to fit the window.
+  const W = 1280, s = win.clientWidth / W;
+  Object.assign(frameEl.style, { width:W + 'px', height:(win.clientHeight / s) + 'px', transform:`scale(${s})` });
+}
+function show(p, src) {
+  const win = $('dWin'), img = $('dImg');
+  const live = src === '@live', site = src === '@page', isGh = src === p.gh, scrolls = site || isGh;
+  win.classList.toggle('live', live);
+  win.classList.toggle('dark', !live && !scrolls);
+  img.style.display = live ? 'none' : 'block';
+  frameEl.style.display = live ? 'block' : 'none';
+  $('dLive').style.display = p.page ? '' : 'none';
+  $('dLive').classList.toggle('on', live);
+  $('dLive').textContent = live ? 'Back to the preview' : 'Use it live';
+  if (live) {
+    win.style.backgroundImage = `url("${A + p.page.poster}")`;
+    if (frameEl.dataset.url !== p.page.url) { frameEl.classList.remove('ready'); frameEl.dataset.url = p.page.url; frameEl.src = p.page.url }
+    requestAnimationFrame(fitFrame);
+  } else {
+    win.style.backgroundImage = '';
+    img.src = A + (site ? p.page.full : src);
+    win.scrollTop = 0; userScrolled = !scrolls;
+  }
+  const url = p.page && (live || site) ? p.page.url : isGh ? 'https://' + p.repo : null;
+  $('dUrl').textContent = url ? url.replace(/^https?:\/\//, '').replace(/\/$/, '') : src.replace(/\.(png|jpe?g|gif)$/, '');
+  $('dOpen').style.display = url ? '' : 'none'; if (url) $('dOpen').href = url;
+  const tab = live ? '@page' : src;
+  $('dThumbs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.src === tab));
+}
+$('dLive').onclick = () => show(current, $('dWin').classList.contains('live') ? '@page' : '@live');
+$('dThumbs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) show(current, b.dataset.src) });
+['wheel', 'pointerdown', 'touchstart'].forEach(ev => $('dWin').addEventListener(ev, () => userScrolled = true, { passive:true }));
+// A slow glimpse down the repo page, until you take over.
+(function glide() {
+  const win = $('dWin');
+  if (detailOpen() && !userScrolled && !reduce && !win.classList.contains('live') && !win.classList.contains('dark') && !win.classList.contains('pdf') && !panel.classList.contains('text')) {
+    autoScroll += .55; if (autoScroll >= 1) { win.scrollTop += Math.floor(autoScroll); autoScroll %= 1 }
+  }
+  requestAnimationFrame(glide);
+})();
+
+let closing = false;
+// Frames in a cluster slide together before the piece moves, so no wall shows between them.
+function setGaps(el, gap) { el.style.gap = gap; el.querySelectorAll('.col').forEach(c => c.style.gap = gap) }
+function open(id, src, fromHistory) {
+  if (closing) snapClosed();
+  const item = ITEMS[id]; if (!item || detailOpen()) return;
+  current = item.d;
+  item.kind === 'project' ? fillProject(item.d) : item.kind === 'resume' ? fillResume() : fillText(item.d, item.kind);
+  if (!fromHistory) history.pushState({ id }, '', '#' + id);
+  detail.classList.add('on'); detail.setAttribute('aria-hidden', 'false');
+  loupe.classList.remove('on');
+  const vw = innerWidth, vh = innerHeight;
+  const pr = panel.getBoundingClientRect();
+  if (!src || reduce) {
+    panel.style.visibility = 'visible';
+    panel.animate([{ opacity:0, transform:'scale(.97)' }, { opacity:1, transform:'none' }], { duration:reduce ? 1 : 450, easing:ease });
+    srcArt = null; fitFrame(); return;
+  }
+  srcArt = src;
+  const r = src.getBoundingClientRect();
+  ghost = src.cloneNode(true); ghost.classList.add('ghost');
+  Object.assign(ghost.style, { left:r.left + 'px', top:r.top + 'px' });
+  document.body.appendChild(ghost);
+  src.style.visibility = 'hidden';
+  // Size of the piece once its frames have closed up.
+  const gap = getComputedStyle(src).columnGap;
+  setGaps(ghost, '0px');
+  const c = ghost.getBoundingClientRect();
+  // The panel grows out from a part of the piece that is a solid rectangle, so nothing behind
+  // ever shows through a notch. If every part is full height the whole piece is solid.
+  let inner = { x:0, y:0, w:c.width, h:c.height };
+  const parts = [...ghost.children].flatMap(k => k.getBoundingClientRect().width ? [k] : [...k.children])
+    .map(k => k.getBoundingClientRect()).filter(b => b.width && b.height)
+    .map(b => ({ x:b.left - c.left, y:b.top - c.top, w:b.width, h:b.height }));
+  if (parts.length > 1 && !parts.every(q => Math.abs(q.h - c.height) < 2 && Math.abs(q.y) < 2))
+    inner = parts.reduce((a, b) => b.w * b.h > a.w * a.h ? b : a);
+  setGaps(ghost, gap);
+  ghost._gap = gap;
+  const cw = c.width, ch = c.height;
+  const s = Math.min(vw * .62 / cw, vh * .64 / ch, 1.3);
+  const cx = (vw - cw * s) / 2 - r.left, cy = (vh - ch * s) / 2 - r.top;
+  const centre = `translate(${cx}px, ${cy}px) scale(${s})`;
+  const gone = `translate(${-r.left - cw * s - 80}px, ${cy}px) scale(${s}) perspective(1200px) rotateY(10deg)`;
+  // The panel starts clipped to exactly where the centred piece hangs, then opens as the piece rolls away.
+  const gx = (vw - cw * s) / 2 + inner.x * s - pr.left, gy = (vh - ch * s) / 2 + inner.y * s - pr.top;
+  const clipIn = `inset(${gy}px ${pr.width - gx - inner.w * s}px ${pr.height - gy - inner.h * s}px ${gx}px)`;
+  ghost._centre = centre; ghost._gone = gone; panel._clip = clipIn;
+  requestAnimationFrame(() => {
+    if (!ghost) return;
+    ghost.style.transition = 'gap .35s cubic-bezier(.65,0,.25,1)';
+    ghost.querySelectorAll('.col').forEach(col => col.style.transition = ghost.style.transition);
+    setGaps(ghost, '0px');
+  });
+  ghost.animate([{ transform:'none' }, { transform:centre }], { duration:600, easing:ease, fill:'forwards' }).finished.then(() => {
+    if (!ghost) return;
+    panel.style.visibility = 'visible'; fitFrame();
+    panel.animate([{ clipPath:clipIn }, { clipPath:'inset(0px 0px 0px 0px)' }], { duration:900, easing:ease, fill:'forwards' });
+    ghost.animate([{ transform:centre }, { transform:gone }], { duration:900, easing:ease, fill:'forwards' });
+  }).catch(() => {});
+}
+function resetViewer() {
+  frameEl.classList.remove('ready'); frameEl.src = 'about:blank'; delete frameEl.dataset.url;
+  $('dImg').removeAttribute('src');
+}
+function finishClose() {
+  closing = false; resetViewer();
+  detail.classList.remove('on'); detail.setAttribute('aria-hidden', 'true');
+  panel.style.visibility = 'hidden'; panel.getAnimations().forEach(a => a.cancel());
+  if (ghost) { ghost.remove(); ghost = null }
+  if (srcArt) srcArt.style.visibility = '';
+}
+// If you scroll or drag while a piece is going back, it just fades onto the wall instead of flying to a stale spot.
+function snapClosed() {
+  if (!closing) return;
+  const g = ghost; ghost = null;
+  panel.getAnimations().forEach(a => a.cancel());
+  panel.style.visibility = 'hidden';
+  detail.classList.remove('on'); detail.setAttribute('aria-hidden', 'true');
+  if (srcArt) srcArt.style.visibility = '';
+  closing = false; resetViewer();
+  if (g) { g.getAnimations().forEach(a => a.pause()); g.animate([{ opacity:1 }, { opacity:0 }], { duration:140, fill:'forwards' }).finished.then(() => g.remove()) }
+}
+function close(fromHistory) {
+  if (!detailOpen() || closing) return;
+  if (!fromHistory) { history.back(); return }
+  closing = true;
+  if (!ghost) { panel.animate([{ opacity:1 }, { opacity:0 }], { duration:reduce ? 1 : 250 }).finished.then(finishClose); return }
+  const g = ghost;
+  panel.animate([{ clipPath:'inset(0px 0px 0px 0px)' }, { clipPath:panel._clip }], { duration:550, easing:ease, fill:'forwards' });
+  g.animate([{ transform:g._gone }, { transform:g._centre }], { duration:550, easing:ease, fill:'forwards' }).finished.then(() => {
+    if (ghost !== g) return;
+    panel.style.visibility = 'hidden';
+    detail.classList.remove('on');
+    // Aim at where the piece is now, in case the wall moved.
+    const now = srcArt.getBoundingClientRect(), r = { left:parseFloat(g.style.left), top:parseFloat(g.style.top) };
+    g.style.transition = 'gap .3s cubic-bezier(.65,0,.25,1)'; setGaps(g, g._gap);
+    g.animate([{ transform:g._centre }, { transform:`translate(${now.left - r.left}px, ${now.top - r.top}px)` }], { duration:420, easing:ease, fill:'forwards' }).finished.then(() => { if (ghost === g) finishClose() }).catch(() => {});
+  }).catch(() => {});
+}
+['wheel', 'pointerdown', 'keydown', 'touchmove'].forEach(ev => addEventListener(ev, () => { if (closing) snapClosed() }, { capture:true, passive:true }));
+addEventListener('scroll', () => { if (closing) snapClosed() }, { passive:true });
+$('close').onclick = () => close();
+$('backdrop').onclick = () => close();
+addEventListener('popstate', () => {
+  const id = location.hash.slice(1);
+  if (!id && detailOpen()) close(true);
+  else if (id && !detailOpen()) open(id, null, true);
+});
+
+/* ---------- Guestbook ---------- */
+$('book').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.currentTarget, err = $('gerr');
+  err.textContent = '';
+  if (!f.checkValidity()) {
+    [...f.elements].filter(el => el.willValidate && !el.checkValidity()).forEach(el =>
+      el.animate([{ transform:'translateX(0)' }, { transform:'translateX(-6px)' }, { transform:'translateX(5px)' }, { transform:'translateX(0)' }], { duration:300 }));
+    err.textContent = 'All three lines need filling in, with a real email.';
+    return;
+  }
+  if (f.website.value) return; // a bot filled the hidden field
+  const btn = f.querySelector('button'); btn.disabled = true;
+  f.classList.add('sending');
+  // Hold the ink for a beat even on a fast connection, so the send reads as something happening.
+  const beat = new Promise(r => setTimeout(r, reduce ? 0 : 1500));
+  try {
+    if (GUESTBOOK_URL) {
+      // Apps Script web apps don't send CORS headers, so this goes as a simple form post and we don't read the reply.
+      await Promise.all([fetch(GUESTBOOK_URL, { method:'POST', mode:'no-cors', body:new URLSearchParams(new FormData(f)) }), beat]);
+      $('sealNote').textContent = 'I\u2019ll write back to the email you left.';
+    } else {
+      $('sealNote').textContent = 'Draft only: this form isn&rsquo;t connected yet.'.replace('&rsquo;', '’');
+    }
+  } catch {
+    f.classList.remove('sending'); btn.disabled = false;
+    err.textContent = 'That didn’t go through. Try again in a moment.';
+    return;
+  }
+  f.animate([{ transform:'none' }, { transform:'translateY(-6px) rotate(-.6deg)' }, { transform:'none' }], { duration:500, easing:ease });
+  const seal = $('seal');
+  seal.style.pointerEvents = 'auto';
+  // The seal fades in over the ink, and only then does the card underneath get cleared.
+  seal.animate([{ opacity:0 }, { opacity:1 }], { duration:350, fill:'forwards' }).finished.then(() => { f.classList.remove('sending'); f.reset() });
+  seal.querySelector('.wax').animate([{ transform:'scale(2.2) rotate(-20deg)', opacity:0 }, { transform:'scale(.92) rotate(4deg)', opacity:1, offset:.7 }, { transform:'scale(1) rotate(0)' }], { duration:650, delay:200, easing:'cubic-bezier(.3,1.4,.5,1)', fill:'backwards' });
+});
+
+/* ---------- Walking in: lights flicker on, then the camera moves into the room ---------- */
+function showHint() {
+  if (userMoved || scrollY > 60) return; // already walking, no need to say how
+  $('hintText').textContent = mobile() ? 'Scroll to walk through' : 'Scroll or drag to walk through';
+  hint.classList.add('on');
+}
+function endIntro() {
+  if (!introRunning) return;
+  introRunning = false;
+  setTimeout(showHint, 250);
+}
+function finishIntro() {
+  if (!introRunning) return;
+  document.getAnimations().forEach(a => { if (a._intro) a.finish() });
+  endIntro();
+}
+// The name comes up first as the room moves toward you, then everything else.
+function runIntro() {
+  if (reduce || location.hash) { root.classList.remove('intro'); setTimeout(showHint, 400); return }
+  introRunning = true;
+  const tag = a => (a._intro = true, a);
+  tag(scene.animate([{ transform:'scale(1.1)' }, { transform:'none' }], { duration:1700, easing:'cubic-bezier(.2,.7,.1,1)', fill:'backwards' }));
+  tag(document.querySelector('.entrance h1').animate([{ opacity:0, transform:'translateY(18px)' }, { opacity:1, transform:'none' }], { duration:1100, delay:100, easing:'cubic-bezier(.2,.7,.1,1)', fill:'backwards' }));
+  [...document.querySelectorAll('.entrance p'), document.querySelector('.progress')].forEach((w, i) =>
+    tag(w.animate([{ opacity:0, transform:'translateY(10px)' }, { opacity:1, transform:'none' }], { duration:800, delay:950 + i * 140, easing:ease, fill:'backwards' })));
+  setTimeout(() => root.classList.remove('intro'), 30);
+  setTimeout(endIntro, 1500);
+}
+addEventListener('pointerdown', () => { if (introRunning) finishIntro() }, true);
+document.fonts.ready.then(runIntro);
+if (location.hash) { const id = location.hash.slice(1); history.replaceState({ id }, '', '#' + id); setTimeout(() => open(id, null, true), 50) }
+</script>
+</body>
+</html>

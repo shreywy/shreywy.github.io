@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>07 Gallery · Shrey Mistry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<script src="nav.js"></script>
+<style>
+  :root { --wall:#1d1b18; --wall2:#24211d; --text:#e9e2d3; --mid:#9a9282; --mat:#f1ece1; --frame:#0e0d0c; --mx:50vw; --my:50vh; }
+  * { box-sizing:border-box; margin:0; padding:0 }
+  html, body { height:100% }
+  body { background:var(--wall); color:var(--text); font:500 19px/1.5 'Cormorant Garamond', Garamond, serif; overflow:hidden }
+  a { color:inherit }
+
+  header { position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:center; padding:24px 4vw; z-index:10; font-size:15px; letter-spacing:.18em; text-transform:uppercase; pointer-events:none }
+  header > * { pointer-events:auto }
+  .progress { position:fixed; left:4vw; right:4vw; bottom:28px; height:1px; background:rgba(233,226,211,.15); z-index:10 }
+  .progress i { position:absolute; left:0; top:0; height:1px; width:100%; background:var(--text); transform-origin:left; transform:scaleX(var(--p, 0)) }
+
+  .hall { position:fixed; inset:0; cursor:grab; touch-action:pan-y }
+  .hall.drag { cursor:grabbing }
+  .track { position:absolute; top:0; bottom:0; left:0; display:flex; align-items:center; gap:12vw; padding:0 12vw; will-change:transform;
+    background:linear-gradient(180deg, rgba(255,240,210,.05), transparent 30%, transparent 85%, rgba(0,0,0,.25)) }
+
+  /* Ceiling lights wash each piece from above */
+  .piece { position:relative; flex:none }
+  .piece::before { content:""; position:absolute; left:50%; top:-28vh; width:140%; height:calc(100% + 34vh); transform:translateX(-50%); pointer-events:none;
+    background:radial-gradient(ellipse 50% 60% at 50% 0%, rgba(255,236,200,.13), transparent 70%) }
+
+  .wall-text { width:min(46vw, 640px) }
+  .wall-text h1 { font-weight:400; font-size:clamp(56px, 7.4vw, 120px); line-height:.92; letter-spacing:-.01em }
+  .wall-text p { font-style:italic; font-size:24px; color:#cfc6b4; margin-top:22px; max-width:28ch }
+  .wall-text .hint { max-width:none; font-style:normal; font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:var(--mid); margin-top:40px }
+
+  .room { font-size:13px; letter-spacing:.3em; text-transform:uppercase; color:var(--mid); writing-mode:vertical-rl; transform:rotate(180deg); border-left:1px solid rgba(233,226,211,.2); padding-left:18px; height:46vh; text-align:right }
+
+  .vinyl { width:min(30vw, 400px) }
+  .vinyl h2 { font-weight:500; font-size:clamp(40px, 4vw, 64px); line-height:1 }
+  .vinyl .role { font-style:italic; color:#cfc6b4; margin:8px 0 18px; font-size:21px }
+  .vinyl p { font-size:19px; color:#ddd5c4 }
+
+  .work { display:flex; align-items:flex-end; gap:34px }
+  .frame { position:relative; background:var(--frame); padding:12px; cursor:zoom-in;
+    box-shadow:0 2px 0 rgba(255,255,255,.04) inset, 0 40px 70px -20px rgba(0,0,0,.7), 0 10px 20px -10px rgba(0,0,0,.6); transform-style:preserve-3d; will-change:transform }
+  .mat { background:var(--mat); padding:clamp(18px, 2.6vw, 38px) }
+  .mat img { display:block; height:var(--h, 46vh); width:auto; max-width:48vw; object-fit:cover; object-position:top left; box-shadow:inset 0 0 0 1px rgba(0,0,0,.1) }
+  .frame::after { content:""; position:absolute; inset:12px; pointer-events:none; background:linear-gradient(115deg, rgba(255,255,255,var(--glare, 0)) 0%, transparent 40%) }
+  .placard { width:230px; padding-bottom:6px; font-size:16px; line-height:1.4; color:#d8d0bf }
+  .placard b { display:block; font-weight:600; font-size:22px; color:var(--text) }
+  .placard i { display:block; color:var(--mid); margin:2px 0 10px }
+  .placard .med { font-size:14px; color:var(--mid); margin-top:10px }
+
+  .exit { width:min(40vw, 560px) }
+  .exit h2 { font-weight:400; font-size:clamp(44px, 5vw, 80px); line-height:1 }
+  .exit p { margin-top:18px; font-size:22px }
+  .exit a { text-decoration:none; border-bottom:1px solid rgba(233,226,211,.4) }
+  .exit a:hover { border-color:var(--text) }
+
+  /* Spotlight: everything outside the beam falls back into the dark */
+  .beam { position:fixed; inset:0; pointer-events:none; z-index:5; background:radial-gradient(circle 46vmax at var(--mx) var(--my), transparent 0%, rgba(8,7,6,.12) 35%, rgba(8,7,6,.6) 100%); transition:opacity .6s }
+
+  .lightbox { position:fixed; inset:0; z-index:20; background:rgba(12,11,10,.92); display:grid; place-items:center; opacity:0; pointer-events:none; transition:opacity .4s; cursor:zoom-out; padding:5vh 5vw }
+  .lightbox.on { opacity:1; pointer-events:auto }
+  .lightbox img { max-width:90vw; max-height:84vh; transform:scale(.94); transition:transform .6s cubic-bezier(.2,.8,.1,1); box-shadow:0 30px 80px rgba(0,0,0,.6) }
+  .lightbox.on img { transform:none }
+
+  @media (max-width: 760px) {
+    body { overflow-x:hidden; overflow-y:auto }
+    .hall { position:static; cursor:auto }
+    .track { position:static; flex-direction:column; align-items:flex-start; gap:80px; padding:100px 16px 120px; transform:none !important }
+    .room { writing-mode:horizontal-tb; transform:none; height:auto; border-left:0; border-top:1px solid rgba(233,226,211,.2); padding:14px 0 0; width:100% ; text-align:left }
+    .wall-text, .vinyl, .exit { width:100% }
+    .work { flex-direction:column; align-items:flex-start; gap:18px }
+    .mat img { height:auto; width:100%; max-width:none }
+    .frame { width:100% }
+    .beam, .piece::before { display:none }
+    .progress { display:none }
+  }
+</style>
+</head>
+<body>
+<header><span>Shrey Mistry</span><span id="where">Entrance</span></header>
+<div class="progress"><i id="bar"></i></div>
+
+<div class="hall" id="hall">
+  <div class="track" id="track">
+    <section class="piece wall-text" data-room="Entrance">
+      <h1>Shrey Mistry</h1>
+      <p>Computer Science at Toronto Metropolitan University, graduating May 2027.</p>
+      <p class="hint">Drag, scroll, or use the arrow keys</p>
+    </section>
+
+    <div class="room" data-room="Internships">Room one, Internships</div>
+    <section class="piece vinyl" data-room="Internships">
+      <h2>Geotab</h2><p class="role">Software Engineering Intern, Oakville, 2025 to 2026</p>
+      <p>Sixteen months on telematics. I took one device from PRD to launch in six months and built BigQuery dashboards for 1,000+ IoT units. Intern of the Month, January 2026.</p>
+    </section>
+    <section class="piece vinyl" data-room="Internships">
+      <h2>AMD</h2><p class="role">Performance Engineering Intern, Markham, 2024</p>
+      <p>A Python benchmark framework that cut runtimes by 60%, and an Arduino tool that measures sub-millisecond input latency.</p>
+    </section>
+    <section class="piece vinyl" data-room="Internships">
+      <h2>Bombardier</h2><p class="role">Automation Engineering Intern, Toronto, 2023</p>
+      <p>TypeScript pipelines into Power BI that cut compliance report time by over 70%.</p>
+    </section>
+
+    <div class="room" data-room="Projects">Room two, Projects</div>
+    <section class="piece work" data-room="Projects">
+      <div class="frame"><div class="mat"><img src="assets/forkable-home.png" alt="Forkable homepage"></div></div>
+      <div class="placard"><b>Forkable</b><i>2026</i>Version control for recipes. Fork, commit tweaks, diff by ingredient, and merge Taste Tests.<div class="med">TypeScript, Next.js 16, PostgreSQL, Prisma, Redis. 83 tests.</div></div>
+    </section>
+    <section class="piece work" data-room="Projects">
+      <div class="frame"><div class="mat"><img src="assets/ttt-plan.png" alt="TrainTripTime on a phone" style="--h:56vh"></div></div>
+      <div class="placard"><b>TrainTripTime</b><i>2026</i>Tell it when you need to be downtown. It tells you when to wake up.<div class="med">Python stdlib. A 118MB feed streamed into a 1MB index.</div></div>
+    </section>
+    <section class="piece work" data-room="Projects">
+      <div class="frame"><div class="mat"><img src="assets/speckle-grid.jpg" alt="Speckle photo grid"></div></div>
+      <div class="placard"><b>Speckle</b><i>2026</i>A local-first photo and video library. Type boats, get boats.<div class="med">Rust, axum, SQLite, CLIP, InsightFace.</div></div>
+    </section>
+    <section class="piece work" data-room="Projects">
+      <div class="frame"><div class="mat"><img src="assets/fft-phone.png" alt="firefox-tabs on a phone" style="--h:56vh"></div></div>
+      <div class="placard"><b>firefox-tabs</b><i>2026</i>My desktop&rsquo;s open Firefox tabs, on any device, served from a Raspberry Pi.<div class="med">Python stdlib, hand-written LZ4 and Snappy.</div></div>
+    </section>
+    <section class="piece work" data-room="Projects">
+      <div class="frame"><div class="mat"><img src="assets/gm-phone.png" alt="GridMacro on a phone" style="--h:56vh"></div></div>
+      <div class="placard"><b>GridMacro</b><i>2026</i>A calorie and weight log that lives in your own Google Sheet.<div class="med">Apps Script, Sheets API, Gemini.</div></div>
+    </section>
+
+    <div class="room" data-room="Exit">Exit</div>
+    <section class="piece exit" data-room="Exit">
+      <h2>Thanks for coming by.</h2>
+      <p><a href="mailto:shrey.d.mistry@gmail.com">shrey.d.mistry@gmail.com</a></p>
+      <p><a href="https://github.com/shreywy">GitHub</a> &nbsp; <a href="https://linkedin.com/in/shreymistry">LinkedIn</a></p>
+    </section>
+  </div>
+</div>
+
+<div class="beam" id="beam"></div>
+<div class="lightbox" id="lb"><img alt=""></div>
+
+<script>
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const mobile = () => innerWidth <= 760;
+const hall = document.getElementById('hall'), track = document.getElementById('track');
+const root = document.documentElement, bar = document.getElementById('bar'), where = document.getElementById('where');
+
+let x = 0, tx = 0, max = 0;
+const measure = () => { max = Math.max(0, track.scrollWidth - innerWidth) };
+addEventListener('load', measure); addEventListener('resize', measure); measure();
+const clamp = v => Math.max(0, Math.min(max, v));
+
+addEventListener('wheel', e => { if (mobile()) return; e.preventDefault(); tx = clamp(tx + (Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * 1.1) }, { passive:false });
+addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') tx = clamp(tx + innerWidth * .6);
+  if (e.key === 'ArrowLeft') tx = clamp(tx - innerWidth * .6);
+  if (e.key === 'Escape') lb.classList.remove('on');
+});
+
+// Drag with a throw: release velocity carries the hall on.
+let drag = null, moved = false;
+hall.addEventListener('pointerdown', e => { if (mobile()) return; drag = { sx:e.clientX, st:tx, lx:e.clientX, v:0 }; moved = false; hall.classList.add('drag') });
+addEventListener('pointermove', e => {
+  root.style.setProperty('--mx', e.clientX + 'px'); root.style.setProperty('--my', e.clientY + 'px');
+  if (!drag) return;
+  if (Math.abs(e.clientX - drag.sx) > 4) moved = true;
+  drag.v = drag.lx - e.clientX; drag.lx = e.clientX;
+  tx = clamp(drag.st - (e.clientX - drag.sx));
+});
+addEventListener('pointerup', () => { if (!drag) return; tx = clamp(tx + drag.v * 14); drag = null; hall.classList.remove('drag') });
+
+// Frames lean toward the viewer and catch a little glare.
+const frames = [...document.querySelectorAll('.frame')].map(el => ({ el, rx:0, ry:0, trx:0, try:0 }));
+frames.forEach(f => {
+  f.el.addEventListener('pointermove', e => {
+    const r = f.el.getBoundingClientRect();
+    f.try = ((e.clientX - r.left) / r.width - .5) * 8;
+    f.trx = -((e.clientY - r.top) / r.height - .5) * 8;
+  });
+  f.el.addEventListener('pointerleave', () => { f.trx = f.try = 0 });
+  f.el.addEventListener('click', () => { if (moved) return; lb.querySelector('img').src = f.el.querySelector('img').src; lb.classList.add('on') });
+});
+const lb = document.getElementById('lb');
+lb.addEventListener('click', () => lb.classList.remove('on'));
+
+const pieces = [...document.querySelectorAll('[data-room]')];
+(function tick() {
+  if (!mobile()) {
+    x += (tx - x) * (reduce ? 1 : .085);
+    track.style.transform = `translate3d(${-x}px,0,0)`;
+    bar.style.setProperty('--p', max ? x / max : 0);
+    const mid = pieces.filter(p => p.getBoundingClientRect().left < innerWidth * .55).pop();
+    if (mid && where.textContent !== mid.dataset.room) where.textContent = mid.dataset.room;
+  }
+  frames.forEach(f => {
+    f.rx += (f.trx - f.rx) * .1; f.ry += (f.try - f.ry) * .1;
+    f.el.style.transform = `perspective(1000px) rotateX(${f.rx}deg) rotateY(${f.ry}deg)`;
+    f.el.style.setProperty('--glare', (Math.abs(f.rx) + Math.abs(f.ry)) * .012);
+  });
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

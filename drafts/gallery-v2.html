@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en" class="intro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gallery v2 · Shrey Mistry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script src="nav.js"></script>
+<style>
+  :root {
+    --wall:#1c1a17; --text:#ece5d6; --soft:#cfc6b4; --mid:#958c7b; --mat:#f1ece0; --brass:#c9a45c;
+    --mx:50vw; --my:50vh;
+    /* One size system for every piece: a large unit, and a small unit that stacks two-high to match it */
+    --L:min(48vh, 480px); --fb:16px; --bd:4px; --mp:18px; --g:22px;
+    --T:calc(var(--fb) + var(--bd) + var(--mp));
+    --S:calc((var(--L) - 2 * var(--T) - var(--g)) / 2);
+  }
+  * { box-sizing:border-box; margin:0; padding:0 }
+  html, body { height:100% }
+  body { background:var(--wall); color:var(--text); font:500 19px/1.5 'Cormorant Garamond', Garamond, serif; overflow:hidden }
+  a { color:inherit }
+  button, input, textarea { font:inherit; color:inherit }
+
+  /* Header: blurs whatever passes beneath it, fading out at its lower edge */
+  header { position:fixed; top:0; left:0; right:0; z-index:20; display:flex; justify-content:space-between; align-items:center; padding:22px 4vw 30px; font-size:14px; letter-spacing:.2em; text-transform:uppercase }
+  header::before { content:""; position:absolute; inset:0; z-index:-1; backdrop-filter:blur(14px) saturate(1.1); -webkit-backdrop-filter:blur(14px); background:rgba(28,26,23,.35);
+    -webkit-mask:linear-gradient(#000 55%, transparent); mask:linear-gradient(#000 55%, transparent) }
+  header a { text-decoration:none; cursor:pointer }
+  header nav { display:flex; gap:28px; align-items:center }
+  header .room { color:var(--mid) }
+
+  .hall { position:fixed; inset:0; cursor:grab; overflow:hidden }
+  .hall.drag { cursor:grabbing }
+  .scene { position:absolute; inset:0; transform-origin:50% 55% }
+  .track { position:absolute; top:0; bottom:0; left:0; display:flex; gap:10vw; padding:0 12vw 0 10vw; will-change:transform }
+  .bay { position:relative; flex:none; height:100%; display:flex; align-items:center; padding-top:4vh }
+
+  /* Track light above each bay. The cone starts at the very top of the screen so it never shows an edge. */
+  .lamp { position:absolute; top:0; left:-22%; right:-22%; height:100%; pointer-events:none;
+    background:radial-gradient(ellipse 46% 78% at 50% 0%, rgba(255,231,190,.21), rgba(255,231,190,.07) 48%, transparent 75%) }
+  .lamp::after { content:""; position:absolute; top:12px; left:50%; top:0; width:160px; height:44px; margin-left:-80px; border-radius:50%; background:radial-gradient(closest-side, rgba(255,242,210,.75), rgba(255,236,200,.18) 55%, transparent) }
+
+  /* Entrance */
+  /* The entrance fills the screen on its own: padding 10vw + 80vw + gap 10vw */
+  .bay:first-child { width:80vw }
+  .entrance { width:min(56vw, 760px) }
+  .entrance h1 { font-weight:400; font-size:clamp(64px, 8.6vw, 140px); line-height:.9; letter-spacing:-.01em }
+  .entrance p { font-style:italic; font-size:clamp(20px, 1.9vw, 26px); color:var(--soft); margin-top:24px; max-width:30ch; line-height:1.35 }
+  .entrance .loc { max-width:none; font-style:normal; font-size:13px; letter-spacing:.24em; text-transform:uppercase; color:var(--mid); margin-top:20px }
+
+  .roomsign { width:auto; height:46vh; align-self:center; display:flex; align-items:center; border-left:1px solid rgba(236,229,214,.2); padding-left:18px }
+  .roomsign span { writing-mode:vertical-rl; transform:rotate(180deg); font-size:13px; letter-spacing:.32em; text-transform:uppercase; color:var(--mid) }
+
+  .vinyl { width:min(30vw, 400px) }
+  .vinyl h2 { font-weight:500; font-size:clamp(44px, 4.2vw, 68px); line-height:1 }
+  .vinyl .role { font-style:italic; color:var(--soft); margin:8px 0 18px; font-size:21px; line-height:1.3 }
+  .vinyl p { font-size:20px; color:#ddd5c4 }
+  .vinyl .plaque { display:inline-block; margin-top:18px; padding:6px 14px; font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:#2a2010;
+    background:linear-gradient(135deg, #e6c983, #b58d43 55%, #e0c27a); box-shadow:inset 0 1px 0 rgba(255,255,255,.5), 0 4px 10px rgba(0,0,0,.4) }
+  .quote { width:min(40vw, 560px) }
+  .quote blockquote { font-style:italic; font-weight:400; font-size:clamp(30px, 2.8vw, 44px); line-height:1.2 }
+  .quote cite { display:block; font-style:normal; font-size:13px; letter-spacing:.24em; text-transform:uppercase; color:var(--mid); margin-top:20px }
+
+  /* Exhibits */
+  .exhibit { display:flex; align-items:flex-end; gap:34px }
+  .art { display:flex; align-items:flex-end; gap:var(--g); cursor:none }
+  .col { display:flex; flex-direction:column; gap:var(--g) }
+  .frame { position:relative; border:var(--fb) solid; transform-style:preserve-3d; will-change:transform;
+    box-shadow:0 34px 50px -18px rgba(0,0,0,.8), 0 8px 14px rgba(0,0,0,.45) }
+  /* A sheen over the moulding only, not the picture */
+  .frame::after { content:""; position:absolute; inset:calc(-1 * var(--fb)); border:var(--fb) solid transparent; pointer-events:none;
+    background:linear-gradient(125deg, rgba(255,255,255,.28), transparent 35%, transparent 65%, rgba(0,0,0,.22)) border-box;
+    -webkit-mask:linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask:linear-gradient(#000 0 0) padding-box exclude, linear-gradient(#000 0 0) }
+  .bead { padding:var(--bd) }
+  .mat { padding:var(--mp); background:var(--mat); box-shadow:inset 0 2px 6px rgba(0,0,0,.25) }
+  .mat img { display:block; object-fit:cover; object-position:top; box-shadow:0 0 0 3px #fbf8f1, 0 0 0 4px rgba(0,0,0,.12) }
+  .ls { aspect-ratio:16 / 10 } .pt { aspect-ratio:9 / 19 }
+  .L img { height:var(--L); width:auto } .S img { height:var(--S); width:auto }
+
+  .gilt { border-color:#ecd38c #d2ae5e #94702e #76561f }
+  .gilt .bead { background:radial-gradient(circle, #f7e6a8 0 1.4px, #6f5220 1.9px) 0 0 / 5px 5px; box-shadow:inset 0 0 0 1px rgba(60,40,10,.5) }
+  .walnut { border-color:#6b4a30 #573b25 #3a2717 #2c1d11 }
+  .walnut .bead { background:linear-gradient(135deg, #e8cd86, #a8823d); box-shadow:inset 0 0 0 1px rgba(40,25,5,.6) }
+  .ebony { border-color:#3a3632 #2a2724 #141210 #0b0a09 }
+  .ebony .bead { background:linear-gradient(#d9bb72, #9d7b37); padding:2px; margin:2px 0; box-shadow:0 0 0 2px #121110 }
+  .silver { border-color:#e2e2df #c3c3bf #87877f #6c6c66 }
+  .silver .bead { background:radial-gradient(circle, #f4f4f1 0 1.4px, #66665f 1.9px) 0 0 / 5px 5px }
+
+  .placard { width:230px; padding:16px 18px 18px; background:#ece6d8; color:#2b2721; font-size:15.5px; line-height:1.4; box-shadow:0 6px 16px rgba(0,0,0,.45) }
+  .placard b { display:block; font-weight:600; font-size:23px; line-height:1.1 }
+  .placard i { display:block; color:#6d6658; margin:2px 0 10px }
+  .placard .med { font-size:13.5px; color:#6d6658; margin-top:10px }
+  .placard .more { display:block; margin-top:12px; font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:#7b5c22; cursor:pointer }
+
+  /* Guestbook */
+  .guest { width:min(36vw, 480px) }
+  .guest h2 { font-weight:400; font-size:clamp(44px, 4.4vw, 72px); line-height:1 }
+  .guest > p { font-style:italic; color:var(--soft); margin:10px 0 22px; font-size:21px }
+  .book { position:relative; background:#efe9db; color:#2b2721; padding:24px 26px 22px; box-shadow:0 30px 50px -20px rgba(0,0,0,.8); cursor:auto }
+  .book label { display:block; font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:#857c6b; margin-top:12px }
+  .book input, .book textarea { display:block; width:100%; background:transparent; border:0; border-bottom:1px solid #b9b09d; padding:6px 0 5px; font-size:20px; outline:none; resize:none; color:#2b2721 }
+  .book textarea { height:84px; background:repeating-linear-gradient(transparent 0 27px, #cfc6b2 27px 28px); border-bottom:0; line-height:28px; font-family:'EB Garamond', serif; font-size:18px }
+  .book input:focus, .book textarea:focus { border-color:#7b5c22 }
+  .book button { margin-top:18px; padding:12px 22px; border:0; cursor:pointer; letter-spacing:.18em; text-transform:uppercase; font-size:13px; color:#2a2010;
+    background:linear-gradient(135deg, #e6c983, #b58d43 55%, #e0c27a); box-shadow:inset 0 1px 0 rgba(255,255,255,.5), 0 4px 10px rgba(0,0,0,.3); transition:transform .12s }
+  .book button:active { transform:translateY(1px) scale(.98) }
+  .seal { position:absolute; inset:0; display:grid; place-items:center; text-align:center; background:#efe9db; opacity:0; pointer-events:none; padding:30px }
+  .seal .wax { width:86px; height:86px; border-radius:50%; margin:0 auto 14px; display:grid; place-items:center; color:#f3d9c9; font-size:30px; font-style:italic;
+    background:radial-gradient(circle at 35% 30%, #c2463a, #7d1f18 70%); box-shadow:inset 0 -4px 8px rgba(0,0,0,.35), 0 4px 10px rgba(0,0,0,.25) }
+  .elsewhere { margin-top:22px; font-size:18px; color:var(--soft) }
+  .elsewhere a { text-decoration:none; border-bottom:1px solid rgba(236,229,214,.35); margin-right:18px }
+  .offclock { margin-top:14px; font-style:italic; font-size:17px; color:var(--mid); max-width:40ch }
+
+  /* Spotlight on the cursor */
+  .beam { position:fixed; inset:0; pointer-events:none; z-index:5; background:radial-gradient(circle 44vmax at var(--mx) var(--my), transparent 0%, rgba(8,7,6,.1) 38%, rgba(8,7,6,.55) 100%) }
+
+  /* Hint, bottom centre */
+  .hint { position:fixed; left:50%; bottom:46px; transform:translateX(-50%); z-index:15; display:flex; align-items:center; gap:14px; font-size:13px; letter-spacing:.24em; text-transform:uppercase; color:var(--soft); opacity:0; transition:opacity .8s; pointer-events:none; white-space:nowrap }
+  .hint.on { opacity:1 }
+  .hint i { position:relative; width:56px; height:1px; background:rgba(236,229,214,.3); overflow:hidden }
+  .hint i::after { content:""; position:absolute; left:0; top:-1px; width:14px; height:3px; border-radius:2px; background:var(--text); animation:walk 1.8s cubic-bezier(.5,0,.3,1) infinite }
+  @keyframes walk { from { transform:translateX(-14px) } to { transform:translateX(56px) } }
+  .progress { position:fixed; left:4vw; right:4vw; bottom:26px; height:1px; background:rgba(236,229,214,.12); z-index:15 }
+  .progress i { position:absolute; inset:0; background:var(--text); transform-origin:left; transform:scaleX(var(--p, 0)) }
+
+  /* Loupe */
+  .loupe { position:fixed; left:0; top:0; z-index:60; pointer-events:none; opacity:0; transition:opacity .2s }
+  .loupe.on { opacity:1 }
+  .loupe .lens { position:absolute; left:-80px; top:-80px; width:160px; height:160px; border-radius:50%; background-color:#111; background-repeat:no-repeat;
+    box-shadow:0 0 0 6px #b8914a, 0 0 0 8px #6b5222, 0 0 0 9px rgba(255,230,170,.5), 0 18px 30px rgba(0,0,0,.6); transform:scale(.6); transition:transform .35s cubic-bezier(.3,1.5,.5,1) }
+  .loupe.on .lens { transform:scale(1) }
+  .loupe .lens::after { content:""; position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 30% 26%, rgba(255,255,255,.28), transparent 26%), radial-gradient(circle, transparent 78%, rgba(0,0,0,.28)) }
+  .loupe .handle { position:absolute; left:52px; top:52px; width:16px; height:88px; border-radius:6px; transform-origin:top center; transform:rotate(-45deg);
+    background:linear-gradient(90deg, #3a2a18, #6b4c2c 45%, #2c1e10); box-shadow:0 8px 14px rgba(0,0,0,.5) }
+  .loupe .cue { position:absolute; left:-82px; top:-122px; width:164px; text-align:center; font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--text); background:rgba(20,18,16,.82); padding:6px 0 5px; border-radius:999px; opacity:0; transition:opacity .4s .5s }
+  .loupe.on .cue { opacity:1 }
+
+  /* Detail view: the frame slides away along a rail to reveal what's behind it */
+  .detail { position:fixed; inset:0; z-index:40; pointer-events:none }
+  .detail.on { pointer-events:auto }
+  .detail .backdrop { position:absolute; inset:0; background:rgba(10,9,8,.86); backdrop-filter:blur(6px); opacity:0; transition:opacity .5s }
+  .detail.on .backdrop { opacity:1 }
+  .panel { position:absolute; inset:6vh 5vw; background:#24211d; box-shadow:inset 0 0 0 1px rgba(236,229,214,.08), inset 0 30px 60px -30px rgba(0,0,0,.6), 0 40px 80px rgba(0,0,0,.5);
+    display:grid; grid-template-columns:minmax(320px, 0.85fr) 1.15fr; gap:4vw; padding:5vh 4vw; visibility:hidden; overflow:hidden }
+  .panel, .panel .info, .glimpse .win, .thumbs { scrollbar-width:thin; scrollbar-color:rgba(236,229,214,.25) transparent }
+  .glimpse .win { scrollbar-color:#c9c3b6 #f4f2ee }
+  .panel .info { overflow:auto; padding-right:14px; font:400 17.5px/1.6 'EB Garamond', serif; color:#ddd5c4 }
+  .panel .kick { font:500 12px/1 'Cormorant Garamond'; letter-spacing:.26em; text-transform:uppercase; color:var(--mid) }
+  .panel h2 { font:400 clamp(44px, 4.6vw, 76px)/1 'Cormorant Garamond'; color:var(--text); margin:12px 0 8px }
+  .panel .tag { font:italic 400 24px/1.3 'Cormorant Garamond'; color:var(--soft); margin-bottom:22px }
+  .panel h3 { font:500 12px/1 'Cormorant Garamond'; letter-spacing:.24em; text-transform:uppercase; color:var(--brass); margin:22px 0 8px }
+  .panel table { border-collapse:collapse; font-size:15.5px; width:100% }
+  .panel td { padding:5px 0; border-bottom:1px solid rgba(236,229,214,.1) }
+  .panel td:first-child { color:var(--mid); width:42% }
+  .links { display:flex; gap:12px; flex-wrap:wrap; margin-top:26px }
+  .links a { text-decoration:none; padding:10px 16px; font:500 13px/1 'Cormorant Garamond'; letter-spacing:.18em; text-transform:uppercase; border:1px solid rgba(201,164,92,.6); color:var(--text); transition:background .25s, color .25s }
+  .links a:hover { background:var(--brass); color:#1c1a17 }
+  .close { position:absolute; top:18px; right:22px; z-index:2; background:none; border:0; cursor:pointer; font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:var(--soft); padding:8px }
+  .close:hover { color:var(--text) }
+  .view { display:flex; flex-direction:column; gap:16px; min-height:0 }
+  .glimpse { flex:1; min-height:0; display:flex; flex-direction:column; background:#fff; box-shadow:0 20px 40px rgba(0,0,0,.5); border-radius:6px; overflow:hidden }
+  .glimpse .bar { display:flex; align-items:center; gap:10px; padding:9px 12px; background:#e9e6df; font:13px/1 ui-sans-serif, system-ui, sans-serif; color:#555 }
+  .glimpse .bar span { flex:1; background:#fff; border-radius:5px; padding:6px 10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+  .glimpse .win { flex:1; overflow:auto; background:#fff }
+  .glimpse .win img { display:block; width:100% }
+  .glimpse .win.dark { background:#111; display:grid; place-items:center }
+  .glimpse .win.dark img { width:auto; max-width:100%; max-height:100% }
+  .thumbs { display:flex; gap:12px; overflow-x:auto; padding-bottom:4px }
+  .thumbs button { flex:none; border:0; padding:4px; background:#14120f; cursor:pointer; opacity:.6; transition:opacity .25s, transform .25s; box-shadow:0 0 0 1px rgba(236,229,214,.15) }
+  .thumbs button.on, .thumbs button:hover { opacity:1 }
+  .thumbs button.on { box-shadow:0 0 0 2px var(--brass) }
+  .thumbs img { display:block; height:58px; width:auto }
+  .thumbs .gh { height:58px; padding:0 14px; display:grid; place-items:center; font:500 12px/1 'Cormorant Garamond'; letter-spacing:.18em; text-transform:uppercase; color:var(--text) }
+  .ghost { position:fixed; z-index:45; margin:0; pointer-events:none; transform-origin:0 0 }
+
+  /* Intro curtain */
+  .dark { position:fixed; inset:0; z-index:30; background:#050504; pointer-events:none; opacity:0 }
+  .intro .dark { opacity:1 }
+  .intro .entrance > *, .intro header, .intro .progress { opacity:0 }
+
+  @media (max-width: 760px), (pointer: coarse) and (max-width: 1024px) {
+    :root { --fb:11px; --bd:3px; --mp:10px; --g:14px }
+    body { overflow-x:hidden; overflow-y:auto }
+    header { padding:16px 16px 24px; font-size:12px } header nav { gap:16px } header .room { display:none }
+    .hall { position:relative; inset:auto; cursor:auto; overflow:visible }
+    .scene { position:relative; inset:auto }
+    .track { position:relative; flex-direction:column; align-items:center; gap:0; padding:0 16px 140px; transform:none !important }
+    .bay { height:auto; min-height:auto; width:100%; padding:16vh 0 4vh; justify-content:center }
+    .lamp { left:-16px; right:-16px; background:radial-gradient(ellipse closest-side at 50% 30%, rgba(255,231,190,.12), transparent) }
+    .lamp::before, .lamp::after { display:none }
+    .bay:first-child { width:100%; min-height:100svh; padding:0; align-items:center }
+    .entrance, .vinyl, .quote, .guest { width:100%; text-align:center }
+    .entrance p { margin-left:auto; margin-right:auto }
+    .roomsign { height:auto; border-left:0; padding:0; width:100%; justify-content:center; border-top:1px solid rgba(236,229,214,.2); padding-top:14px }
+    .roomsign span { writing-mode:horizontal-tb; transform:none }
+    .exhibit { flex-direction:column; align-items:center; gap:22px; width:100% }
+    /* Phones: the lead piece spans the width, the rest pair up beneath it */
+    .art { display:grid; grid-template-columns:1fr 1fr; gap:var(--g); width:100%; align-items:start; cursor:pointer }
+    .col { display:contents }
+    .art .frame { justify-self:center; max-width:100% }
+    .art .frame.lead { grid-column:1 / -1 }
+    .art .frame img.ls { width:100%; height:auto }
+    .art .frame img.pt { width:min(100%, 150px); height:auto }
+    .art .frame.lead img.pt { width:auto; height:min(56vh, 480px) }
+    .placard { width:100%; max-width:420px; text-align:left }
+    .book { text-align:left }
+    .beam, .loupe, .progress { display:none }
+    .hint { bottom:22px }
+    .hint i { width:1px; height:30px } .hint i::after { width:3px; height:10px; left:-1px; top:0; animation:fall 1.8s cubic-bezier(.5,0,.3,1) infinite }
+    @keyframes fall { from { transform:translateY(-10px) } to { transform:translateY(30px) } }
+    .panel { inset:0; grid-template-columns:1fr; padding:64px 18px 30px; overflow:auto; display:block }
+    .panel .info { overflow:visible }
+    .view { margin-top:28px }
+    .glimpse { height:62vh; flex:none }
+  }
+  @media (prefers-reduced-motion: reduce) { .hint i::after { animation:none } }
+</style>
+</head>
+<body>
+<header>
+  <a id="home">Shrey Mistry</a>
+  <nav><span class="room" id="where">Entrance</span><a id="toGuest">Guestbook</a></nav>
+</header>
+
+<div class="hall" id="hall"><div class="scene" id="scene"><div class="track" id="track">
+  <section class="bay" data-room="Entrance">
+    <div class="lamp"></div>
+    <div class="entrance">
+      <h1>Shrey Mistry</h1>
+      <p>Computer Science at Toronto Metropolitan University, graduating May 2027.</p>
+      <p class="loc">Brampton, Ontario</p>
+    </div>
+  </section>
+
+  <section class="bay" data-room="Internships"><div class="roomsign"><span>Room one, Internships</span></div></section>
+  <section class="bay" data-room="Internships"><div class="lamp"></div><div class="vinyl">
+    <h2>Geotab</h2><p class="role">Software Engineering Intern, Oakville, May 2025 to Aug 2026</p>
+    <p>Sixteen months on telematics. I took one device from PRD to launch in six months, built BigQuery dashboards for 1,000+ IoT units used by 40 to 50 staff, and wrote Chrome extensions that cut manual firmware verification by 80%.</p>
+    <span class="plaque">Intern of the Month, Jan 2026</span></div></section>
+  <section class="bay" data-room="Internships"><div class="lamp"></div><div class="vinyl">
+    <h2>AMD</h2><p class="role">Performance Engineering Intern, Markham, Jan to Aug 2024</p>
+    <p>A Python benchmark framework that launches games through Steam and Epic and navigates menus by image matching, cutting runtimes by 60%. An Arduino tool that measures sub-millisecond input latency.</p></div></section>
+  <section class="bay" data-room="Internships"><div class="lamp"></div><div class="vinyl">
+    <h2>Bombardier</h2><p class="role">Automation Engineering Intern, Toronto, May to Aug 2023</p>
+    <p>TypeScript and Node.js pipelines into Power BI, with validation that flags anomalies in audit records. Compliance reports took over 70% less time.</p></div></section>
+  <section class="bay" data-room="Internships"><div class="lamp"></div><div class="quote">
+    <blockquote>&ldquo;Shrey was instrumental in taking a new hardware product from early concept to market.&rdquo;</blockquote>
+    <cite>Rob Wyatt, Geotab</cite></div></section>
+
+  <section class="bay" data-room="Projects"><div class="roomsign"><span>Room two, Projects</span></div></section>
+  <!-- exhibits are inserted here -->
+  <section class="bay" data-room="Guestbook" id="guestBay"><div class="roomsign"><span>Guestbook</span></div></section>
+  <section class="bay" data-room="Guestbook"><div class="lamp"></div><div class="guest">
+    <h2>Sign the guestbook</h2>
+    <p>Leave a note and I&rsquo;ll write back.</p>
+    <form class="book" id="book" novalidate>
+      <label for="gname">Name</label><input id="gname" name="name" autocomplete="name" required>
+      <label for="gmail">Email</label><input id="gmail" name="email" type="email" autocomplete="email" required>
+      <label for="gnote">Note</label><textarea id="gnote" name="message" required></textarea>
+      <button type="submit">Sign</button>
+      <div class="seal" id="seal"><div><div class="wax">S</div><p style="font-size:22px">Thanks, it&rsquo;s in the book.</p><p style="font-size:14px; color:#857c6b; margin-top:6px">Draft only: this form isn&rsquo;t connected to anything yet.</p></div></div>
+    </form>
+    <p class="elsewhere"><a href="https://github.com/shreywy">GitHub</a><a href="https://linkedin.com/in/shreymistry">LinkedIn</a></p>
+    <p class="offclock">Off the clock: F1 and Le Mans, 3D printing functional parts, and self-hosting on Raspberry Pis.</p>
+  </div></section>
+</div></div></div>
+
+<div class="beam"></div>
+<div class="hint" id="hint"><span id="hintText">Scroll or drag to walk through</span><i></i></div>
+<div class="progress"><i id="bar"></i></div>
+<div class="loupe" id="loupe"><span class="handle"></span><div class="lens" id="lens"></div><span class="cue">Click to look closer</span></div>
+<div class="dark" id="dark"></div>
+
+<div class="detail" id="detail" aria-hidden="true">
+  <div class="backdrop" id="backdrop"></div>
+  <article class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="dTitle">
+    <button class="close" id="close">Back to the wall &nbsp;&times;</button>
+    <div class="info" id="dInfo"></div>
+    <div class="view">
+      <div class="glimpse"><div class="bar"><span id="dUrl"></span></div><div class="win" id="dWin"><img id="dImg" alt=""></div></div>
+      <div class="thumbs" id="dThumbs"></div>
+    </div>
+  </article>
+</div>
+
+<script src="gallery-projects.js"></script>
+<script>
+const A = 'assets/';
+const P = window.PROJECTS.filter(p => !p.hidden);
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const mobile = () => matchMedia('(max-width: 760px), (pointer: coarse) and (max-width: 1024px)').matches;
+const $ = id => document.getElementById(id);
+const track = $('track'), hall = $('hall'), scene = $('scene'), root = document.documentElement;
+
+// Build the exhibits from the data so the wall and the detail views never drift apart.
+const frameHTML = (p, [src, shape, size]) =>
+  `<div class="frame ${p.frame} ${size}"><div class="bead"><div class="mat"><img class="${shape}" src="${A + src}" alt="${p.title}" draggable="false"></div></div></div>`;
+P.forEach(p => {
+  let html = '', smalls = [];
+  const flush = () => { if (smalls.length) { html += `<div class="col">${smalls.join('')}</div>`; smalls = [] } };
+  p.art.forEach(a => { if (a[2] === 'S') smalls.push(frameHTML(p, a)); else { flush(); html += frameHTML(p, a) } });
+  flush();
+  const bay = document.createElement('section');
+  bay.className = 'bay'; bay.dataset.room = 'Projects';
+  bay.innerHTML = `<div class="lamp"></div><div class="exhibit"><div class="art" data-id="${p.id}">${html}</div>
+    <div class="placard"><b>${p.title}</b><i>${p.year}</i>${p.placard}<div class="med">${p.medium}</div><span class="more" data-id="${p.id}">Look closer &rarr;</span></div></div>`;
+  const fr = [...bay.querySelectorAll('.frame')];
+  fr[0].classList.add('lead');
+  if (fr.length % 2 === 0) fr[fr.length - 1].classList.add('lead');
+  track.insertBefore(bay, $('guestBay'));
+});
+// After the last piece, a pointer to everything else.
+const archive = document.createElement('section');
+archive.className = 'bay'; archive.dataset.room = 'Projects';
+archive.innerHTML = `<div class="lamp"></div><div class="vinyl"><h2 style="font-size:clamp(34px,3vw,48px)">The archive</h2>
+  <p class="role">Smaller things, school work, and experiments</p><p><a href="https://github.com/shreywy" target="_blank" rel="noopener" style="text-decoration:none; border-bottom:1px solid rgba(236,229,214,.35)">github.com/shreywy &#8599;</a></p></div>`;
+track.insertBefore(archive, $('guestBay'));
+
+/* ---------- Walking the hall (desktop) ---------- */
+let x = 0, tx = 0, max = 0, travelled = 0;
+const measure = () => { max = Math.max(0, track.scrollWidth - innerWidth) };
+addEventListener('load', measure); addEventListener('resize', measure); measure();
+const clamp = v => Math.max(0, Math.min(max, v));
+const detailOpen = () => $('detail').classList.contains('on');
+
+addEventListener('wheel', e => {
+  if (mobile() || detailOpen() || introRunning) return;
+  e.preventDefault();
+  tx = clamp(tx + (Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * 1.1);
+}, { passive:false });
+
+const bays = () => [...track.querySelectorAll('.bay')];
+function stepBay(dir) {
+  const centres = bays().map(b => b.offsetLeft + b.offsetWidth / 2 - innerWidth / 2).map(clamp);
+  const next = dir > 0 ? centres.find(c => c > tx + 20) : [...centres].reverse().find(c => c < tx - 20);
+  tx = next ?? (dir > 0 ? max : 0);
+}
+addEventListener('keydown', e => {
+  if (introRunning) { finishIntro(); return }
+  if (e.key === 'Escape' && detailOpen()) history.back();
+  if (detailOpen() || mobile() || e.target.closest('input, textarea')) return;
+  if (e.key === 'ArrowRight') stepBay(1);
+  if (e.key === 'ArrowLeft') stepBay(-1);
+});
+
+let drag = null, moved = false;
+hall.addEventListener('pointerdown', e => {
+  if (mobile() || e.target.closest('input, textarea, button, a, label')) return;
+  drag = { sx:e.clientX, st:tx, lx:e.clientX, v:0 }; moved = false; hall.classList.add('drag');
+});
+addEventListener('pointermove', e => {
+  root.style.setProperty('--mx', e.clientX + 'px'); root.style.setProperty('--my', e.clientY + 'px');
+  if (!drag) return;
+  if (Math.abs(e.clientX - drag.sx) > 5) moved = true;
+  drag.v = drag.lx - e.clientX; drag.lx = e.clientX;
+  tx = clamp(drag.st - (e.clientX - drag.sx));
+});
+addEventListener('pointerup', e => {
+  if (drag) { tx = clamp(tx + drag.v * 14); drag = null; hall.classList.remove('drag') }
+});
+track.addEventListener('click', e => {
+  const t = e.target.closest('.art, .more');
+  if (!t || moved) return;
+  const art = t.classList.contains('art') ? t : track.querySelector(`.art[data-id="${t.dataset.id}"]`);
+  open(art.dataset.id, art);
+});
+$('home').onclick = () => mobile() ? scrollTo({ top:0, behavior:'smooth' }) : (tx = 0);
+$('toGuest').onclick = () => { const b = $('guestBay').nextElementSibling; mobile() ? b.scrollIntoView({ behavior:'smooth', block:'center' }) : (tx = clamp(b.offsetLeft + b.offsetWidth / 2 - innerWidth / 2)) };
+
+/* ---------- Frames lean toward you; the loupe magnifies ---------- */
+const frames = [...document.querySelectorAll('.frame')].map(el => ({ el, rx:0, ry:0, trx:0, try:0 }));
+const loupe = $('loupe'), lens = $('lens');
+const Z = 2.4, R = 80;
+let lpx = 0, lpy = 0, ltx = 0, lty = 0;
+frames.forEach(f => {
+  const img = f.el.querySelector('img');
+  f.el.addEventListener('pointerenter', () => {
+    if (mobile()) return;
+    lens.style.backgroundImage = `url("${img.currentSrc || img.src}")`;
+    loupe.classList.add('on');
+  });
+  f.el.addEventListener('pointermove', e => {
+    if (mobile()) return;
+    const r = f.el.getBoundingClientRect();
+    f.try = ((e.clientX - r.left) / r.width - .5) * 5;
+    f.trx = -((e.clientY - r.top) / r.height - .5) * 5;
+    // Map the cursor onto the picture as object-fit: cover / object-position: top draws it.
+    const b = img.getBoundingClientRect();
+    const s = Math.max(b.width / img.naturalWidth, b.height / img.naturalHeight);
+    const dw = img.naturalWidth * s, dh = img.naturalHeight * s, ox = (b.width - dw) / 2;
+    const px = e.clientX - b.left - ox, py = e.clientY - b.top;
+    lens.style.backgroundSize = `${dw * Z}px ${dh * Z}px`;
+    lens.style.backgroundPosition = `${R - px * Z}px ${R - py * Z}px`;
+    ltx = e.clientX; lty = e.clientY;
+  });
+  f.el.addEventListener('pointerleave', () => { f.trx = f.try = 0; loupe.classList.remove('on') });
+});
+
+const pieces = [...track.querySelectorAll('[data-room]')], where = $('where'), bar = $('bar'), hint = $('hint');
+(function tick() {
+  if (!mobile()) {
+    const before = x;
+    x += (tx - x) * (reduce ? 1 : .085);
+    travelled += Math.abs(x - before);
+    track.style.transform = `translate3d(${-x}px,0,0)`;
+    bar.style.setProperty('--p', max ? x / max : 0);
+    const here = pieces.filter(p => p.getBoundingClientRect().left < innerWidth * .5).pop();
+    if (here && where.textContent !== here.dataset.room) where.textContent = here.dataset.room;
+  }
+  if (travelled > 80 && !nudging) hint.classList.remove('on');
+  frames.forEach(f => {
+    f.rx += (f.trx - f.rx) * .1; f.ry += (f.try - f.ry) * .1;
+    if (!reduce) f.el.style.transform = `perspective(1100px) rotateX(${f.rx.toFixed(2)}deg) rotateY(${f.ry.toFixed(2)}deg)`;
+  });
+  lpx += (ltx - lpx) * .35; lpy += (lty - lpy) * .35;
+  loupe.style.transform = `translate(${lpx}px, ${lpy}px)`;
+  requestAnimationFrame(tick);
+})();
+addEventListener('scroll', () => { if (scrollY > 60) hint.classList.remove('on') }, { passive:true });
+
+/* ---------- Detail view ---------- */
+const detail = $('detail'), panel = $('panel');
+let ghost = null, srcArt = null;
+const ease = 'cubic-bezier(.65,0,.25,1)';
+
+function fill(p) {
+  const sec = (h, t) => t ? `<h3>${h}</h3><p>${t}</p>` : '';
+  $('dInfo').innerHTML = `<div class="kick">Room two, Projects &middot; ${p.year}</div><h2 id="dTitle">${p.title}</h2><p class="tag">${p.tag}</p>
+    ${sec('What it is', p.what)}${sec('How it works', p.how)}${sec('Numbers', p.nums)}
+    ${p.map ? `<h3>Git, in the kitchen</h3><table>${p.map.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table>` : ''}
+    <h3>Built with</h3><p>${p.medium}</p>
+    <div class="links">${p.links.map(([t, u]) => `<a href="${u}" target="_blank" rel="noopener">${t} &#8599;</a>`).join('')}</div>`;
+  const shots = p.art.map(a => a[0]).concat(p.extra || []);
+  $('dThumbs').innerHTML = `<button class="gh on" data-src="${p.gh}">GitHub</button>` + shots.map(s => `<button data-src="${s}"><img src="${A + s}" alt=""></button>`).join('');
+  show(p, p.gh);
+}
+let autoScroll = 0, userScrolled = false;
+function show(p, src) {
+  const win = $('dWin'), img = $('dImg'), isGh = src === p.gh;
+  img.src = A + src;
+  win.classList.toggle('dark', !isGh);
+  $('dUrl').textContent = isGh ? p.repo : src.replace(/\.(png|jpe?g|gif)$/, '');
+  win.scrollTop = 0; userScrolled = !isGh;
+  $('dThumbs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.src === src));
+}
+$('dThumbs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) show(current, b.dataset.src) });
+['wheel', 'pointerdown', 'touchstart'].forEach(ev => $('dWin').addEventListener(ev, () => userScrolled = true, { passive:true }));
+// A slow glimpse down the repo page, until you take over.
+(function glide() {
+  const win = $('dWin');
+  if (detailOpen() && !userScrolled && !reduce) { autoScroll += .55; if (autoScroll >= 1) { win.scrollTop += Math.floor(autoScroll); autoScroll %= 1 } }
+  requestAnimationFrame(glide);
+})();
+
+let current = null;
+function open(id, art, fromHistory) {
+  const p = P.find(q => q.id === id); if (!p || detailOpen()) return;
+  current = p; fill(p);
+  if (!fromHistory) history.pushState({ id }, '', '#' + id);
+  detail.classList.add('on'); detail.setAttribute('aria-hidden', 'false');
+  loupe.classList.remove('on');
+  const vw = innerWidth, vh = innerHeight;
+  const pr = panel.getBoundingClientRect();
+  if (!art || reduce) {
+    panel.style.visibility = 'visible';
+    panel.animate([{ opacity:0, transform:'scale(.97)' }, { opacity:1, transform:'none' }], { duration:reduce ? 1 : 500, easing:ease });
+    srcArt = null; return;
+  }
+  srcArt = art;
+  const r = art.getBoundingClientRect();
+  ghost = art.cloneNode(true); ghost.classList.add('ghost');
+  Object.assign(ghost.style, { left:r.left + 'px', top:r.top + 'px', width:r.width + 'px', height:r.height + 'px' });
+  document.body.appendChild(ghost);
+  art.style.visibility = 'hidden';
+  const s = Math.min(vw * .62 / r.width, vh * .64 / r.height, 1.3);
+  const cx = (vw - r.width * s) / 2 - r.left, cy = (vh - r.height * s) / 2 - r.top;
+  const centre = `translate(${cx}px, ${cy}px) scale(${s})`;
+  const gone = `translate(${-r.left - r.width * s - 80}px, ${cy}px) scale(${s}) perspective(1200px) rotateY(10deg)`;
+  // The panel starts clipped to exactly where the centred frame hangs, then opens as the frame rolls away.
+  const gx = (vw - r.width * s) / 2 - pr.left, gy = (vh - r.height * s) / 2 - pr.top;
+  const clipIn = `inset(${gy}px ${pr.width - gx - r.width * s}px ${pr.height - gy - r.height * s}px ${gx}px)`;
+  ghost._centre = centre; ghost._gone = gone; panel._clip = clipIn;
+  ghost.animate([{ transform:'none' }, { transform:centre }], { duration:650, easing:ease, fill:'forwards' }).finished.then(() => {
+    panel.style.visibility = 'visible';
+    panel.animate([{ clipPath:clipIn }, { clipPath:'inset(0px 0px 0px 0px)' }], { duration:1000, easing:ease, fill:'forwards' });
+    ghost.animate([{ transform:centre }, { transform:gone }], { duration:1000, easing:ease, fill:'forwards' });
+  });
+}
+function close(fromHistory) {
+  if (!detailOpen()) return;
+  if (!fromHistory) { history.back(); return }
+  const done = () => {
+    detail.classList.remove('on'); detail.setAttribute('aria-hidden', 'true');
+    panel.style.visibility = 'hidden'; panel.getAnimations().forEach(a => a.cancel());
+    if (ghost) { ghost.remove(); ghost = null }
+    if (srcArt) srcArt.style.visibility = '';
+  };
+  if (!ghost) { panel.animate([{ opacity:1 }, { opacity:0 }], { duration:reduce ? 1 : 300 }).finished.then(done); return }
+  panel.animate([{ clipPath:'inset(0px 0px 0px 0px)' }, { clipPath:panel._clip }], { duration:800, easing:ease, fill:'forwards' });
+  ghost.animate([{ transform:ghost._gone }, { transform:ghost._centre }], { duration:800, easing:ease, fill:'forwards' }).finished.then(() => {
+    panel.style.visibility = 'hidden';
+    detail.classList.remove('on');
+    ghost.animate([{ transform:ghost._centre }, { transform:'none' }], { duration:600, easing:ease, fill:'forwards' }).finished.then(done);
+  });
+}
+$('close').onclick = () => close();
+$('backdrop').onclick = () => close();
+addEventListener('popstate', () => {
+  const id = location.hash.slice(1);
+  if (!id && detailOpen()) close(true);
+  else if (id && !detailOpen()) open(id, null, true);
+});
+
+/* ---------- Guestbook ---------- */
+$('book').addEventListener('submit', e => {
+  e.preventDefault();
+  const f = e.currentTarget;
+  if (!f.checkValidity()) {
+    [...f.elements].filter(el => el.willValidate && !el.checkValidity()).forEach(el =>
+      el.animate([{ transform:'translateX(0)' }, { transform:'translateX(-6px)' }, { transform:'translateX(5px)' }, { transform:'translateX(0)' }], { duration:300 }));
+    return;
+  }
+  // Not wired to a backend yet. The card closes and gets a wax seal.
+  f.animate([{ transform:'none' }, { transform:'translateY(-6px) rotate(-.6deg)' }, { transform:'none' }], { duration:500, easing:ease });
+  const seal = $('seal');
+  seal.style.pointerEvents = 'auto';
+  seal.animate([{ opacity:0 }, { opacity:1 }], { duration:400, delay:250, fill:'forwards' });
+  seal.querySelector('.wax').animate([{ transform:'scale(2.2) rotate(-20deg)', opacity:0 }, { transform:'scale(.92) rotate(4deg)', opacity:1, offset:.7 }, { transform:'scale(1) rotate(0)' }], { duration:650, delay:420, easing:'cubic-bezier(.3,1.4,.5,1)', fill:'backwards' });
+});
+
+/* ---------- Walking in: lights flicker on, then the camera moves into the room ---------- */
+let introRunning = false, nudging = false;
+const dark = $('dark');
+function showHint() {
+  $('hintText').textContent = mobile() ? 'Scroll to walk through' : 'Scroll or drag to walk through';
+  hint.classList.add('on');
+  // A small nudge so the hall shows which way it moves.
+  if (!mobile() && !reduce && tx === 0) { nudging = true; tx = 90; setTimeout(() => { tx = 0; setTimeout(() => { nudging = false; travelled = 0 }, 900) }, 650) }
+}
+function finishIntro() {
+  if (!introRunning) return;
+  introRunning = false;
+  document.getAnimations().forEach(a => { if (a._intro) a.finish() });
+  root.classList.remove('intro');
+  setTimeout(showHint, 300);
+}
+function runIntro() {
+  if (reduce || location.hash) { root.classList.remove('intro'); setTimeout(showHint, 400); return }
+  introRunning = true;
+  const tag = a => (a._intro = true, a);
+  const lamps = [...document.querySelectorAll('.lamp')].filter(l => l.getBoundingClientRect().left < innerWidth * 1.2);
+  // The room itself: dark, a stutter of light, then on.
+  tag(dark.animate([
+    { opacity:1 }, { opacity:1, offset:.18 }, { opacity:.72, offset:.2 }, { opacity:1, offset:.24 }, { opacity:.6, offset:.3 }, { opacity:.95, offset:.33 },
+    { opacity:.45, offset:.42 }, { opacity:.8, offset:.45 }, { opacity:.3, offset:.55 }, { opacity:0 }
+  ], { duration:1900, fill:'forwards' }));
+  lamps.forEach((l, i) => tag(l.animate([
+    { opacity:0 }, { opacity:.9, offset:.08 }, { opacity:0, offset:.14 }, { opacity:0, offset:.3 }, { opacity:1, offset:.34 }, { opacity:.2, offset:.4 },
+    { opacity:.85, offset:.5 }, { opacity:.4, offset:.56 }, { opacity:1 }
+  ], { duration:1300, delay:200 + i * 260, fill:'backwards', easing:'steps(1, end)' })));
+  // Walking in: a long dolly from the doorway.
+  tag(scene.animate([
+    { transform:'scale(1.55) translateY(3vh)', filter:'blur(5px)' },
+    { transform:'scale(1.18) translateY(1vh)', filter:'blur(1.5px)', offset:.45 },
+    { transform:'none', filter:'blur(0)' }
+  ], { duration:3200, delay:300, easing:'cubic-bezier(.3,.1,.15,1)', fill:'backwards' }));
+  const words = [...document.querySelectorAll('.entrance > *'), document.querySelector('header'), document.querySelector('.progress')];
+  words.forEach((w, i) => tag(w.animate([{ opacity:0, transform:'translateY(12px)' }, { opacity:1, transform:'none' }], { duration:1100, delay:2200 + i * 140, easing:ease, fill:'backwards' })));
+  setTimeout(() => { root.classList.remove('intro') }, 30);
+  setTimeout(() => { if (introRunning) { introRunning = false; showHint() } }, 3700);
+}
+addEventListener('pointerdown', () => { if (introRunning) finishIntro() }, true);
+document.fonts.ready.then(runIntro);
+if (location.hash) { const id = location.hash.slice(1); history.replaceState({ id }, '', '#' + id); setTimeout(() => open(id, null, true), 50) }
+</script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>01 Broadsheet · Shrey Mistry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="nav.js"></script>
+<style>
+  :root { --paper:#f2eee4; --ink:#1b1915; --muted:#6d675c; --soft:#d9d2c3; }
+  * { box-sizing:border-box; margin:0; padding:0 }
+  html { -webkit-text-size-adjust:100% }
+  body { background:var(--paper); color:var(--ink); font:16px/1.6 'Libre Caslon Text', Georgia, serif; }
+  body::after { content:""; position:fixed; inset:0; pointer-events:none; opacity:.55; mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .09 0 0 0 0 .07 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  a { color:inherit }
+
+  .page { max-width:1200px; margin:0 auto; padding:22px 32px 120px }
+
+  .rule { height:1px; background:var(--ink); transform-origin:left; }
+  .rule.thick { height:3px }
+  .rule.double { height:5px; background:none; border-top:1px solid var(--ink); border-bottom:1px solid var(--ink) }
+
+  .strip { display:flex; justify-content:space-between; gap:16px; padding:9px 0; font-size:12px; letter-spacing:.14em; text-transform:uppercase; }
+  .strip a { text-decoration:none }
+  .strip a:hover { text-decoration:underline; text-underline-offset:3px }
+
+  .masthead { text-align:center; padding:14px 0 6px; }
+  .masthead h1 { font:400 clamp(56px, 12.4vw, 168px)/0.95 'Libre Caslon Display', serif; letter-spacing:-.015em; }
+  .masthead h1 span { display:inline-block; }
+  .masthead p { font-style:italic; color:var(--muted); margin:22px 0 12px; font-size:15px }
+
+  .grid { display:grid; grid-template-columns:repeat(12, 1fr); column-gap:28px; margin-top:26px; position:relative }
+  .lead { grid-column:1 / span 8; position:relative }
+  .side { grid-column:9 / span 4; position:relative; padding-left:28px }
+  .side::before, .vcol::before { content:""; position:absolute; left:-1px; top:0; width:1px; height:100%; background:var(--ink); transform-origin:top; transform:scaleY(var(--draw, 0)); transition:transform 1.4s cubic-bezier(.2,.7,.1,1) }
+
+  .kicker { font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-bottom:8px }
+  .hed { font:400 clamp(34px, 4.4vw, 56px)/1.04 'Libre Caslon Display', serif; letter-spacing:-.01em; margin-bottom:12px; text-wrap:balance }
+  .dek { font-style:italic; font-size:19px; line-height:1.4; color:#3b3730; margin-bottom:18px; max-width:40ch }
+  .byline { font-size:12px; letter-spacing:.12em; text-transform:uppercase; padding:8px 0; border-top:1px solid var(--soft); border-bottom:1px solid var(--soft); margin-bottom:18px; display:flex; justify-content:space-between }
+
+  .cols { columns:2; column-gap:28px; column-rule:1px solid var(--soft); text-align:justify; hyphens:auto }
+  .cols p { margin-bottom:.8em }
+  .cols p:first-child::first-letter { float:left; font:400 5.1em/.8 'Libre Caslon Display', serif; padding:.06em .08em 0 0 }
+
+  .brief { padding:0 0 20px; margin-bottom:20px; border-bottom:1px solid var(--soft) }
+  .brief h3 { font:400 26px/1.1 'Libre Caslon Display', serif; margin:4px 0 8px }
+  .brief p { font-size:15px }
+  .quote { font:400 30px/1.15 'Libre Caslon Display', serif; padding:8px 0 4px; text-wrap:balance }
+  .quote + cite { display:block; font-style:normal; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted) }
+
+  .section-label { display:flex; align-items:center; gap:14px; margin:64px 0 22px; font-size:12px; letter-spacing:.2em; text-transform:uppercase }
+  .section-label .rule { flex:1 }
+
+  .projects { display:grid; grid-template-columns:repeat(3, 1fr); column-gap:28px }
+  .vcol { position:relative; padding:0 0 0 28px }
+  .vcol:first-child { padding-left:0 }
+  .vcol:first-child::before { display:none }
+  .proj h3 { font:400 30px/1.05 'Libre Caslon Display', serif; margin:12px 0 6px }
+  .proj .dek { font-size:16px; margin-bottom:10px }
+  .proj p { font-size:15px; text-align:justify; hyphens:auto }
+
+  /* Photo: halftone grey by default. Ink blooms into colour from wherever the cursor enters. */
+  .photo { position:relative; aspect-ratio:4/3; overflow:hidden; background:var(--soft); cursor:crosshair }
+  .photo img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:top left }
+  .photo .bw { filter:grayscale(1) contrast(1.25) brightness(1.05) sepia(.18); mix-blend-mode:multiply }
+  .photo .color { clip-path:circle(0% at var(--x, 50%) var(--y, 50%)); transition:clip-path .9s cubic-bezier(.3,.7,.1,1) }
+  .photo.inked .color { clip-path:circle(150% at var(--x, 50%) var(--y, 50%)) }
+  .caption { font-size:12px; font-style:italic; color:var(--muted); margin-top:6px }
+
+  /* Fold-out "continued" text */
+  .more { display:grid; grid-template-rows:0fr; transition:grid-template-rows .7s cubic-bezier(.3,.7,.1,1) }
+  .more > div { overflow:hidden }
+  .more > div p { padding-top:10px; transform-origin:top; transform:perspective(500px) rotateX(-60deg); opacity:0; transition:transform .7s cubic-bezier(.3,.7,.1,1), opacity .4s }
+  .open .more { grid-template-rows:1fr }
+  .open .more > div p { transform:none; opacity:1 }
+  .toggle { margin-top:10px; background:none; border:0; border-bottom:1px solid var(--ink); font:italic 14px 'Libre Caslon Text', serif; color:var(--ink); cursor:pointer; padding:0 0 1px }
+
+  /* Load-in */
+  .js .rule { transform:scaleX(0) }
+  .js.ready .rule { transform:scaleX(1); transition:transform 1.1s cubic-bezier(.2,.7,.1,1) }
+  .js .masthead h1 span { opacity:0; transform:translateY(-.35em) rotate(-4deg) }
+  .js.ready .masthead h1 span { opacity:1; transform:none; transition:transform .7s cubic-bezier(.2,1.4,.4,1), opacity .2s }
+  .js .set { opacity:0; transform:translateY(10px) }
+  .js .set.in { opacity:1; transform:none; transition:opacity .8s, transform .8s cubic-bezier(.2,.7,.1,1) }
+
+  @media (max-width: 860px) {
+    .page { padding:16px 16px 100px }
+    .strip { font-size:10px; letter-spacing:.1em }
+    .strip .hide-m { display:none }
+    .lead, .side { grid-column:1 / -1 }
+    .side { padding-left:0; margin-top:28px }
+    .side::before { display:none }
+    .cols { columns:1 }
+    .projects { grid-template-columns:1fr; row-gap:40px }
+    .vcol { padding-left:0 }
+    .vcol::before { display:none }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before { transition:none !important }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="strip">
+    <span>Brampton, Ontario</span>
+    <span class="hide-m">Wednesday, October 1, 2026</span>
+    <a href="mailto:shrey.d.mistry@gmail.com">shrey.d.mistry@gmail.com</a>
+  </div>
+  <div class="rule double"></div>
+
+  <header class="masthead">
+    <h1 id="mast">Shrey Mistry</h1>
+    <p>Computer Science at Toronto Metropolitan University, graduating May 2027</p>
+  </header>
+
+  <div class="rule thick"></div>
+  <div class="strip">
+    <span>GPA 3.96 / 4.33</span>
+    <span class="hide-m">Three internships, 28 months</span>
+    <span><a href="https://github.com/shreywy">GitHub</a> &nbsp;·&nbsp; <a href="https://linkedin.com/in/shreymistry">LinkedIn</a></span>
+  </div>
+  <div class="rule"></div>
+
+  <div class="grid">
+    <article class="lead set">
+      <div class="kicker">Geotab · Oakville · May 2025 to Aug 2026</div>
+      <h2 class="hed">From PRD to launch in six months</h2>
+      <p class="dek">Sixteen months on telematics hardware and the software around it.</p>
+      <div class="byline"><span>Software Engineering Intern</span><span>Intern of the Month, Jan 2026</span></div>
+      <div class="cols">
+        <p>I spent 16 months at Geotab working on three flagship devices: GO Anywhere (internally, 90k), GO10 (trinity), and GO Anywhere Lite. I wrote the harness PRDs and took one device from PRD to launch in six months, through EVT, DVT, and PVT.</p>
+        <p>On the software side I built telemetry dashboards on BigQuery for 1,000+ IoT units, used by 40 to 50 staff including executives, then moved them from Apps Script to GCP containers with a GitLab CI pipeline.</p>
+        <p>I also wrote Node.js Chrome extensions that crawl and validate firmware test pages. They cut manual verification time by 80%, and the firmware team used them to check builds before beta.</p>
+        <p>The rest was hands on: crimping JST connectors, voltage checks on alpha PCBAs over SSH, and shipping prototypes to the US and Taiwan.</p>
+      </div>
+    </article>
+
+    <aside class="side set">
+      <div class="brief">
+        <div class="kicker">AMD · Markham · 2024</div>
+        <h3>Benchmark runtimes cut by 60%</h3>
+        <p>As a Performance Engineering Intern I built a Python framework that launches games through Steam and Epic and navigates menus by image matching. I also built an Arduino tool that measures sub-millisecond input latency.</p>
+      </div>
+      <div class="brief">
+        <div class="kicker">Bombardier · Toronto · 2023</div>
+        <h3>Report time cut by over 70%</h3>
+        <p>TypeScript and Node.js pipelines into Power BI, with validation that flags anomalies in audit records.</p>
+      </div>
+      <p class="quote">&ldquo;He raises the bar on every deliverable.&rdquo;</p>
+      <cite>Rob Wyatt, Geotab</cite>
+    </aside>
+  </div>
+
+  <div class="section-label set"><span>Projects</span><div class="rule"></div><span>Built 2025 and 2026</span></div>
+
+  <div class="projects">
+    <article class="vcol proj set">
+      <div class="photo"><img class="bw" src="assets/forkable-home.png" alt=""><img class="color" src="assets/forkable-home.png" alt="Forkable homepage"></div>
+      <div class="caption">Forkable, homepage. Live at fforkable.vercel.app</div>
+      <h3>Forkable</h3>
+      <p class="dek">Version control for recipes.</p>
+      <p>Fork a recipe, commit tweaks, and see a structural diff between versions down to the ingredient. Suggestions arrive as Taste Tests, which are pull requests you merge with one click.</p>
+      <div class="more"><div><p>Next.js 16, PostgreSQL on Neon with a 21-model Prisma schema, Redis caching, and 83 Vitest tests running in GitHub Actions CI. Search is raw SQL over tsvector with a GIN index.</p></div></div>
+      <button class="toggle">Continued</button>
+    </article>
+    <article class="vcol proj set">
+      <div class="photo"><img class="bw" src="assets/ttt-plan.png" alt=""><img class="color" src="assets/ttt-plan.png" alt="TrainTripTime plan screen"></div>
+      <div class="caption">TrainTripTime, plan screen on a phone</div>
+      <h3>TrainTripTime</h3>
+      <p class="dek">Tell it when you need to be downtown. It tells you when to wake up.</p>
+      <p>A GO Transit planner that works backwards from your arrival time and merges the live GTFS realtime feeds.</p>
+      <div class="more"><div><p>Pure Python stdlib. It streams a 118MB timetable into a 1MB index and runs on a Raspberry Pi with systemd socket activation, so it only wakes up when I open it.</p></div></div>
+      <button class="toggle">Continued</button>
+    </article>
+    <article class="vcol proj set">
+      <div class="photo"><img class="bw" src="assets/speckle-search.jpg" alt=""><img class="color" src="assets/speckle-search.jpg" alt="Speckle semantic search"></div>
+      <div class="caption">Speckle, searching &ldquo;a red sports car&rdquo;</div>
+      <h3>Speckle</h3>
+      <p class="dek">A local-first photo library. Type boats, get boats.</p>
+      <p>Rust and axum over SQLite, with CLIP running locally at about 13 photos a second on CPU. No account, no cloud.</p>
+      <div class="more"><div><p>Face clustering with InsightFace, video scrubbing with live transcoding, 14 WebGL adjustments, and a phone UI over Tailscale.</p></div></div>
+      <button class="toggle">Continued</button>
+    </article>
+  </div>
+</div>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const root = document.documentElement;
+  if (!reduce) root.classList.add('js');
+
+  // Set the masthead letter by letter, like type going into a composing stick.
+  const mast = document.getElementById('mast');
+  mast.innerHTML = [...mast.textContent].map((c, i) =>
+    c === ' ' ? ' ' : `<span style="transition-delay:${180 + i * 45}ms">${c}</span>`).join('');
+  document.querySelectorAll('.rule').forEach((r, i) => r.style.transitionDelay = (i * 90) + 'ms');
+
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('ready')));
+
+  const io = new IntersectionObserver(entries => entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('in');
+    e.target.style.setProperty('--draw', 1);
+    io.unobserve(e.target);
+  }), { threshold: .15 });
+  document.querySelectorAll('.set').forEach((el, i) => { el.style.transitionDelay = (el.classList.contains('vcol') ? (i % 3) * 120 : 300) + 'ms'; io.observe(el) });
+
+  // Colour ink spreads from the exact point the cursor enters, and drains back out where it leaves.
+  document.querySelectorAll('.photo').forEach(p => {
+    const at = e => { const r = p.getBoundingClientRect(); p.style.setProperty('--x', (e.clientX - r.left) + 'px'); p.style.setProperty('--y', (e.clientY - r.top) + 'px') };
+    p.addEventListener('pointerenter', e => { at(e); requestAnimationFrame(() => p.classList.add('inked')) });
+    p.addEventListener('pointerleave', e => { at(e); p.classList.remove('inked') });
+    p.addEventListener('click', e => { at(e); p.classList.toggle('inked') });
+  });
+
+  document.querySelectorAll('.toggle').forEach(b => b.addEventListener('click', () => {
+    const a = b.closest('article');
+    a.classList.toggle('open');
+    b.textContent = a.classList.contains('open') ? 'Fold' : 'Continued';
+  }));
+</script>
+</body>
+</html>

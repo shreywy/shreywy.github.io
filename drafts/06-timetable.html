@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>06 Timetable · Shrey Mistry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..600&display=swap" rel="stylesheet">
+<script src="nav.js"></script>
+<style>
+  :root { --wall:#e9e5dc; --board:#17201c; --flap:#222c27; --flap2:#1c2521; --char:#f1ead7; --amber:#e9b23f; --mid:#8f9a93; --ink:#1b1d1b; }
+  * { box-sizing:border-box; margin:0; padding:0 }
+  body { overflow-x:hidden; background:var(--wall); color:var(--ink); font:400 17px/1.55 'Source Serif 4', Georgia, serif; }
+  a { color:inherit }
+  main { max-width:1240px; margin:0 auto; padding:5vh 24px 140px }
+
+  .top { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:22px; gap:20px }
+  .top h1 { font-weight:600; font-size:15px; letter-spacing:.14em; text-transform:uppercase }
+  .top p { font-style:italic; color:#5b5f59; font-size:15px }
+
+  .board { background:var(--board); border-radius:6px; padding:26px 26px 18px; box-shadow:0 1px 0 #000, 0 30px 60px -30px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04) }
+  .bhead { display:flex; justify-content:space-between; align-items:center; color:var(--amber); font:600 13px 'Source Serif 4'; letter-spacing:.2em; text-transform:uppercase; padding:0 2px 14px; border-bottom:1px solid #2c3832; margin-bottom:14px }
+
+  /* Split-flap cell */
+  .flaps { display:flex; gap:var(--gap) }
+  .f { --h:calc(var(--w) * 1.42); position:relative; width:var(--w); height:var(--h); perspective:300px; flex:none; font:600 calc(var(--w) * 1.05)/var(--h) 'Source Serif 4', serif; font-variation-settings:'opsz' 60; color:var(--char); text-align:center }
+  .f > span { position:absolute; left:0; right:0; height:50%; overflow:hidden; background:var(--flap); backface-visibility:hidden }
+  .f > span i { position:absolute; left:0; right:0; height:var(--h); font-style:normal }
+  .f .t, .f .ft { top:0; border-radius:2px 2px 0 0; transform-origin:50% 100% }
+  .f .b, .f .fb { top:50%; border-radius:0 0 2px 2px; background:var(--flap2); transform-origin:50% 0 }
+  .f .b i, .f .fb i { top:-100% }
+  .f::after { content:""; position:absolute; left:0; right:0; top:50%; height:1px; background:rgba(0,0,0,.6); z-index:3 }
+  .f .ft { z-index:2; transform:none } .f .fb { z-index:2; transform:rotateX(90deg); visibility:hidden }
+  .f.go .fb { visibility:visible }
+  .f.go .ft { transform:rotateX(-90deg); transition:transform var(--d) ease-in }
+  .f.go .fb { transform:rotateX(0); transition:transform var(--d) ease-out var(--d) }
+  .f.go .ft, .f.go .fb { box-shadow:0 0 0 rgba(0,0,0,0) }
+
+  .name { --w:clamp(26px, 5.4vw, 70px); --gap:4px; margin:6px 0 22px }
+  .sub { --w:clamp(9px, 1.25vw, 16px); --gap:2px; margin-bottom:6px }
+
+  .cols, .row { display:grid; grid-template-columns:var(--grid); gap:0 18px; align-items:center }
+  .cols { color:var(--mid); font-size:11px; letter-spacing:.2em; text-transform:uppercase; padding:10px 0 8px; border-top:1px solid #2c3832 }
+  .row { --w:clamp(10px, 1.16vw, 15px); --gap:2px; padding:7px 0; cursor:pointer; border-radius:3px; transition:background .25s }
+  .row:hover { background:rgba(255,255,255,.035) }
+  .row .flaps.st .f { color:var(--amber) }
+  .detail { display:grid; grid-template-rows:0fr; transition:grid-template-rows .6s cubic-bezier(.2,.8,.1,1) }
+  .detail > div { overflow:hidden; color:#c9d0c8; font-size:15.5px; line-height:1.55 }
+  .detail p { padding:6px 0 16px; max-width:70ch; margin-left:calc(var(--first) + 18px) }
+  .row-wrap.open .detail { grid-template-rows:1fr }
+  .row-wrap { border-bottom:1px solid #222c27 }
+
+  .note { margin-top:26px; display:grid; grid-template-columns:1fr 1fr; gap:40px; font-size:16px }
+  .note h2 { font-size:13px; letter-spacing:.18em; text-transform:uppercase; font-weight:600; margin-bottom:8px }
+  .note a { text-underline-offset:3px }
+
+  @media (max-width: 760px) {
+    main { padding:24px 16px 110px }
+    .top { flex-direction:column; align-items:flex-start }
+    .board { padding:16px 12px 10px }
+    .name { --w:calc((100vw - 56px) / 12 - 2px); --gap:2px }
+    .sub { --w:calc((100vw - 56px) / 36 - 2px); --gap:2px }
+    .row { --w:calc((100vw - 100px) / 21 - 2px) }
+    .note { grid-template-columns:1fr; gap:20px }
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <h1>Shrey Mistry</h1>
+    <p>Tap a row for the details.</p>
+  </div>
+
+  <section class="board" id="board">
+    <div class="bhead"><span>Departures</span><span id="clock"></span></div>
+    <div class="flaps name" data-text="Shrey Mistry"></div>
+    <div class="flaps sub" data-text="Computer Science, TMU, class of 2027"></div>
+    <div id="rows"></div>
+  </section>
+
+  <div class="note">
+    <div><h2>Write</h2><p><a href="mailto:shrey.d.mistry@gmail.com">shrey.d.mistry@gmail.com</a>. I live in Brampton, Ontario.</p></div>
+    <div><h2>Elsewhere</h2><p><a href="https://github.com/shreywy">github.com/shreywy</a> and <a href="https://linkedin.com/in/shreymistry">linkedin.com/in/shreymistry</a></p></div>
+  </div>
+</main>
+
+<script>
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const CH = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+// Board data. Every cell is padded to its column width.
+const sections = [
+  { label:'Internships', rows:[
+    ['2025', 'Geotab', 'Software Eng. Intern', 'Oakville', '16 mo', 'Telemetry dashboards on BigQuery for 1,000+ IoT units, used by 40 to 50 staff including executives. Chrome extensions that cut manual firmware verification by 80%. Took one device from PRD to launch in six months. Intern of the Month, Jan 2026.'],
+    ['2024', 'AMD', 'Performance Eng. Intern', 'Markham', '8 mo', 'A modular Python benchmark framework that launches games via Steam and Epic and navigates menus by image matching, cutting runtimes by 60%. An Arduino tool that measures sub-millisecond input latency with photoelectric sensors.'],
+    ['2023', 'Bombardier', 'Automation Eng. Intern', 'Toronto', '4 mo', 'TypeScript and Node.js pipelines into Power BI with anomaly flags on audit records, cutting compliance report time by over 70%.'],
+  ]},
+  { label:'Projects', rows:[
+    ['2026', 'Forkable', 'Recipe version control', 'Vercel', 'Live', 'Fork a recipe, commit tweaks, diff versions by ingredient, and merge Taste Tests. Next.js 16, PostgreSQL with 21 Prisma models, Redis, and 83 Vitest tests in CI.'],
+    ['2026', 'TrainTripTime', 'GO commute planner', 'Pi', 'Live', 'Tell it when you need to be downtown. It tells you when to wake up. Streams a 118MB GTFS feed into a 1MB index, merges live GO feeds, and runs on a Raspberry Pi.'],
+    ['2026', 'Speckle', 'Local photo library', 'Windows', 'New', 'Rust, axum, and SQLite with CLIP search running locally at about 13 photos a second on CPU. Type boats, get boats.'],
+    ['2026', 'firefox-tabs', 'Tabs on any device', 'Pi', 'Live', 'Reads Firefox session files with LZ4 and Snappy decompression I wrote in pure Python. Zero memory when idle.'],
+    ['2026', 'GridMacro', 'Calorie log in Sheets', 'Sheets', 'Live', 'A calorie and weight log that lives in your own Google Sheet. Two taps to log from ranked history, or a Gemini estimate from a photo.'],
+  ]},
+];
+const wide = () => innerWidth > 760;
+const widths = () => wide() ? [4, 13, 23, 8, 5] : [4, 13, 0, 0, 4];
+
+function cell(c) {
+  const f = document.createElement('span');
+  f.className = 'f';
+  f.innerHTML = `<span class="t"><i>${c}</i></span><span class="b"><i>${c}</i></span><span class="ft"><i>${c}</i></span><span class="fb"><i>${c}</i></span>`;
+  f.cur = c;
+  return f;
+}
+function flipTo(f, next, d) {
+  return new Promise(res => {
+    const [t, b, ft, fb] = f.children;
+    t.firstChild.textContent = next; fb.firstChild.textContent = next;
+    ft.firstChild.textContent = f.cur; b.firstChild.textContent = f.cur;
+    f.style.setProperty('--d', d + 'ms');
+    f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+    setTimeout(() => { b.firstChild.textContent = next; ft.firstChild.textContent = next; f.classList.remove('go'); f.cur = next; res() }, d * 2);
+  });
+}
+// Each cell rattles through a few random characters, more the further right it is, then lands.
+async function settle(f, target, i) {
+  if (reduce) { [...f.querySelectorAll('i')].forEach(x => x.textContent = target); f.cur = target; return }
+  const n = 2 + Math.floor(i * .35 + Math.random() * 4);
+  for (let k = 0; k < n; k++) await flipTo(f, CH[Math.floor(Math.random() * CH.length)], 34);
+  await flipTo(f, target === ' ' ? ' ' : target, 46);
+}
+function flapLine(el, text, len) {
+  el.innerHTML = '';
+  const s = (len ? text.padEnd(len).slice(0, len) : text);
+  [...s].forEach((c, i) => { const f = cell(' '); el.appendChild(f); setTimeout(() => settle(f, c, i), 80 + i * 18) });
+}
+
+function render() {
+  const w = widths(), rows = document.getElementById('rows');
+  const cw = parseFloat(getComputedStyle(document.documentElement).fontSize);
+  rows.innerHTML = '';
+  sections.forEach(sec => {
+    const cols = document.createElement('div');
+    cols.className = 'cols';
+    rows.appendChild(cols);
+    const tpl = w.filter(Boolean).map(n => `calc(${n} * (var(--w) + var(--gap)))`).join(' ');
+    const heads = [sec.label === 'Projects' ? 'Built' : 'Year', sec.label, 'Service', 'Platform', 'Status'];
+    let delay = 0;
+    sec.rows.forEach((r, ri) => {
+      const wrap = document.createElement('div'); wrap.className = 'row-wrap';
+      const row = document.createElement('div'); row.className = 'row';
+      w.forEach((n, ci) => {
+        if (!n) return;
+        const fl = document.createElement('div'); fl.className = 'flaps' + (ci === 4 ? ' st' : '');
+        row.appendChild(fl);
+        setTimeout(() => flapLine(fl, r[ci], n), 500 + ri * 220 + ci * 60);
+      });
+      const det = document.createElement('div'); det.className = 'detail';
+      det.innerHTML = `<div><p>${r[5]}</p></div>`;
+      wrap.append(row, det);
+      rows.appendChild(wrap);
+      row.addEventListener('click', () => wrap.classList.toggle('open'));
+      requestAnimationFrame(() => {
+        const g = getComputedStyle(row);
+        row.style.setProperty('--grid', tpl); cols.style.setProperty('--grid', tpl);
+        cols.style.setProperty('--w', g.getPropertyValue('--w')); cols.style.setProperty('--gap', '2px');
+        det.style.setProperty('--first', `calc(${w[0]} * (${g.getPropertyValue('--w')} + 2px))`);
+      });
+    });
+    cols.innerHTML = heads.filter((_, i) => w[i]).map(h => `<span>${h}</span>`).join('');
+  });
+}
+
+flapLine(document.querySelector('.name'), 'Shrey Mistry');
+setTimeout(() => flapLine(document.querySelector('.sub'), document.querySelector('.sub').dataset.text), 300);
+render();
+let wasWide = wide();
+addEventListener('resize', () => { if (wide() !== wasWide) { wasWide = wide(); render() } });
+
+// A live clock in the corner, Toronto time.
+const clock = document.getElementById('clock');
+const fmt = new Intl.DateTimeFormat('en-CA', { hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'America/Toronto' });
+const tickClock = () => clock.textContent = 'Toronto ' + fmt.format(new Date());
+tickClock(); setInterval(tickClock, 10000);
+
+// Click the name to shuffle it again.
+document.querySelector('.name').addEventListener('click', e => flapLine(e.currentTarget, 'Shrey Mistry'));
+</script>
+</body>
+</html>

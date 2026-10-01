@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>05 Specimen · Shrey Mistry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1;1,9..144,100..900,0..100,0..1&display=swap" rel="stylesheet">
+<script src="nav.js"></script>
+<style>
+  :root { --bg:#fbfaf6; --ink:#121210; --mid:#8a877f; --hair:#e3e0d7; --green:#1d4a37; }
+  * { box-sizing:border-box; margin:0; padding:0 }
+  body { background:var(--bg); color:var(--ink); font:400 18px/1.5 'Fraunces', Georgia, serif; font-variation-settings:'opsz' 14, 'SOFT' 0, 'WONK' 0; }
+  a { color:inherit }
+
+  .bar { display:flex; justify-content:space-between; padding:20px 3vw; font-size:13px; color:var(--mid); border-bottom:1px solid var(--hair); font-variation-settings:'opsz' 9 }
+  .bar a { text-decoration:none } .bar a:hover { color:var(--ink) }
+
+  /* Each specimen line carries its size in the margin */
+  .line { display:grid; grid-template-columns:7vw 1fr; align-items:baseline; border-bottom:1px solid var(--hair); padding:2.2vw 3vw 2.2vw 0 }
+  .pt { font-size:12px; color:var(--mid); text-align:right; padding-right:2vw; font-variant-numeric:tabular-nums; font-variation-settings:'opsz' 9 }
+
+  .name { font-size:clamp(64px, 13.6vw, 230px); line-height:.86; letter-spacing:-.035em; white-space:nowrap; cursor:default; user-select:none }
+  .name span { display:inline-block; font-variation-settings:'opsz' 144, 'wght' var(--w, 300), 'SOFT' var(--s, 0), 'WONK' 0; }
+  .l48 { font-size:clamp(26px, 3.4vw, 50px); line-height:1.1; letter-spacing:-.015em; font-variation-settings:'opsz' 72, 'wght' 340 }
+  .l48 i { font-variation-settings:'opsz' 72, 'wght' 340, 'WONK' 1 }
+  .l20 { font-size:20px; line-height:1.5; max-width:58ch; font-variation-settings:'opsz' 20, 'wght' 380 }
+
+  .head { display:grid; grid-template-columns:7vw 1fr auto; padding:64px 3vw 14px 0; align-items:baseline; border-bottom:1px solid var(--ink) }
+  .head h2 { font-size:15px; font-weight:400; letter-spacing:.02em; font-variation-settings:'opsz' 14, 'wght' 560 }
+  .head span { font-size:13px; color:var(--mid) }
+
+  /* Glyph chart for numbers */
+  .glyphs { display:grid; grid-template-columns:repeat(6, 1fr); border-left:1px solid var(--hair); margin-left:7vw }
+  .g { border-right:1px solid var(--hair); border-bottom:1px solid var(--hair); aspect-ratio:1 / .78; display:flex; flex-direction:column; justify-content:space-between; padding:14px; cursor:default; transition:background .35s, color .35s }
+  .g b { font-weight:400; font-size:clamp(34px, 5vw, 80px); line-height:1; letter-spacing:-.005em; font-variation-settings:'opsz' 144, 'wght' var(--gw, 250), 'SOFT' 100; transition:font-variation-settings .6s cubic-bezier(.2,.8,.1,1) }
+  .g small { font-size:12.5px; line-height:1.35; color:var(--mid); font-variation-settings:'opsz' 9; transition:color .35s }
+  .g:hover { background:var(--green); color:var(--bg) }
+  .g:hover b { --gw:850 }
+  .g:hover small { color:#bcd0c4 }
+
+  /* Projects as a waterfall */
+  .proj { display:grid; grid-template-columns:7vw 1.1fr 1fr; gap:0 3vw; padding:30px 3vw 30px 0; border-bottom:1px solid var(--hair); align-items:baseline; cursor:default }
+  .proj h3 { font-weight:400; font-size:clamp(40px, 5.6vw, 92px); line-height:.95; letter-spacing:-.03em }
+  .proj h3 span { display:inline-block; font-variation-settings:'opsz' 144, 'wght' var(--w, 300), 'SOFT' 50, 'WONK' var(--k, 0); transition:font-variation-settings .5s cubic-bezier(.2,.8,.1,1) }
+  .proj .tag { font-style:italic; font-size:21px; line-height:1.3; font-variation-settings:'opsz' 24, 'wght' 360 }
+  .proj .facts { font-size:14px; color:var(--mid); margin-top:10px; font-variation-settings:'opsz' 9 }
+
+  .exp { display:grid; grid-template-columns:7vw 1fr 1fr 1fr; gap:3vw; padding:28px 3vw 40px 0 }
+  .exp h3 { font-weight:400; font-size:32px; letter-spacing:-.02em; font-variation-settings:'opsz' 72, 'wght' 500 }
+  .exp .r { font-style:italic; color:var(--mid); font-size:15px; margin-bottom:10px }
+  .exp p { font-size:15.5px; font-variation-settings:'opsz' 14 }
+
+  footer { display:grid; grid-template-columns:7vw 1fr; padding:12vh 3vw 140px 0; border-top:1px solid var(--ink) }
+  footer a { font-size:clamp(28px, 4.6vw, 76px); letter-spacing:-.025em; text-decoration:none; font-variation-settings:'opsz' 144, 'wght' 300, 'SOFT' 100; transition:font-variation-settings .7s cubic-bezier(.2,.8,.1,1) }
+  footer a:hover { font-variation-settings:'opsz' 144, 'wght' 800, 'SOFT' 100 }
+
+  @media (max-width: 820px) {
+    .line, .head, footer { grid-template-columns:44px 1fr; padding-right:16px }
+    .pt { padding-right:10px }
+    .name { white-space:normal }
+    .glyphs { grid-template-columns:repeat(2, 1fr); margin-left:44px }
+    .proj { grid-template-columns:44px 1fr; padding-right:16px } .proj > div:last-child { grid-column:2 }
+    .exp { grid-template-columns:44px 1fr; padding-right:16px } .exp > div { grid-column:2 }
+    .head { grid-template-columns:44px 1fr }
+    .head span { display:none }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important } }
+</style>
+</head>
+<body>
+<div class="bar"><span>Shrey Mistry, specimen of work, October 2026</span><a href="mailto:shrey.d.mistry@gmail.com">shrey.d.mistry@gmail.com</a></div>
+
+<div class="line"><span class="pt">230</span><h1 class="name" id="name">Shrey Mistry</h1></div>
+<div class="line"><span class="pt">48</span><p class="l48">Computer Science at Toronto Metropolitan University, <i>graduating May 2027.</i></p></div>
+<div class="line"><span class="pt">20</span><p class="l20">I&rsquo;ve done three internships across 28 months, at Geotab, AMD, and Bombardier. On the side I build tools I actually use, and a few of them run on a Raspberry Pi.</p></div>
+
+<div class="head"><span class="pt">&nbsp;</span><h2>Figures</h2><span>Hover a figure for its weight</span></div>
+<div class="glyphs">
+  <div class="g"><b>3.96</b><small>GPA out of 4.33, Dean&rsquo;s List</small></div>
+  <div class="g"><b>1,000+</b><small>IoT units on my Geotab dashboards</small></div>
+  <div class="g"><b>80%</b><small>less manual firmware verification at Geotab</small></div>
+  <div class="g"><b>60%</b><small>shorter benchmark runtimes at AMD</small></div>
+  <div class="g"><b>83</b><small>Vitest tests in Forkable&rsquo;s CI</small></div>
+  <div class="g"><b>1MB</b><small>TrainTripTime index, down from a 118MB feed</small></div>
+</div>
+
+<div class="head"><span class="pt">&nbsp;</span><h2>Projects</h2><span>2025 and 2026</span></div>
+<div class="proj"><span class="pt">92</span><h3 class="wave">Forkable</h3><div><p class="tag">Version control for recipes. Taste Tests are pull requests.</p><p class="facts">TypeScript, Next.js 16, PostgreSQL, Prisma, Redis. 21 models, 83 tests.</p></div></div>
+<div class="proj"><span class="pt">92</span><h3 class="wave">Speckle</h3><div><p class="tag">A local-first photo library. Type boats, get boats.</p><p class="facts">Rust, axum, SQLite, CLIP at about 13 photos a second on CPU.</p></div></div>
+<div class="proj"><span class="pt">92</span><h3 class="wave">TrainTripTime</h3><div><p class="tag">Tell it when you need to be downtown. It tells you when to wake up.</p><p class="facts">Python stdlib, zero dependencies. Runs on a Raspberry Pi.</p></div></div>
+<div class="proj"><span class="pt">92</span><h3 class="wave">firefox-tabs</h3><div><p class="tag">My desktop&rsquo;s open tabs on any device.</p><p class="facts">Hand-written LZ4 and Snappy decompression in pure Python.</p></div></div>
+<div class="proj"><span class="pt">92</span><h3 class="wave">drizzy-drake</h3><div><p class="tag">A Discord bot for friends that kept growing.</p><p class="facts">Music, embed fixing, and text to speech with 93 voices. Python on a Pi 3B.</p></div></div>
+
+<div class="head"><span class="pt">&nbsp;</span><h2>Experience</h2><span>2023 to 2026</span></div>
+<div class="exp">
+  <span class="pt">32</span>
+  <div><h3>Geotab</h3><p class="r">Software Engineering Intern, 2025 to 2026</p><p>Took one device from PRD to launch in six months. Dashboards on BigQuery for 1,000+ units. Intern of the Month, Jan 2026.</p></div>
+  <div><h3>AMD</h3><p class="r">Performance Engineering Intern, 2024</p><p>Python benchmark framework that cut runtimes by 60%. Arduino tool for sub-millisecond input latency.</p></div>
+  <div><h3>Bombardier</h3><p class="r">Automation Engineering Intern, 2023</p><p>TypeScript pipelines into Power BI, cutting compliance report time by over 70%.</p></div>
+</div>
+
+<footer><span class="pt">76</span><a href="mailto:shrey.d.mistry@gmail.com">shrey.d.mistry@gmail.com</a></footer>
+
+<script>
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const wrap = (el) => { el.innerHTML = [...el.textContent].map(c => c === ' ' ? ' ' : `<span>${c}</span>`).join('') ; return [...el.querySelectorAll('span')] };
+
+// Name: each letter has its own weight and softness, pulled toward heavy by cursor proximity.
+const letters = wrap(document.getElementById('name')).map(el => ({ el, w:100, s:0, tw:300, ts:0 }));
+let mx = -9999, my = -9999;
+addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY });
+document.addEventListener('pointerleave', () => { mx = my = -9999 });
+// Intro: the whole name sweeps from hairline to its resting weight.
+letters.forEach((l, i) => setTimeout(() => l.boost = 1, reduce ? 0 : 200 + i * 60));
+
+(function tick() {
+  letters.forEach(l => {
+    const r = l.el.getBoundingClientRect();
+    const d = Math.hypot(mx - (r.left + r.width / 2), my - (r.top + r.height / 2));
+    const near = Math.max(0, 1 - d / 320);
+    l.tw = 300 + near * 600 - (l.boost ? 0 : 200);
+    l.ts = near * 100;
+    const k = reduce ? 1 : .14;
+    l.w += (l.tw - l.w) * k; l.s += (l.ts - l.s) * k;
+    l.el.style.setProperty('--w', l.w.toFixed(1));
+    l.el.style.setProperty('--s', l.s.toFixed(1));
+  });
+  requestAnimationFrame(tick);
+})();
+
+// Project names: hovering sends a wave of weight through the word, left to right.
+document.querySelectorAll('.wave').forEach(h => {
+  const spans = wrap(h);
+  const row = h.closest('.proj');
+  row.addEventListener('pointerenter', () => spans.forEach((s, i) => {
+    s.style.transitionDelay = (i * 35) + 'ms'; s.style.setProperty('--w', 760); s.style.setProperty('--k', 1);
+  }));
+  row.addEventListener('pointerleave', () => spans.forEach((s, i) => {
+    s.style.transitionDelay = (i * 20) + 'ms'; s.style.setProperty('--w', 300); s.style.setProperty('--k', 0);
+  }));
+});
+</script>
+</body>
+</html>

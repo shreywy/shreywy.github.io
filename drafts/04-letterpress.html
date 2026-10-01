@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>04 Letterpress · Shrey Mistry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&display=swap" rel="stylesheet">
+<script src="nav.js"></script>
+<style>
+  :root { --paper:#eee7d8; --ink:#1e2b47; --ink2:#5c6478; --lx:0; --ly:-1; }
+  * { box-sizing:border-box; margin:0; padding:0 }
+  body { background:var(--paper); color:var(--ink); font:400 17px/1.65 'Bodoni Moda', Didot, serif; font-optical-sizing:auto; }
+  body::before { content:""; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.9; mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .9' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .5 0 0 0 0 .4 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .35 0 0 0 0 .3 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"); }
+  main { position:relative; z-index:1; max-width:980px; margin:0 auto; padding:12vh 24px 140px; text-align:center }
+  a { color:inherit; text-decoration:none }
+
+  /* Ink pressed into paper. The light comes from wherever the cursor is. */
+  .press { text-shadow:
+      calc(var(--lx) * -.6px) calc(var(--ly) * -.6px) 0 rgba(20,15,5,.28),
+      calc(var(--lx) * .9px) calc(var(--ly) * .9px) .5px rgba(255,252,244,.85); }
+  .blind { color:var(--paper); text-shadow:
+      calc(var(--lx) * -1.4px) calc(var(--ly) * -1.4px) 1px rgba(60,45,20,.38),
+      calc(var(--lx) * 1.4px) calc(var(--ly) * 1.4px) 1px rgba(255,253,247,.95); }
+
+  .name { font-weight:500; font-size:clamp(36px, 6.2vw, 80px); letter-spacing:.16em; line-height:1.05; text-transform:uppercase; padding-left:.16em }
+  .sub { font-style:italic; font-size:clamp(17px, 2vw, 22px); color:var(--ink2); margin-top:18px }
+  .orn { display:flex; align-items:center; justify-content:center; gap:14px; margin:56px auto; color:var(--ink2); font-size:12px; letter-spacing:.3em; text-transform:uppercase }
+  .orn::before, .orn::after { content:""; width:60px; height:1px; background:currentColor; opacity:.5 }
+
+  .big { display:flex; align-items:center; justify-content:center; gap:28px; margin:20px 0 10px }
+  .big .num { font-size:clamp(140px, 22vw, 300px); font-weight:700; line-height:.8; font-variation-settings:'opsz' 96; letter-spacing:-.04em }
+  .big p { text-align:left; max-width:16ch; font-size:20px; line-height:1.35; font-style:italic }
+
+  .three { display:grid; grid-template-columns:repeat(3, 1fr); gap:40px; text-align:center; margin-top:10px }
+  .three h3 { font-weight:500; font-size:26px; letter-spacing:.06em; text-transform:uppercase }
+  .three .role { font-style:italic; color:var(--ink2); font-size:15px; margin:4px 0 12px }
+  .three p { font-size:17px }
+
+  .plates { display:grid; grid-template-columns:1fr 1fr; gap:48px; margin-top:10px; text-align:left }
+  .plate .well { aspect-ratio:16/10; border-radius:2px; overflow:hidden; position:relative;
+    box-shadow:inset calc(var(--lx) * -3px) calc(var(--ly) * -3px) 5px rgba(60,45,20,.28), inset calc(var(--lx) * 2px) calc(var(--ly) * 2px) 2px rgba(255,253,247,.7);
+    padding:10px; background:rgba(0,0,0,.025) }
+  .plate img { width:100%; height:100%; object-fit:cover; object-position:top left; display:block; filter:sepia(.18) saturate(.85); transition:transform .5s cubic-bezier(.2,.7,.1,1), filter .5s }
+  .plate:hover img { transform:scale(.985); filter:none }
+  .plate h3 { font-weight:500; font-size:28px; margin-top:20px; letter-spacing:.02em }
+  .plate .tag { font-style:italic; color:var(--ink2); margin-bottom:8px }
+  .plate p { font-size:17px }
+
+  /* Blind-debossed buttons that sink further when pressed */
+  .btn { display:inline-block; margin:8px; padding:16px 30px; border-radius:2px; font-size:15px; letter-spacing:.18em; text-transform:uppercase; cursor:pointer; user-select:none;
+    box-shadow:inset calc(var(--lx) * -2px) calc(var(--ly) * -2px) 3px rgba(60,45,20,.25), inset calc(var(--lx) * 1.5px) calc(var(--ly) * 1.5px) 1px rgba(255,253,247,.9);
+    transition:box-shadow .12s, transform .12s }
+  .btn:active { transform:translateY(1px) scale(.985); box-shadow:inset calc(var(--lx) * -4px) calc(var(--ly) * -4px) 6px rgba(60,45,20,.38), inset calc(var(--lx) * 1px) calc(var(--ly) * 1px) 1px rgba(255,253,247,.9) }
+
+  .quote { font-style:italic; font-size:clamp(22px, 2.8vw, 32px); line-height:1.35; max-width:30ch; margin:0 auto }
+  .quote + .cite { font-size:13px; letter-spacing:.24em; text-transform:uppercase; color:var(--ink2); margin-top:18px }
+
+  /* The impression: each block arrives slightly too big and soft, then the platen closes. */
+  .js .imp { opacity:0; transform:scale(1.035); filter:blur(3px) }
+  .js .imp.in { opacity:1; transform:none; filter:none; transition:opacity .25s, transform .55s cubic-bezier(.5,0,.2,1.4), filter .45s }
+
+  @media (max-width: 760px) {
+    main { padding:8vh 16px 110px }
+    .three, .plates { grid-template-columns:1fr }
+    .big { flex-direction:column; gap:6px } .big p { text-align:center }
+    .name { letter-spacing:.1em }
+  }
+  @media (prefers-reduced-motion: reduce) { .js .imp { opacity:1; transform:none; filter:none } }
+</style>
+</head>
+<body>
+<main>
+  <h1 class="name press imp">Shrey Mistry</h1>
+  <p class="sub press imp">Computer Science, Toronto Metropolitan University. Graduating May 2027.</p>
+
+  <div class="orn imp">Brampton, Ontario</div>
+
+  <div class="big imp">
+    <span class="num blind">28</span>
+    <p class="press">months interning at Geotab, AMD, and Bombardier.</p>
+  </div>
+
+  <div class="orn imp">Experience</div>
+  <div class="three">
+    <div class="imp"><h3 class="press">Geotab</h3><div class="role press">Software Engineering Intern, 2025 to 2026</div>
+      <p class="press">Telemetry dashboards on BigQuery for 1,000+ IoT units. Chrome extensions that cut manual firmware verification by 80%. Intern of the Month, Jan 2026.</p></div>
+    <div class="imp"><h3 class="press">AMD</h3><div class="role press">Performance Engineering Intern, 2024</div>
+      <p class="press">A Python benchmark framework that cut runtimes by 60%, and an Arduino rig for sub-millisecond input latency.</p></div>
+    <div class="imp"><h3 class="press">Bombardier</h3><div class="role press">Automation Engineering Intern, 2023</div>
+      <p class="press">TypeScript pipelines into Power BI that cut compliance report time by over 70%.</p></div>
+  </div>
+
+  <div class="orn imp">Projects</div>
+  <div class="plates">
+    <article class="plate imp">
+      <div class="well"><img src="assets/forkable-recipe.png" alt="Forkable recipe page"></div>
+      <h3 class="press">Forkable</h3>
+      <div class="tag press">Version control for recipes</div>
+      <p class="press">Fork a recipe, commit tweaks, and diff versions down to the ingredient. A 21-model Postgres schema with 83 tests in CI.</p>
+    </article>
+    <article class="plate imp">
+      <div class="well"><img src="assets/gm-desktop.png" alt="GridMacro today view"></div>
+      <h3 class="press">GridMacro</h3>
+      <div class="tag press">A calorie log that lives in your own Google Sheet</div>
+      <p class="press">I built it for my own cut. The spreadsheet stays the database and logging a meal takes two taps.</p>
+    </article>
+  </div>
+
+  <div class="orn imp">From Geotab</div>
+  <p class="quote press imp">&ldquo;Shrey was instrumental in taking a new hardware product from early concept to market.&rdquo;</p>
+  <p class="cite press imp">Rob Wyatt</p>
+
+  <div class="orn imp">Correspondence</div>
+  <div class="imp">
+    <a class="btn press" href="mailto:shrey.d.mistry@gmail.com">Write to me</a>
+    <a class="btn press" href="https://github.com/shreywy">GitHub</a>
+    <a class="btn press" href="https://linkedin.com/in/shreymistry">LinkedIn</a>
+  </div>
+</main>
+
+<script>
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const root = document.documentElement;
+root.classList.add('js');
+
+// Light follows the cursor, eased so the shadows drift instead of snapping.
+let tx = 0, ty = -1, lx = 0, ly = -1;
+addEventListener('pointermove', e => {
+  tx = (e.clientX / innerWidth - .5) * 2.4;
+  ty = (e.clientY / innerHeight - .5) * 2.4;
+});
+// On phones, tilt the paper instead.
+addEventListener('deviceorientation', e => { if (e.gamma != null) { tx = e.gamma / 25; ty = (e.beta - 45) / 25 } });
+(function tick() {
+  lx += (tx - lx) * .08; ly += (ty - ly) * .08;
+  root.style.setProperty('--lx', (-lx).toFixed(3));
+  root.style.setProperty('--ly', (-ly).toFixed(3));
+  requestAnimationFrame(tick);
+})();
+
+const io = new IntersectionObserver(es => {
+  es.filter(e => e.isIntersecting).forEach((e, i) => {
+    setTimeout(() => e.target.classList.add('in'), reduce ? 0 : i * 140);
+    io.unobserve(e.target);
+  });
+}, { threshold: .2 });
+document.querySelectorAll('.imp').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>03 Card Catalog · Shrey Mistry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="nav.js"></script>
+<style>
+  :root { --desk:#e4e0d6; --card:#fbf8f0; --ink:#22201c; --typed:#2b2a33; --red:#c9473c; --blue:#9fb7cf; --mid:#77736a; }
+  * { box-sizing:border-box; margin:0; padding:0 }
+  html, body { height:100% }
+  body { background:var(--desk); color:var(--ink); font:16px/1.6 'Libre Baskerville', Georgia, serif; overflow-x:hidden }
+  a { color:inherit }
+
+  main { min-height:100%; display:grid; grid-template-columns:minmax(280px, 0.8fr) 1.2fr; align-items:center; gap:5vw; padding:6vh 6vw 12vh }
+
+  .intro h1 { font-weight:400; font-size:clamp(40px, 4.6vw, 68px); line-height:1.02; letter-spacing:-.02em }
+  .intro .sub { font-style:italic; color:#4a4740; margin:18px 0 28px; font-size:17px; max-width:30ch }
+  .intro dl { font:14px/1.7 'Courier Prime', monospace; color:var(--typed); display:grid; grid-template-columns:auto 1fr; gap:2px 16px; margin-bottom:28px }
+  .intro dt { color:var(--mid) }
+  .hint { font:italic 14px/1.6 'Libre Baskerville', serif; color:var(--mid); max-width:34ch; border-top:1px solid #cdc7b9; padding-top:14px }
+
+  .tray { position:relative; width:min(600px, 100%); aspect-ratio:5/3.15; margin:40px auto 0; touch-action:none }
+  .card { position:absolute; inset:0; cursor:grab; will-change:transform; user-select:none }
+  .card.dragging { cursor:grabbing }
+  .face, .back { --lh:26px; --top:52px; position:absolute; inset:0; background-color:var(--card); border-radius:3px; padding:0 6% 0 7%; backface-visibility:hidden; overflow:hidden;
+    box-shadow:0 1px 0 rgba(0,0,0,.06), 0 1px 2px rgba(40,30,10,.12), 0 calc(var(--lift,0) * 1px) calc(var(--lift,0) * 2px) rgba(40,30,10,calc(.04 + var(--lift,0) * .004));
+    background-image:linear-gradient(var(--red), var(--red)), repeating-linear-gradient(transparent 0 calc(var(--lh) - 1px), var(--blue) calc(var(--lh) - 1px) var(--lh));
+    background-size:100% 1.5px, 100% 100%; background-position:0 calc(var(--top) - 1px), 0 var(--top); background-repeat:no-repeat;
+    transition:transform .7s cubic-bezier(.3,1.3,.4,1) }
+  .face::after, .back::after { content:""; position:absolute; left:50%; bottom:7%; width:14px; height:14px; margin-left:-7px; border-radius:50%; background:var(--desk); box-shadow:inset 0 1px 2px rgba(0,0,0,.25) }
+  .face { transform:perspective(1400px) rotateY(0) }
+  .back { transform:perspective(1400px) rotateY(180deg) }
+  .card.flipped .face { transform:perspective(1400px) rotateY(-180deg) }
+  .card.flipped .back { transform:perspective(1400px) rotateY(0) }
+  .card .tab { position:absolute; top:-22px; height:24px; width:12%; background:var(--card); border-radius:4px 4px 0 0; font:700 10px/24px 'Courier Prime', monospace; letter-spacing:.06em; text-align:center; color:var(--typed); cursor:pointer; box-shadow:0 -1px 1px rgba(40,30,10,.08) }
+  .card .tab::after { content:attr(data-full) }
+
+  .head { display:flex; justify-content:space-between; align-items:baseline; font:13px 'Courier Prime', monospace; color:var(--typed); height:var(--top); padding-top:calc(var(--top) - 30px) }
+  .head b { font-family:'Libre Baskerville', serif; font-size:clamp(17px, 2.1vw, 22px); font-weight:700; color:var(--ink); letter-spacing:-.01em }
+  .typed { font:14px/var(--lh) 'Courier Prime', monospace; color:var(--typed); padding-top:6px }
+  .typed .k { color:var(--mid) }
+  .typed p { text-indent:2.2em }
+  .typed ol { list-style:none; counter-reset:s }
+  .typed ol li { counter-increment:s } .typed ol li::before { content:counter(s) ". " }
+
+  @media (max-width: 860px) {
+    main { grid-template-columns:1fr; padding:40px 16px 110px; gap:10px }
+    .tray { aspect-ratio:4/4.6; margin-top:48px }
+    .face, .back { --lh:23px; --top:46px }
+    .typed { font-size:12.5px }
+    .card .tab::after { content:attr(data-short) }
+  }
+  @media (prefers-reduced-motion: reduce) { .face, .back { transition:none } }
+</style>
+</head>
+<body>
+<main>
+  <section class="intro">
+    <h1>Shrey Mistry</h1>
+    <p class="sub">Computer Science student at Toronto Metropolitan University, graduating May 2027.</p>
+    <dl>
+      <dt>GPA</dt><dd>3.96 / 4.33, Dean&rsquo;s List</dd>
+      <dt>Interned</dt><dd>Geotab, AMD, Bombardier</dd>
+      <dt>Based</dt><dd>Brampton, Ontario</dd>
+      <dt>Write</dt><dd><a href="mailto:shrey.d.mistry@gmail.com">shrey.d.mistry@gmail.com</a></dd>
+      <dt>Elsewhere</dt><dd><a href="https://github.com/shreywy">GitHub</a>, <a href="https://linkedin.com/in/shreymistry">LinkedIn</a></dd>
+    </dl>
+    <p class="hint">Throw the top card aside to file it at the back. Click a card to turn it over. Pull any card forward by its tab.</p>
+  </section>
+
+  <section class="tray" id="tray" aria-label="Index cards"></section>
+</main>
+
+<script>
+const cards = [
+  { tab:'GEOTAB', short:'01', no:'SM 25.1', title:'Geotab', yr:'2025/26',
+    front:`<span class="k">Role</span>  Software Engineering Intern<br><span class="k">Where</span> Oakville, ON. 16 months.<p>Telemetry dashboards on BigQuery for 1,000+ IoT units, used by 40 to 50 staff. Chrome extensions that cut manual firmware verification by 80%.</p>`,
+    back:`<ol><li>Telematics. GO Anywhere (90k), GO10 (trinity).</li><li>PRD to launch in six months, EVT to PVT.</li><li>BigQuery, GCP, GitLab CI.</li><li>Intern of the Month, Jan 2026.</li></ol>` },
+  { tab:'AMD', short:'02', no:'SM 24.1', title:'AMD', yr:'2024',
+    front:`<span class="k">Role</span>  Performance Engineering Intern<br><span class="k">Where</span> Markham, ON. Technical Marketing Labs.<p>A modular Python benchmark framework, tested with pytest, that cut runtimes by 60%.</p>`,
+    back:`<ol><li>Arduino latency tool, sub-millisecond.</li><li>Photoelectric sensors. Anti-Lag.</li><li>Test benches, BIOS flashing.</li><li>AMD vs. NVIDIA RTX analysis.</li></ol>` },
+  { tab:'BOMBARDIER', short:'03', no:'SM 23.1', title:'Bombardier', yr:'2023',
+    front:`<span class="k">Role</span>  Automation Engineering Intern<br><span class="k">Where</span> Toronto, ON. Supplier Quality.<p>TypeScript and Node.js pipelines into Power BI. Compliance reports took over 70% less time.</p>`,
+    back:`<ol><li>Legacy VBA rewritten as TypeScript.</li><li>Anomaly flags on audit records.</li><li>Excel databases, 92-person team.</li></ol>` },
+  { tab:'FORKABLE', short:'04', no:'QA 76.1', title:'Forkable', yr:'2026',
+    front:`<span class="k">What</span>  Version control for recipes<br><span class="k">Stack</span> Next.js 16, PostgreSQL, Prisma<p>Fork a recipe, commit tweaks, diff versions by ingredient. Taste Tests are pull requests.</p>`,
+    back:`<ol><li>21-model PostgreSQL schema.</li><li>LCS structural diff engine.</li><li>83 Vitest tests in CI.</li><li>fforkable.vercel.app</li></ol>` },
+  { tab:'SPECKLE', short:'05', no:'QA 76.2', title:'Speckle', yr:'2026',
+    front:`<span class="k">What</span>  Local-first photo library<br><span class="k">Stack</span> Rust, axum, SQLite, CLIP<p>Type boats, get boats. Search runs on your own machine at about 13 photos a second on CPU.</p>`,
+    back:`<ol><li>Face clustering, InsightFace.</li><li>Video scrubbing, live transcode.</li><li>Phone UI over Tailscale.</li></ol>` },
+  { tab:'TRAINTRIP', short:'06', no:'QA 76.3', title:'TrainTripTime', yr:'2026',
+    front:`<span class="k">What</span>  GO Transit commute planner<br><span class="k">Stack</span> Python stdlib, PWA<p>Tell it when you need to be downtown. It tells you when to wake up.</p>`,
+    back:`<ol><li>118MB GTFS feed to a 1MB index.</li><li>Live GTFS-realtime, fail-soft.</li><li>Raspberry Pi, socket activated.</li></ol>` },
+  { tab:'FIREFOX', short:'07', no:'QA 76.4', title:'firefox-tabs', yr:'2026',
+    front:`<span class="k">What</span>  Desktop tabs on any device<br><span class="k">Stack</span> Python stdlib, SQLite<p>Reads Firefox&rsquo;s own session files with no extension and serves them from a Raspberry Pi.</p>`,
+    back:`<ol><li>LZ4 and Snappy, hand written.</li><li>SpiderMonkey clone parser.</li><li>Zero memory when idle.</li></ol>` },
+  { tab:'GRIDMACRO', short:'08', no:'QA 76.5', title:'GridMacro', yr:'2026',
+    front:`<span class="k">What</span>  Calorie and weight log<br><span class="k">Stack</span> Apps Script, Sheets, Gemini<p>Lives in your own Google Sheet. Two taps to log from ranked history.</p>`,
+    back:`<ol><li>Open Food Facts search.</li><li>Gemini estimate from a photo.</li><li>Weight trends, cuts shaded.</li></ol>` },
+];
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const tray = document.getElementById('tray');
+const els = cards.map((c, i) => {
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.innerHTML = `
+    <div class="tab" data-full="${c.tab}" data-short="${c.short}" style="left:${2 + i * 12.2}%"></div>
+    <div class="face"><div class="head"><span>${c.no}</span><b>${c.title}</b><span>${c.yr}</span></div><div class="typed">${c.front}</div></div>
+    <div class="back"><div class="head"><span>${c.no}</span><b>Subjects</b><span>${c.yr}</span></div><div class="typed">${c.back}</div></div>`;
+  tray.appendChild(el);
+  // Each card keeps its own slightly crooked resting angle, like a real stack.
+  return { el, i, x:0, y:0, r:0, vx:0, vy:0, vr:0, tx:0, ty:0, tr:0, rest:(Math.sin(i * 7.3) * 1.6) };
+});
+let order = els.map((_, i) => i);
+
+function layout() {
+  order.forEach((ci, depth) => {
+    const c = els[ci];
+    if (c.dragging || c.flying) return;
+    c.tx = depth * 3; c.ty = depth * -5; c.tr = depth === 0 ? 0 : c.rest;
+    c.el.style.zIndex = 100 - depth;
+    c.el.style.setProperty('--lift', depth === 0 ? 18 : 2);
+  });
+}
+layout();
+// Deal the deck in on load.
+if (!reduce) els.forEach((c, i) => { c.y = 500 + i * 60; c.r = (i % 2 ? 8 : -8) })
+
+function fileToBack(ci, dir = 1, delay = 0) {
+  const c = els[ci];
+  c.flying = true; c.el.classList.remove('flipped');
+  c.tx = dir * (tray.offsetWidth * .9); c.ty = -40; c.tr = dir * 14;
+  setTimeout(() => {
+    order = order.filter(o => o !== ci).concat(ci);
+    c.el.style.zIndex = 1;
+    c.flying = false;
+    layout();
+  }, reduce ? 0 : 260 + delay);
+}
+
+// Dragging the front card
+let drag = null;
+tray.addEventListener('pointerdown', e => {
+  const tab = e.target.closest('.tab');
+  if (tab) { bringForward(els.findIndex(c => c.el.contains(tab))); return }
+  const el = e.target.closest('.card');
+  if (!el) return;
+  const ci = els.findIndex(c => c.el === el);
+  if (ci !== order[0]) return;
+  const c = els[ci];
+  drag = { c, sx:e.clientX, sy:e.clientY, lx:e.clientX, vx:0, moved:false };
+  c.dragging = true; el.classList.add('dragging'); el.setPointerCapture(e.pointerId);
+});
+tray.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+  if (Math.hypot(dx, dy) > 5) drag.moved = true;
+  drag.vx = e.clientX - drag.lx; drag.lx = e.clientX;
+  drag.c.tx = dx; drag.c.ty = dy; drag.c.tr = dx * .05;
+  drag.c.el.style.setProperty('--lift', 40);
+});
+tray.addEventListener('pointerup', e => {
+  if (!drag) return;
+  const { c, moved } = drag, dx = e.clientX - drag.sx;
+  c.dragging = false; c.el.classList.remove('dragging');
+  if (!moved) c.el.classList.toggle('flipped');
+  else if (Math.abs(dx) > 120 || Math.abs(drag.vx) > 14) fileToBack(c.i, Math.sign(dx || drag.vx));
+  layout();
+  drag = null;
+});
+
+function bringForward(ci) {
+  const pos = order.indexOf(ci);
+  order.slice(0, pos).forEach((o, k) => setTimeout(() => fileToBack(o, k % 2 ? -1 : 1), k * 90));
+}
+
+addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') fileToBack(order[0], 1);
+  if (e.key === 'ArrowLeft') bringForward(order[order.length - 1]);
+  if (e.key === ' ') { e.preventDefault(); els[order[0]].el.classList.toggle('flipped') }
+});
+
+// One spring per card. Stiff enough to feel like card stock, loose enough to wobble once.
+(function tick() {
+  els.forEach(c => {
+    const k = c.dragging ? .35 : .09, d = c.dragging ? .55 : .74;
+    if (reduce && !c.dragging) { c.x = c.tx; c.y = c.ty; c.r = c.tr }
+    c.vx = (c.vx + (c.tx - c.x) * k) * d; c.vy = (c.vy + (c.ty - c.y) * k) * d; c.vr = (c.vr + (c.tr - c.r) * k) * d;
+    c.x += c.vx; c.y += c.vy; c.r += c.vr;
+    c.el.style.transform = `translate(${c.x}px, ${c.y}px) rotate(${c.r}deg)`;
+  });
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

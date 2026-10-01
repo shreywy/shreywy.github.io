@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10 Ledger · Shrey Mistry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<script src="nav.js"></script>
+<style>
+  :root { --paper:#f3f0e2; --ink:#1f2420; --mid:#6f7468; --green:#9fb59a; --green2:#c9d6c2; --red:#b8463a; --row:44px; }
+  * { box-sizing:border-box; margin:0; padding:0 }
+  body { background:#e6e2d1; color:var(--ink); font:400 17px/1.5 'Spectral', Georgia, serif; font-variant-numeric:oldstyle-nums }
+  a { color:inherit }
+
+  .book { position:relative; max-width:1080px; margin:40px auto 120px; background:var(--paper); box-shadow:0 1px 0 rgba(0,0,0,.05), 0 30px 60px -30px rgba(50,45,20,.35); padding:56px 0 40px }
+  .book::before { content:""; position:absolute; top:0; bottom:0; left:82px; width:3px; border-left:1px solid var(--red); border-right:1px solid var(--red); pointer-events:none }
+
+  .head { display:flex; justify-content:space-between; align-items:flex-end; padding:0 48px 16px 110px }
+  .head h1 { font-weight:300; font-size:clamp(40px, 6vw, 76px); line-height:1; letter-spacing:-.015em }
+  .head .meta { text-align:right; font-style:italic; color:var(--mid); font-size:15px }
+  .lede { padding:6px 48px 30px 110px; font-size:19px; font-weight:300; max-width:820px }
+
+  .sec { display:grid; grid-template-columns:var(--cols); padding:26px 48px 8px 110px; font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--mid); border-bottom:2px solid var(--green) }
+  .sec span:last-child { text-align:right }
+  :root { --cols:110px 1fr 150px 130px }
+
+  .entry { display:grid; grid-template-columns:var(--cols); align-items:baseline; min-height:var(--row); padding:10px 48px 9px 110px; border-bottom:1px solid var(--green2); cursor:pointer; position:relative }
+  .entry .d { font-size:14px; color:var(--mid); font-style:italic }
+  .entry .p b { font-weight:500 }
+  .entry .p i { color:var(--mid) }
+  .entry .r { font-size:14px; color:var(--mid) }
+  .entry .a { text-align:right; font-weight:500; font-variant-numeric:tabular-nums lining-nums; font-size:18px; white-space:nowrap }
+  .entry.sub .p { padding-left:22px; font-size:16px }
+  .entry.sub .a { font-weight:400; color:#3a4038 }
+  .memo { grid-column:2 / -1; display:grid; grid-template-rows:0fr; transition:grid-template-rows .55s cubic-bezier(.2,.8,.1,1) }
+  .memo > div { overflow:hidden; font-style:italic; color:#4a5047; font-size:15.5px; max-width:62ch }
+  .memo p { padding-top:6px }
+  .entry.open .memo { grid-template-rows:1fr }
+
+  .total { display:grid; grid-template-columns:var(--cols); padding:12px 48px 10px 110px; align-items:baseline }
+  .total .p { font-style:italic }
+  .total .a { text-align:right; font-weight:600; font-size:22px; font-variant-numeric:tabular-nums lining-nums; justify-self:end; padding:0 2px 3px; border-top:1px solid var(--ink); border-bottom:4px double var(--ink) }
+
+  .foot { padding:40px 48px 0 110px; display:flex; justify-content:space-between; gap:24px; font-size:16px; flex-wrap:wrap }
+  .foot a { text-underline-offset:3px }
+
+  /* The reading ruler: clear acrylic with ticks along its top edge */
+  .ruler { position:absolute; left:-14px; right:-14px; height:var(--h, 46px); top:0; pointer-events:none; z-index:5; border-radius:3px; will-change:transform;
+    background:linear-gradient(rgba(190,215,200,.22), rgba(190,215,200,.32));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.7), inset 0 -1px 0 rgba(60,90,70,.25), 0 6px 14px -6px rgba(40,60,40,.35);
+    backdrop-filter:saturate(1.15) brightness(1.03); opacity:0; transition:opacity .3s }
+  .ruler::before { content:""; position:absolute; left:0; right:0; top:0; height:9px; background:
+      repeating-linear-gradient(90deg, rgba(40,60,45,.55) 0 1px, transparent 1px 10px),
+      repeating-linear-gradient(90deg, rgba(40,60,45,.7) 0 1px, transparent 1px 50px); background-size:100% 5px, 100% 9px; background-repeat:no-repeat }
+  .book:hover .ruler, .ruler.show { opacity:1 }
+
+  @media (max-width: 760px) {
+    :root { --cols:1fr auto }
+    .book { margin:0 0 90px; padding-top:32px } .book::before { left:12px }
+    .head, .lede, .sec, .entry, .total, .foot { padding-left:28px; padding-right:16px }
+    .head { flex-direction:column; align-items:flex-start; gap:8px } .head .meta { text-align:left }
+    .entry .d, .entry .r, .sec span:nth-child(1), .sec span:nth-child(3), .total .d, .total .r { display:none }
+    .memo { grid-column:1 / -1 }
+  }
+</style>
+</head>
+<body>
+<div class="book" id="book">
+  <div class="head"><h1>Shrey Mistry</h1><div class="meta">Brampton, Ontario<br>Folio 1, October 2026</div></div>
+  <p class="lede">Computer Science at Toronto Metropolitan University, graduating May 2027. Everything here is a number I can back up. Click a line for the memo.</p>
+
+  <div class="sec"><span>Date</span><span>Internships</span><span>Place</span><span>Figure</span></div>
+  <div class="entry"><span class="d">May 2023</span><span class="p"><b>Bombardier Aerospace</b> <i>Automation Engineering Intern</i></span><span class="r">Toronto</span><span class="a" data-n="4" data-suf=" mo">4 mo</span>
+    <div class="memo"><div><p>Supplier Quality. TypeScript and Node.js pipelines into Power BI, and a one-sheet summary that replaced a many-tab review workbook.</p></div></div></div>
+  <div class="entry sub"><span class="d"></span><span class="p">Compliance report generation time, reduced by</span><span class="r"></span><span class="a" data-n="70" data-pre="over " data-suf="%">over 70%</span></div>
+
+  <div class="entry"><span class="d">Jan 2024</span><span class="p"><b>AMD</b> <i>Performance Engineering Intern</i></span><span class="r">Markham</span><span class="a" data-n="8" data-suf=" mo">8 mo</span>
+    <div class="memo"><div><p>Technical Marketing Labs. A modular Python benchmark framework that launches games via Steam and Epic and navigates menus by image matching. An Arduino tool for sub-millisecond input latency.</p></div></div></div>
+  <div class="entry sub"><span class="d"></span><span class="p">Benchmark runtime, reduced by</span><span class="r"></span><span class="a" data-n="60" data-suf="%">60%</span></div>
+
+  <div class="entry"><span class="d">May 2025</span><span class="p"><b>Geotab</b> <i>Software Engineering Intern</i></span><span class="r">Oakville</span><span class="a" data-n="16" data-suf=" mo">16 mo</span>
+    <div class="memo"><div><p>Solutions Delivery Management. GO Anywhere (90k), GO10 (trinity), and GO Anywhere Lite. Intern of the Month, January 2026.</p></div></div></div>
+  <div class="entry sub"><span class="d"></span><span class="p">IoT units on my BigQuery dashboards</span><span class="r"></span><span class="a" data-n="1000" data-suf="+">1,000+</span></div>
+  <div class="entry sub"><span class="d"></span><span class="p">Manual firmware verification time, reduced by</span><span class="r"></span><span class="a" data-n="80" data-suf="%">80%</span></div>
+  <div class="entry sub"><span class="d"></span><span class="p">One device, PRD to launch</span><span class="r"></span><span class="a" data-n="6" data-suf=" mo">6 mo</span></div>
+
+  <div class="total"><span class="d"></span><span class="p">Total time interning</span><span class="r"></span><span class="a" id="total">28 mo</span></div>
+
+  <div class="sec"><span>Built</span><span>Projects</span><span>Stack</span><span>Figure</span></div>
+  <div class="entry"><span class="d">Aug 2026</span><span class="p"><b>Forkable</b> <i>Vitest tests in CI</i></span><span class="r">Next.js, Postgres</span><span class="a" data-n="83">83</span>
+    <div class="memo"><div><p>Version control for recipes. Fork, commit tweaks, diff by ingredient, and merge Taste Tests. 21 Prisma models. Live at fforkable.vercel.app.</p></div></div></div>
+  <div class="entry"><span class="d">Sep 2026</span><span class="p"><b>TrainTripTime</b> <i>timetable index, from a 118MB feed</i></span><span class="r">Python stdlib</span><span class="a" data-n="1" data-suf=" MB">1 MB</span>
+    <div class="memo"><div><p>Tell it when you need to be downtown. It tells you when to wake up. Self-hosted on a Raspberry Pi.</p></div></div></div>
+  <div class="entry"><span class="d">Sep 2026</span><span class="p"><b>Speckle</b> <i>photos a second through CLIP, on CPU</i></span><span class="r">Rust, SQLite</span><span class="a" data-n="13" data-pre="~">~13</span>
+    <div class="memo"><div><p>A local-first photo and video library. Type boats, get boats. No account, no cloud.</p></div></div></div>
+  <div class="entry"><span class="d">Sep 2026</span><span class="p"><b>firefox-tabs</b> <i>memory used when idle</i></span><span class="r">Python stdlib</span><span class="a" data-n="0" data-suf=" MB">0 MB</span>
+    <div class="memo"><div><p>My desktop&rsquo;s open tabs on any device. Hand-written LZ4 and Snappy decompression in pure Python.</p></div></div></div>
+  <div class="entry"><span class="d">Sep 2026</span><span class="p"><b>drizzy-drake</b> <i>text to speech voices</i></span><span class="r">Python, Pi 3B</span><span class="a" data-n="93">93</span>
+    <div class="memo"><div><p>A Discord bot for friends that grew into music playback, embed fixing, and TTS across about 60 accents and languages.</p></div></div></div>
+
+  <div class="sec"><span>Term</span><span>Standing</span><span></span><span>Figure</span></div>
+  <div class="entry"><span class="d">2022 to now</span><span class="p"><b>Cumulative GPA</b> <i>out of 4.33, Dean&rsquo;s List</i></span><span class="r">TMU</span><span class="a" data-n="3.96" data-dec="2">3.96</span></div>
+
+  <div class="foot">
+    <span>Correspondence: <a href="mailto:shrey.d.mistry@gmail.com">shrey.d.mistry@gmail.com</a></span>
+    <span><a href="https://github.com/shreywy">GitHub</a> &nbsp; <a href="https://linkedin.com/in/shreymistry">LinkedIn</a></span>
+  </div>
+
+  <div class="ruler" id="ruler"></div>
+</div>
+
+<script>
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const book = document.getElementById('book'), ruler = document.getElementById('ruler');
+const rows = [...document.querySelectorAll('.entry, .total')];
+
+// Ruler snaps to the nearest line and settles with a little spring.
+let ty = 0, y = 0, v = 0, th = 46, h = 46;
+function aim(clientY) {
+  const top = book.getBoundingClientRect().top;
+  let best = rows[0], bd = Infinity;
+  rows.forEach(r => { const b = r.getBoundingClientRect(); const d = Math.abs(b.top + b.height / 2 - clientY); if (d < bd) { bd = d; best = r } });
+  ty = best.offsetTop - 1; th = best.offsetHeight + 2;
+}
+book.addEventListener('pointermove', e => aim(e.clientY));
+book.addEventListener('click', e => { const r = e.target.closest('.entry'); if (r) { r.classList.toggle('open'); setTimeout(() => aim(e.clientY), 560) } ruler.classList.add('show') });
+(function tick() {
+  const k = reduce ? 1 : .2, d = .62;
+  v = (v + (ty - y) * k) * d; y += v; h += (th - h) * .25;
+  ruler.style.transform = `translateY(${y}px)`; ruler.style.setProperty('--h', h + 'px');
+  requestAnimationFrame(tick);
+})();
+
+// Figures tally up from zero when they come into view.
+const fmt = (n, dec) => dec ? n.toFixed(dec) : Math.round(n).toLocaleString('en-CA');
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  io.unobserve(e.target);
+  const a = e.target.querySelector('.a[data-n]'); if (!a || reduce) return;
+  const n = +a.dataset.n, dec = +(a.dataset.dec || 0), pre = a.dataset.pre || '', suf = a.dataset.suf || '';
+  const t0 = performance.now(), dur = 900 + Math.min(900, n);
+  const step = t => { const p = Math.min(1, (t - t0) / dur), ease = 1 - Math.pow(1 - p, 4); a.textContent = pre + fmt(n * ease, dec) + suf; if (p < 1) requestAnimationFrame(step) };
+  requestAnimationFrame(step);
+}), { threshold:.6 });
+rows.forEach(r => io.observe(r));
+
+// The total only adds up once the three internships above it have been tallied.
+const total = document.getElementById('total');
+const months = [...document.querySelectorAll('.entry:not(.sub) .a[data-suf=" mo"]')].slice(0, 3);
+new IntersectionObserver((es, o) => es.forEach(e => {
+  if (!e.isIntersecting || reduce) return; o.disconnect();
+  let shown = 0; total.textContent = '0 mo';
+  months.forEach((m, i) => setTimeout(() => {
+    const from = shown, to = shown + +m.dataset.n; shown = to; const t0 = performance.now();
+    const step = t => { const p = Math.min(1, (t - t0) / 500); total.textContent = Math.round(from + (to - from) * p) + ' mo'; if (p < 1) requestAnimationFrame(step) };
+    m.closest('.entry').animate([{ background:'rgba(184,70,58,.12)' }, { background:'transparent' }], { duration:700 });
+    requestAnimationFrame(step);
+  }, 300 + i * 650));
+}), { threshold:1 }).observe(total);
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio drafts · Shrey Mistry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..400&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#f6f4ef; --ink:#191816; --mid:#7a756b; --line:#dcd7cc }
+  * { box-sizing:border-box; margin:0; padding:0 }
+  body { background:var(--bg); color:var(--ink); font:400 17px/1.5 'Newsreader', Georgia, serif; padding:56px 4vw 100px }
+  a { color:inherit; text-decoration:none }
+  h1 { font-weight:300; font-size:clamp(36px, 5vw, 64px); letter-spacing:-.02em; line-height:1 }
+  .intro { max-width:62ch; margin:18px 0 48px; color:#45423c }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:40px 28px }
+  .d { display:block }
+  .thumb { aspect-ratio:16/10; overflow:hidden; border:1px solid var(--line); background:#eee }
+  .thumb img { width:100%; height:100%; object-fit:cover; object-position:top; display:block; transition:transform .8s cubic-bezier(.2,.8,.1,1) }
+  .d:hover .thumb img { transform:scale(1.03) }
+  .meta { display:flex; gap:12px; align-items:baseline; margin-top:14px }
+  .meta span { font-size:13px; color:var(--mid); font-variant-numeric:tabular-nums }
+  .meta h2 { font-weight:400; font-size:26px; letter-spacing:-.01em }
+  .d p { font-size:15.5px; color:#45423c; margin-top:4px }
+  .d p b { font-weight:500; color:var(--ink) }
+</style>
+</head>
+<body>
+<h1>Ten directions</h1>
+<p class="intro">Each one is a single page with real content from the spec and its own motion idea. Flip between them with the bar in the corner or the <b>[</b> and <b>]</b> keys. Mixing is fine: the type from one, the motion from another.</p>
+
+<h2 style="font-weight:400; font-size:15px; letter-spacing:.18em; text-transform:uppercase; color:var(--mid); margin-bottom:16px">Round two</h2>
+<div class="grid" style="margin-bottom:64px">
+  <a class="d" href="gallery-v3.html"><div class="thumb"><img src="thumbs/v3.jpg" alt=""></div><div class="meta"><span>v3</span><h2>Gallery</h2></div>
+    <p><b>Latest.</b> The lamp flickers on across the tops of the letters. Internships on a timeline, each with its own page. Education gets a room. Live project sites in the closer look. Guestbook ready to connect.</p></a>
+  <a class="d" href="gallery-v2.html"><div class="thumb"><img src="thumbs/v2.jpg" alt=""></div><div class="meta"><span>v2</span><h2>Gallery</h2></div>
+    <p><b>Cormorant Garamond and EB Garamond.</b> Lights flicker on and you walk in. Gilt, walnut, ebony, and silver frames on one size system, a brass loupe for a cursor, and frames that slide away on a rail to show the story and a glimpse of the repo. Guestbook form instead of an email link.</p></a>
+</div>
+<h2 style="font-weight:400; font-size:15px; letter-spacing:.18em; text-transform:uppercase; color:var(--mid); margin-bottom:16px">Round one</h2>
+<div class="grid">
+  <a class="d" href="01-broadsheet.html"><div class="thumb"><img src="thumbs/01.jpg" alt=""></div><div class="meta"><span>01</span><h2>Broadsheet</h2></div>
+    <p><b>Libre Caslon.</b> A newspaper front page. The masthead is set letter by letter, column rules draw in, and screenshots are halftone grey until colour spreads out from wherever your cursor enters.</p></a>
+  <a class="d" href="02-monograph.html"><div class="thumb"><img src="thumbs/02.jpg" alt=""></div><div class="meta"><span>02</span><h2>Monograph</h2></div>
+    <p><b>Newsreader.</b> Big editorial type on a strict grid, one red dot. Lines rise from behind masks, stats roll like an odometer, and a screenshot trails the cursor on a spring through the project list.</p></a>
+  <a class="d" href="03-card-catalog.html"><div class="thumb"><img src="thumbs/03.jpg" alt=""></div><div class="meta"><span>03</span><h2>Card Catalog</h2></div>
+    <p><b>Libre Baskerville and Courier Prime.</b> Library index cards. Throw the top card aside, click to turn it over for subject headings, or pull any card forward by its tab.</p></a>
+  <a class="d" href="04-letterpress.html"><div class="thumb"><img src="thumbs/04.jpg" alt=""></div><div class="meta"><span>04</span><h2>Letterpress</h2></div>
+    <p><b>Bodoni Moda.</b> Type pressed into cotton paper. Your cursor is the light source, so every impression shifts its shadow as you move. Buttons sink when pressed.</p></a>
+  <a class="d" href="05-specimen.html"><div class="thumb"><img src="thumbs/05.jpg" alt=""></div><div class="meta"><span>05</span><h2>Specimen</h2></div>
+    <p><b>Fraunces, variable.</b> A type specimen sheet with point sizes in the margin. Letters in the name get heavier as your cursor nears them, and project names take a wave of weight on hover.</p></a>
+  <a class="d" href="06-timetable.html"><div class="thumb"><img src="thumbs/06.jpg" alt=""></div><div class="meta"><span>06</span><h2>Timetable</h2></div>
+    <p><b>Source Serif.</b> A split-flap departures board with a live Toronto clock. Every cell clatters into place. Click a row for the details.</p></a>
+  <a class="d" href="07-gallery.html"><div class="thumb"><img src="thumbs/07.jpg" alt=""></div><div class="meta"><span>07</span><h2>Gallery</h2></div>
+    <p><b>Cormorant Garamond.</b> A dark exhibition you drag through sideways. Framed, matted screenshots with placards, a spotlight on the cursor, and frames that lean toward you.</p></a>
+  <a class="d" href="08-book.html"><div class="thumb"><img src="thumbs/08.jpg" alt=""></div><div class="meta"><span>08</span><h2>The Book</h2></div>
+    <p><b>EB Garamond.</b> A bound book with chapters, drop caps, and footnotes. Drag a page to turn it and it follows your hand. Corners lift when you reach for them.</p></a>
+  <a class="d" href="09-drafting.html"><div class="thumb"><img src="thumbs/09.jpg" alt=""></div><div class="meta"><span>09</span><h2>Drafting Sheet</h2></div>
+    <p><b>IBM Plex Serif.</b> An engineering drawing. Internships are the revision history, projects are the parts list, and details are drawn to scale. Drag anywhere to measure.</p></a>
+  <a class="d" href="10-ledger.html"><div class="thumb"><img src="thumbs/10.jpg" alt=""></div><div class="meta"><span>10</span><h2>Ledger</h2></div>
+    <p><b>Spectral.</b> Every claim as a line item. A clear reading ruler snaps from row to row, figures tally up, and the total gets its double rule.</p></a>
+</div>
+</body>
+</html>

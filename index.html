@@ -583,8 +583,10 @@ function drawSel() {
   selKey = key; selShown = rects.length > 0;
   selLayer.innerHTML = rects.map(r => `<i style="left:${r.left - 3}px;top:${r.top}px;width:${r.right - r.left + 6}px;height:${r.bottom - r.top}px"></i>`).join('');
   if (!selShown || pillQuiet) { copyPill.classList.remove('on'); return }
-  // Just under the end of the selection; beside it when there's no room underneath.
-  const end = rects[rects.length - 1], below = end.bottom + 50 < innerHeight;
+  // Just under the end of the selection (the last line that's on screen); beside it when there's no room underneath.
+  const seen = rects.filter(r => r.right > 0 && r.left < innerWidth && r.bottom > 0 && r.top < innerHeight);
+  if (!seen.length) { copyPill.classList.remove('on'); return }
+  const end = seen[seen.length - 1], below = end.bottom + 50 < innerHeight;
   copyPill.style.left = Math.min(innerWidth - 60, Math.max(60, below ? end.right : end.right + 56)) + 'px';
   copyPill.style.top = (below ? end.bottom + 8 : (end.top + end.bottom) / 2 - 15) + 'px';
   copyPill.classList.add('on');
@@ -629,7 +631,7 @@ addEventListener('pointerup', () => { selecting = false; root.classList.remove('
 addEventListener('wheel', e => { if (selecting) { e.preventDefault(); e.stopImmediatePropagation() } }, { capture:true, passive:false });
 // Pressing on a line of text selects it instead of dragging the hall.
 function onText(e) {
-  if (e.target.closest('.art, .doc, button, a, input, textarea, label')) return false;
+  if (e.target.closest('.art, button, a, input, textarea, label')) return false;
   const pos = document.caretPositionFromPoint?.(e.clientX, e.clientY), cr = !pos && document.caretRangeFromPoint?.(e.clientX, e.clientY);
   const node = pos ? pos.offsetNode : cr?.startContainer;
   if (!node || node.nodeType !== 3 || !node.data.trim()) return false;

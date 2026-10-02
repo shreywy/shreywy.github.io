@@ -5,7 +5,7 @@
 //      full-page capture; the closer look scrolls through it and can switch to the live site. Otherwise add a cropped GitHub capture as gh:'gh-<name>.jpg'.
 //   2. Copy a block and fill it in. hidden:true takes a piece down without deleting it.
 //   Fields: id (also the link, /#id), frame (baroque | softwood | shadowbox | gilt | walnut | ebony | silver),
-//           art [file, shape ls|pt, size L|S] (two S in a row stack into one column),
+//           art [file, shape ls|pt, size L|S, 'desktop' to hide it on phones] (two S in a row stack into one column),
 //           placard, tag, what / how / nums, map (optional table), extra (detail-only screenshots), links.
 //
 // Experience (oldest first here; the wall shows newest on the left)
@@ -26,7 +26,7 @@ window.PROJECTS = [
     nums:'21 Prisma models. CI runs lint, typecheck, build, and 83 Vitest tests.',
     map:[['Repository','Recipe'], ['Commit','Tweak'], ['Fork','Remix'], ['Pull request','Taste Test'], ['git log','Tweaks tab']] },
   { id:'traintriptime', page:{ url:'https://shreywy.github.io/TrainTripTime/', poster:'page-ttt.jpg', full:'full-ttt.jpg' }, title:'TrainTripTime', year:'Sep 2026', frame:'softwood',
-    art:[['ttt-plan.png','pt','L'], ['ttt-proof.png','pt','L'], ['ttt-setup.png','pt','L']],
+    art:[['ttt-plan.png','pt','L'], ['ttt-proof.png','pt','L'], ['ttt-setup.png','pt','L','desktop']],
     tag:'Tell it when you need to be downtown. It tells you when to wake up.', placard:'A GO Transit commute planner that works backwards from your arrival time.',
     medium:'Python stdlib, HTML, CSS, JS. Runs on a Raspberry Pi.',
     gh:'gh-ttt.jpg', repo:'github.com/shreywy/TrainTripTime', links:[['GitHub', 'https://github.com/shreywy/TrainTripTime'], ['Project page', 'https://shreywy.github.io/TrainTripTime/']],

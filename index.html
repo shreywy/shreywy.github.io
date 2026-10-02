@@ -395,6 +395,7 @@
     .col { display:contents }
     .art .frame { justify-self:center; max-width:100% }
     .art .frame.lead { grid-column:1 / -1 }
+    .art .frame.desk-only { display:none }
     .art .frame img.ls { width:100%; height:auto }
     .art .frame img.pt { width:min(100%, 150px); height:auto }
     .art .frame.lead img.pt { width:auto; height:min(56vh, 480px) }
@@ -521,8 +522,8 @@ track.insertBefore(bayEl('Resume', `<div class="lamp"></div><div class="doc look
   <p class="sum">Kept current as I go, so it can change between visits.</p>
   <div class="actions"><button class="more" data-id="resume">Read it &rarr;</button></div></div>`, 'xp'), $('guestBay'));
 
-const frameHTML = (p, [src, shape, size]) =>
-  `<div class="frame ${p.frame} ${size}"><div class="bead"><div class="mat"><img class="${shape}" src="${A + src}" alt="${p.title}" draggable="false"></div></div></div>`;
+const frameHTML = (p, [src, shape, size, only]) =>
+  `<div class="frame ${p.frame} ${size}${only === 'desktop' ? ' desk-only' : ''}"><div class="bead"><div class="mat"><img class="${shape}" src="${A + src}" alt="${p.title}" draggable="false"></div></div></div>`;
 P.forEach(p => {
   let html = '', smalls = [];
   const flush = () => { if (smalls.length) { html += `<div class="col">${smalls.join('')}</div>`; smalls = [] } };
@@ -530,9 +531,13 @@ P.forEach(p => {
   flush();
   const bay = bayEl('Projects', `<div class="lamp"></div><div class="exhibit"><div class="art" data-id="${p.id}">${html}</div>
     <div class="placard"><b>${p.title}</b><i>${p.year}</i><p>${p.placard}</p><div class="med">${p.medium}</div><button class="more" data-id="${p.id}">Look closer &rarr;</button></div></div>`);
-  const fr = [...bay.querySelectorAll('.frame')];
-  fr[0].classList.add('lead');
-  if (fr.length % 2 === 0) fr[fr.length - 1].classList.add('lead');
+  // On phones the lead piece spans the width and the rest pair up; an even set of phones just sits as pairs.
+  const fr = [...bay.querySelectorAll('.frame:not(.desk-only)')];
+  const allPhones = fr.every(f => f.querySelector('img.pt'));
+  if (!(allPhones && fr.length % 2 === 0)) {
+    fr[0].classList.add('lead');
+    if (fr.length % 2 === 0) fr[fr.length - 1].classList.add('lead');
+  }
   track.insertBefore(bay, $('eduSign'));
 });
 track.insertBefore(bayEl('Projects', `<div class="lamp"></div><div class="vinyl"><h2 style="font-size:clamp(34px,3vw,48px)">The archive</h2>

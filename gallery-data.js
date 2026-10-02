@@ -12,7 +12,7 @@
 //   Fields: id, company, role, team, city, mode, start, end, months, summary (the wall text),
 //           award (optional plaque on the wall), recognition (detail page only), about (the company in a sentence or two), did (bullets), skills, quote (optional).
 //
-// look picks the object the wall text is printed on: certificate | notebook | report | diploma.
+// look picks the object the wall text is printed on: map | certificate | notebook | report | diploma.
 // Education uses the same shape, plus gpa, honors, coop, coursework, inProgress, and before.
 
 window.PROJECTS = [
@@ -91,7 +91,7 @@ window.EXPERIENCE = [
       'Maintained a legacy Java tool for account-key management against a SQL database, and documented the benchmark tools for whoever comes next.',
     ],
     skills:['Python', 'pytest', 'C', 'C++', 'Arduino', 'Java', 'SQL'] },
-  { id:'geotab', look:'certificate', logo:'geotab.svg', company:'Geotab', role:'Software Engineering Intern', team:'Solutions Delivery Management',
+  { id:'geotab', look:'map', logo:'geotab.svg', company:'Geotab', role:'Software Engineering Intern', team:'Solutions Delivery Management',
     city:'Oakville', mode:'Hybrid', start:'May 2025', end:'Aug 2026', months:16,
     summary:'Sixteen months on telematics. I took one device from PRD to launch in six months, built BigQuery dashboards for 1,000+ IoT units, and cut manual firmware verification by 80%.',
     recognition:'Intern of the Month, Jan 2026',

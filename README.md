@@ -15,7 +15,14 @@ I'm a Computer Science student at Toronto Metropolitan University, graduating Ma
 - **Resume.** A stack of pages that opens the current PDF.
 - **Guestbook.** Leave a note and it lands in my inbox.
 
-The progress bar at the bottom shows where each room starts when you hover it. Click a dot or drag the bar to skip ahead. On phones the hall becomes a vertical walk.
+Getting around:
+
+- Scroll, drag, or use the arrow keys. A fast flick of the wheel or trackpad jumps to the next room.
+- Click the mouse wheel to autoscroll: move down or right to go forward, up or left to go back. Click again or press Esc to stop.
+- Page Down, Page Up, and Space jump between rooms. Home and End go to either end.
+- Hover the progress bar at the bottom to see where each room starts. Click a dot or drag the bar to skip ahead.
+
+On phones the hall becomes a vertical walk.
 
 ## How it's built
 
@@ -42,13 +49,17 @@ Everything on the walls comes from `gallery-data.js`, so the wall, the caption, 
 
 Roles and education work the same way in `window.EXPERIENCE` and `window.EDUCATION`.
 
+## Visit log
+
+The same Apps Script keeps a light visit log: one email per browsing session with the time, where the visitor came from, and their device, plus a Sheet of what they opened. No IP addresses or cookies. It skips local copies and automated browsers, and any device that visits `/?notrack` once is left out from then on.
+
 ## Updating the resume
 
 Drop the new PDF in `resumes/` and update the file name and date in `window.RESUME` at the bottom of `gallery-data.js`.
 
 ## The guestbook
 
-The form posts to a Google Apps Script web app that writes each note to a Google Sheet and emails it to me, with a hidden spam field, a one-note-per-minute limit for each email address, and a daily cap. The source is in `tools/guestbook/`. To change it:
+The form posts to a Google Apps Script web app (the same one behind the visit log) that writes each note to a Google Sheet and emails it to me, with a hidden spam field, a one-note-per-minute limit for each email address, and a daily cap. The source is in `tools/guestbook/`. To change it:
 
 ```bash
 cd tools/guestbook

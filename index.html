@@ -258,6 +258,14 @@
   .marks span { position:absolute; bottom:20px; left:50%; translate:-50% 0; white-space:nowrap; padding:6px 11px 5px; border-radius:999px; pointer-events:none;
     background:rgba(20,18,16,.9); color:var(--text); font:700 11px/1 'Cormorant Garamond'; letter-spacing:.18em; text-transform:uppercase; opacity:0; transition:opacity .2s }
   .marks button:hover span { opacity:1 }
+  /* Middle-click autoscroll anchor */
+  .autoscroll { position:fixed; width:36px; height:36px; margin:-18px 0 0 -18px; border-radius:50%; z-index:70; pointer-events:none; display:none;
+    border:1.5px solid var(--ivory); background:rgba(20,22,26,.7); box-shadow:0 4px 14px rgba(0,0,0,.5) }
+  .autoscroll.on { display:block }
+  .autoscroll::before, .autoscroll::after { content:""; position:absolute; top:50%; margin-top:-5px; border:5px solid transparent }
+  .autoscroll::before { left:4px; border-right:7px solid var(--ivory); border-left:0 }
+  .autoscroll::after { right:4px; border-left:7px solid var(--ivory); border-right:0 }
+  body.autoscrolling, body.autoscrolling * { cursor:ew-resize !important }
 
   /* Loupe: an ivory-rimmed lens on a slim charcoal handle */
   .loupe { position:fixed; left:0; top:0; z-index:60; pointer-events:none; opacity:0; transition:opacity .2s }
@@ -483,6 +491,33 @@
 // Where guestbook notes go: the Apps Script web app in tools/guestbook.
 const GUESTBOOK_URL = 'https://script.google.com/macros/s/AKfycby7GUXekrNdq14cuBK8Gye6sLbpgpy92DeFtFXu9eBBZ1A4-lx9SP_EdN2m2NTDhPfg/exec';
 
+// A light visit log through the same script: one ping per browsing session, then what gets opened.
+// No IP addresses or cookies. Skipped for local copies, automated browsers, and any device that
+// has visited with ?notrack (it remembers).
+const visitLog = (() => {
+  let on = !navigator.webdriver && !/^(localhost|127\.|\[::1\])/.test(location.hostname);
+  try {
+    if (new URLSearchParams(location.search).has('notrack')) localStorage.setItem('notrack', '1');
+    if (localStorage.getItem('notrack')) on = false;
+  } catch {}
+  if (!on) return () => {};
+  let id;
+  try { id = sessionStorage.getItem('visit') } catch {}
+  const fresh = !id;
+  if (fresh) { id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7); try { sessionStorage.setItem('visit', id) } catch {} }
+  const send = data => {
+    const body = new URLSearchParams({ id, ...data });
+    if (!(navigator.sendBeacon && navigator.sendBeacon(GUESTBOOK_URL, body))) fetch(GUESTBOOK_URL, { method:'POST', mode:'no-cors', body, keepalive:true }).catch(() => {});
+  };
+  if (fresh) send({ kind:'visit', ref:document.referrer, path:location.pathname + location.hash, ua:navigator.userAgent,
+    screen:screen.width + 'x' + screen.height, lang:navigator.language, tz:Intl.DateTimeFormat().resolvedOptions().timeZone });
+  return what => send({ kind:'event', what });
+})();
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href]'); if (!a) return;
+  visitLog(a.hasAttribute('download') ? 'downloaded the resume' : 'followed a link to ' + a.href);
+}, true);
+
 const A = 'assets/';
 const P = window.PROJECTS.filter(p => !p.hidden), X = window.EXPERIENCE, E = window.EDUCATION;
 const ITEMS = {};
@@ -570,6 +605,7 @@ function buildMarks() {
   // The last rooms share the final screen, so their dots would stack; keep them at least 4% apart.
   const at = rooms.map(r => r.t / max * 100);
   for (let i = at.length - 2; i >= 0; i--) at[i] = Math.min(at[i], at[i + 1] - 4);
+  roomStops = rooms.map(r => r.t);
   marks.innerHTML = rooms.map((r, i) => `<button type="button" style="--at:${Math.max(0, at[i]).toFixed(2)}%" data-t="${r.t}" aria-label="Go to ${r.room}"><span>${r.room}</span></button>`).join('');
 }
 addEventListener('load', buildMarks); addEventListener('resize', buildMarks); document.fonts.ready.then(buildMarks);
@@ -585,12 +621,56 @@ marks.addEventListener('click', e => { const b = e.target.closest('button'); if 
 const clamp = v => Math.max(0, Math.min(max, v));
 const detailOpen = () => $('detail').classList.contains('on');
 
+// Room starts, filled in by the progress-bar markers. Fast flicks snap between these.
+let roomStops = [], snapLock = 0, settleTimer = 0, burstFrom = 0;
+const recentWheel = [];
+function snapRoom(dir, from = tx) {
+  const stops = [0, ...roomStops, max].sort((a, b) => a - b);
+  const next = dir > 0 ? stops.find(t => t > from + 40) : [...stops].reverse().find(t => t < from - 40);
+  tx = clamp(next ?? (dir > 0 ? max : 0));
+}
+// When movement stops close to a piece, ease it to the middle of the screen.
+function settle() {
+  if (auto || drag || mobile() || detailOpen()) return;
+  const centres = [...track.querySelectorAll('.bay')].filter(b => !b.querySelector('.roomsign'))
+    .map(b => clamp(b.offsetLeft + b.offsetWidth / 2 - innerWidth / 2));
+  const near = centres.reduce((a, c) => Math.abs(c - tx) < Math.abs(a - tx) ? c : a, Infinity);
+  if (Math.abs(near - tx) < innerWidth * .12) tx = near;
+}
 addEventListener('wheel', e => {
   if (introRunning) finishIntro();
   if (mobile() || detailOpen()) return;
   e.preventDefault();
-  tx = clamp(tx + (Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * 1.1);
+  const now = performance.now();
+  if (now < snapLock) return; // let a snap land before taking more input
+  const unit = e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? innerHeight : 1;
+  const d = (Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * unit;
+  // A fast flick (lots of travel in a fraction of a second) jumps to the next room.
+  while (recentWheel.length && now - recentWheel[0][0] > 200) recentWheel.shift();
+  if (!recentWheel.length) burstFrom = tx; // where this burst started, so a flick snaps from there
+  recentWheel.push([now, d]);
+  const burst = recentWheel.reduce((a, [, v]) => a + v, 0);
+  if (Math.abs(burst) > 480 && recentWheel.length > 2) { clearTimeout(settleTimer); snapRoom(Math.sign(burst), burstFrom); recentWheel.length = 0; snapLock = now + 700; return }
+  tx = clamp(tx + d * 1.9);
+  clearTimeout(settleTimer); settleTimer = setTimeout(settle, 220);
 }, { passive:false });
+
+// Middle-click autoscroll, like Windows: click the wheel to drop an anchor, then move the mouse.
+// Down or right travels forward, up or left travels back. Click again or press Esc to stop.
+let auto = null;
+const autoEl = document.createElement('div');
+autoEl.className = 'autoscroll'; document.body.appendChild(autoEl);
+function stopAuto() { if (!auto) return; auto = null; autoEl.classList.remove('on'); document.body.classList.remove('autoscrolling'); setTimeout(settle, 120) }
+addEventListener('mousedown', e => {
+  if (auto) { e.preventDefault(); stopAuto(); return }
+  if (e.button !== 1 || mobile() || detailOpen() || e.target.closest('a')) return;
+  e.preventDefault();
+  auto = { x:e.clientX, y:e.clientY, mx:e.clientX, my:e.clientY, t:performance.now() };
+  autoEl.style.left = e.clientX + 'px'; autoEl.style.top = e.clientY + 'px';
+  autoEl.classList.add('on'); document.body.classList.add('autoscrolling');
+}, true);
+// Holding the wheel and releasing after a move also ends it.
+addEventListener('mouseup', e => { if (e.button === 1 && auto && performance.now() - auto.t > 350 && Math.hypot(auto.mx - auto.x, auto.my - auto.y) > 24) stopAuto() });
 
 const bays = () => [...track.querySelectorAll('.bay')];
 function stepBay(dir) {
@@ -602,8 +682,13 @@ addEventListener('keydown', e => {
   if (introRunning) { finishIntro(); return }
   if (e.key === 'Escape' && detailOpen()) history.back();
   if (detailOpen() || mobile() || e.target.closest('input, textarea')) return;
+  if (e.key === 'Escape') stopAuto();
   if (e.key === 'ArrowRight') stepBay(1);
   if (e.key === 'ArrowLeft') stepBay(-1);
+  if (e.key === 'PageDown' || (e.key === ' ' && !e.shiftKey)) { e.preventDefault(); snapRoom(1) }
+  if (e.key === 'PageUp' || (e.key === ' ' && e.shiftKey)) { e.preventDefault(); snapRoom(-1) }
+  if (e.key === 'Home') tx = 0;
+  if (e.key === 'End') tx = max;
 });
 
 let drag = null, moved = false, userMoved = false;
@@ -615,12 +700,13 @@ hall.addEventListener('pointerdown', e => {
 });
 addEventListener('pointermove', e => {
   root.style.setProperty('--mx', e.clientX + 'px'); root.style.setProperty('--my', e.clientY + 'px');
+  if (auto) { auto.mx = e.clientX; auto.my = e.clientY }
   if (!drag) return;
   if (Math.abs(e.clientX - drag.sx) > 5) moved = true;
   drag.v = drag.lx - e.clientX; drag.lx = e.clientX;
   tx = clamp(drag.st - (e.clientX - drag.sx));
 });
-addEventListener('pointerup', () => { if (drag) { tx = clamp(tx + drag.v * 14); drag = null; hall.classList.remove('drag') } });
+addEventListener('pointerup', () => { if (drag) { tx = clamp(tx + drag.v * 14); drag = null; hall.classList.remove('drag'); clearTimeout(settleTimer); settleTimer = setTimeout(settle, 450) } });
 track.addEventListener('click', e => {
   const t = e.target.closest('.art, .more');
   if (!t || moved || !t.dataset.id) return;
@@ -670,7 +756,14 @@ const pieces = [...track.querySelectorAll('[data-room]')], where = $('where'), b
 (function tick() {
   if (!mobile()) {
     const before = x;
-    x += (tx - x) * (reduce ? 1 : .085);
+    if (auto) {
+      // Speed grows with distance from the anchor, with a small dead zone so it can sit still.
+      // Time based, so it moves the same on any refresh rate: about 900px a second at 160px out.
+      const now = performance.now(), dt = Math.min(.05, (now - (auto.last || now)) / 1000); auto.last = now;
+      const d = (auto.my - auto.y) + (auto.mx - auto.x), m = Math.max(0, Math.abs(d) - 12);
+      tx = clamp(tx + Math.sign(d) * Math.pow(m, 1.25) * 1.8 * dt);
+    }
+    x += (tx - x) * (reduce ? 1 : .11);
     travelled += Math.abs(x - before);
     track.style.transform = `translate3d(${-x}px,0,0)`;
     bar.style.setProperty('--p', max ? x / max : 0);
@@ -811,6 +904,7 @@ function open(id, src, fromHistory) {
   current = item.d;
   item.kind === 'project' ? fillProject(item.d) : item.kind === 'resume' ? fillResume() : fillText(item.d, item.kind);
   if (!fromHistory) history.pushState({ id }, '', '#' + id);
+  visitLog('opened ' + id);
   detail.classList.add('on'); detail.setAttribute('aria-hidden', 'false');
   loupe.classList.remove('on');
   const vw = innerWidth, vh = innerHeight;
@@ -944,6 +1038,7 @@ $('book').addEventListener('submit', async e => {
     err.textContent = 'That didn’t go through. Try again in a moment.';
     return;
   }
+  visitLog('signed the guestbook');
   f.animate([{ transform:'none' }, { transform:'translateY(-6px) rotate(-.6deg)' }, { transform:'none' }], { duration:500, easing:ease });
   const seal = $('seal');
   seal.style.pointerEvents = 'auto';

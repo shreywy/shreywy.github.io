@@ -841,8 +841,12 @@ function open(id, src, fromHistory) {
   const centre = `translate(${cx}px, ${cy}px) scale(${s})`;
   const gone = `translate(${-r.left - cw * s - 80}px, ${cy}px) scale(${s}) perspective(1200px) rotateY(10deg)`;
   // The panel starts clipped to exactly where the centred piece hangs, then opens as the piece rolls away.
-  const gx = (vw - cw * s) / 2 + inner.x * s - pr.left, gy = (vh - ch * s) / 2 + inner.y * s - pr.top;
-  const clipIn = `inset(${gy}px ${pr.width - gx - inner.w * s}px ${pr.height - gy - inner.h * s}px ${gx}px)`;
+  // Rounded frames: start the reveal inside the curve of their corners, so no square corner pokes past them.
+  const radius = Math.max(0, ...[...src.querySelectorAll('.frame')].map(f => parseFloat(getComputedStyle(f).borderTopLeftRadius) || 0));
+  const pad = Math.min(radius * s, inner.w * s / 3, inner.h * s / 3);
+  const gx = (vw - cw * s) / 2 + inner.x * s - pr.left + pad, gy = (vh - ch * s) / 2 + inner.y * s - pr.top + pad;
+  const iw = inner.w * s - pad * 2, ih = inner.h * s - pad * 2;
+  const clipIn = `inset(${gy}px ${pr.width - gx - iw}px ${pr.height - gy - ih}px ${gx}px round ${pad}px)`;
   ghost._centre = centre; ghost._gone = gone; panel._clip = clipIn;
   requestAnimationFrame(() => {
     if (!ghost) return;
@@ -853,7 +857,7 @@ function open(id, src, fromHistory) {
   ghost.animate([{ transform:'none' }, { transform:centre }], { duration:600, easing:ease, fill:'forwards' }).finished.then(() => {
     if (!ghost) return;
     panel.style.visibility = 'visible'; fitFrame();
-    panel.animate([{ clipPath:clipIn }, { clipPath:'inset(0px 0px 0px 0px)' }], { duration:900, easing:ease, fill:'forwards' });
+    panel.animate([{ clipPath:clipIn, opacity:0 }, { opacity:1, offset:.45 }, { clipPath:'inset(0px 0px 0px 0px round 0px)', opacity:1 }], { duration:900, easing:ease, fill:'forwards' });
     ghost.animate([{ transform:centre }, { transform:gone }], { duration:900, easing:ease, fill:'forwards' });
   }).catch(() => {});
 }
@@ -885,7 +889,7 @@ function close(fromHistory) {
   closing = true;
   if (!ghost) { panel.animate([{ opacity:1 }, { opacity:0 }], { duration:reduce ? 1 : 250 }).finished.then(finishClose); return }
   const g = ghost;
-  panel.animate([{ clipPath:'inset(0px 0px 0px 0px)' }, { clipPath:panel._clip }], { duration:550, easing:ease, fill:'forwards' });
+  panel.animate([{ clipPath:'inset(0px 0px 0px 0px round 0px)', opacity:1 }, { opacity:1, offset:.55 }, { clipPath:panel._clip, opacity:0 }], { duration:550, easing:ease, fill:'forwards' });
   g.animate([{ transform:g._gone }, { transform:g._centre }], { duration:550, easing:ease, fill:'forwards' }).finished.then(() => {
     if (ghost !== g) return;
     panel.style.visibility = 'hidden';

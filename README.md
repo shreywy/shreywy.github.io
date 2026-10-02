@@ -17,8 +17,8 @@ I'm a Computer Science student at Toronto Metropolitan University, graduating Ma
 
 Getting around:
 
-- Scroll, drag, or use the arrow keys. A fast flick of the wheel or trackpad jumps to the next room.
-- Click the mouse wheel to autoscroll: move down or right to go forward, up or left to go back. Click again or press Esc to stop.
+- Scroll or drag. The arrow keys jump straight to the next or previous piece.
+- Hold the mouse wheel and move down to go forward, up to go back; let go to stop. Or click the wheel once to lock it on, and click again or press Esc to stop.
 - Page Down, Page Up, and Space jump between rooms. Home and End go to either end.
 - Hover the progress bar at the bottom to see where each room starts. Click a dot or drag the bar to skip ahead.
 

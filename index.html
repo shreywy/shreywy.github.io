@@ -265,6 +265,7 @@
   .autoscroll::before, .autoscroll::after { content:""; position:absolute; top:50%; margin-top:-5px; border:5px solid transparent }
   .autoscroll::before { left:4px; border-right:7px solid var(--ivory); border-left:0 }
   .autoscroll::after { right:4px; border-left:7px solid var(--ivory); border-right:0 }
+  .autoscroll span { display:none }
   body.autoscrolling, body.autoscrolling * { cursor:ew-resize !important }
 
   /* Loupe: an ivory-rimmed lens on a slim charcoal handle */
@@ -617,66 +618,57 @@ prog.addEventListener('pointerdown', e => {
 });
 prog.addEventListener('pointermove', e => { if (scrubbing) seek(e) });
 prog.addEventListener('pointerup', () => { scrubbing = false; prog.classList.remove('drag') });
-marks.addEventListener('click', e => { const b = e.target.closest('button'); if (b) tx = clamp(+b.dataset.t) });
+marks.addEventListener('click', e => { const b = e.target.closest('button'); if (b) go(+b.dataset.t) });
 const clamp = v => Math.max(0, Math.min(max, v));
 const detailOpen = () => $('detail').classList.contains('on');
 
 // Room starts, filled in by the progress-bar markers. Fast flicks snap between these.
-let roomStops = [], snapLock = 0, settleTimer = 0, burstFrom = 0;
-const recentWheel = [];
-function snapRoom(dir, from = tx) {
+// Room starts, filled in by the progress-bar markers. Page Up and Page Down jump between these.
+let roomStops = [], boost = 0;
+function snapRoom(dir) {
   const stops = [0, ...roomStops, max].sort((a, b) => a - b);
-  const next = dir > 0 ? stops.find(t => t > from + 40) : [...stops].reverse().find(t => t < from - 40);
-  tx = clamp(next ?? (dir > 0 ? max : 0));
+  const next = dir > 0 ? stops.find(t => t > tx + 40) : [...stops].reverse().find(t => t < tx - 40);
+  go(next ?? (dir > 0 ? max : 0));
 }
-// When movement stops close to a piece, ease it to the middle of the screen.
-function settle() {
-  if (auto || drag || mobile() || detailOpen()) return;
-  const centres = [...track.querySelectorAll('.bay')].filter(b => !b.querySelector('.roomsign'))
-    .map(b => clamp(b.offsetLeft + b.offsetWidth / 2 - innerWidth / 2));
-  const near = centres.reduce((a, c) => Math.abs(c - tx) < Math.abs(a - tx) ? c : a, Infinity);
-  if (Math.abs(near - tx) < innerWidth * .12) tx = near;
-}
+// A deliberate jump (keys, dots) travels a little quicker than free scrolling.
+function go(t) { tx = clamp(t); boost = performance.now() + 900 }
 addEventListener('wheel', e => {
   if (introRunning) finishIntro();
   if (mobile() || detailOpen()) return;
   e.preventDefault();
-  const now = performance.now();
-  if (now < snapLock) return; // let a snap land before taking more input
   const unit = e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? innerHeight : 1;
-  const d = (Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * unit;
-  // A fast flick (lots of travel in a fraction of a second) jumps to the next room.
-  while (recentWheel.length && now - recentWheel[0][0] > 200) recentWheel.shift();
-  if (!recentWheel.length) burstFrom = tx; // where this burst started, so a flick snaps from there
-  recentWheel.push([now, d]);
-  const burst = recentWheel.reduce((a, [, v]) => a + v, 0);
-  if (Math.abs(burst) > 480 && recentWheel.length > 2) { clearTimeout(settleTimer); snapRoom(Math.sign(burst), burstFrom); recentWheel.length = 0; snapLock = now + 700; return }
-  tx = clamp(tx + d * 1.9);
-  clearTimeout(settleTimer); settleTimer = setTimeout(settle, 220);
+  tx = clamp(tx + (Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * unit * 1.8);
 }, { passive:false });
 
-// Middle-click autoscroll, like Windows: click the wheel to drop an anchor, then move the mouse.
-// Down or right travels forward, up or left travels back. Click again or press Esc to stop.
+// Middle button autoscroll, like Windows.
+//   Hold the wheel and move: down goes forward, up goes back. Let go to stop.
+//   Click the wheel (press and release without moving): it stays on until the next click or Esc.
 let auto = null;
 const autoEl = document.createElement('div');
 autoEl.className = 'autoscroll'; document.body.appendChild(autoEl);
-function stopAuto() { if (!auto) return; auto = null; autoEl.classList.remove('on'); document.body.classList.remove('autoscrolling'); setTimeout(settle, 120) }
+function stopAuto() { if (!auto) return; auto = null; autoEl.classList.remove('on'); document.body.classList.remove('autoscrolling') }
 addEventListener('mousedown', e => {
-  if (auto) { e.preventDefault(); stopAuto(); return }
+  if (auto && !auto.held) { e.preventDefault(); e.stopPropagation(); stopAuto(); return }
   if (e.button !== 1 || mobile() || detailOpen() || e.target.closest('a')) return;
-  e.preventDefault();
-  auto = { x:e.clientX, y:e.clientY, mx:e.clientX, my:e.clientY, t:performance.now() };
+  e.preventDefault(); e.stopPropagation();
+  auto = { x:e.clientX, y:e.clientY, mx:e.clientX, my:e.clientY, t:performance.now(), held:true };
   autoEl.style.left = e.clientX + 'px'; autoEl.style.top = e.clientY + 'px';
   autoEl.classList.add('on'); document.body.classList.add('autoscrolling');
 }, true);
-// Holding the wheel and releasing after a move also ends it.
-addEventListener('mouseup', e => { if (e.button === 1 && auto && performance.now() - auto.t > 350 && Math.hypot(auto.mx - auto.x, auto.my - auto.y) > 24) stopAuto() });
+addEventListener('mouseup', e => {
+  if (e.button !== 1 || !auto || !auto.held) return;
+  const travelled = Math.abs(auto.my - auto.y) > 18 || Math.abs(auto.mx - auto.x) > 18;
+  if (travelled || performance.now() - auto.t > 400) stopAuto(); // it was a hold: done
+  else auto.held = false;                                          // it was a click: stay locked on
+}, true);
+// The middle button opens links in new tabs and pastes on Linux; neither should fire from the hall.
+addEventListener('auxclick', e => { if (e.button === 1 && !e.target.closest('a')) e.preventDefault() }, true);
 
 const bays = () => [...track.querySelectorAll('.bay')];
 function stepBay(dir) {
-  const centres = bays().map(b => b.offsetLeft + b.offsetWidth / 2 - innerWidth / 2).map(clamp);
+  const centres = bays().filter(b => !b.querySelector('.roomsign')).map(b => clamp(b.offsetLeft + b.offsetWidth / 2 - innerWidth / 2));
   const next = dir > 0 ? centres.find(c => c > tx + 20) : [...centres].reverse().find(c => c < tx - 20);
-  tx = next ?? (dir > 0 ? max : 0);
+  go(next ?? (dir > 0 ? max : 0));
 }
 addEventListener('keydown', e => {
   if (introRunning) { finishIntro(); return }
@@ -687,15 +679,15 @@ addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') stepBay(-1);
   if (e.key === 'PageDown' || (e.key === ' ' && !e.shiftKey)) { e.preventDefault(); snapRoom(1) }
   if (e.key === 'PageUp' || (e.key === ' ' && e.shiftKey)) { e.preventDefault(); snapRoom(-1) }
-  if (e.key === 'Home') tx = 0;
-  if (e.key === 'End') tx = max;
+  if (e.key === 'Home') go(0);
+  if (e.key === 'End') go(max);
 });
 
 let drag = null, moved = false, userMoved = false;
 ['wheel', 'pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, () => { userMoved = true }, { capture:true, passive:true }));
 addEventListener('pointerdown', () => { moved = false }, true);
 hall.addEventListener('pointerdown', e => {
-  if (mobile() || e.target.closest('input, textarea, button, a, label')) return;
+  if (e.button !== 0 || auto || mobile() || e.target.closest('input, textarea, button, a, label')) return;
   drag = { sx:e.clientX, st:tx, lx:e.clientX, v:0 }; moved = false; hall.classList.add('drag');
 });
 addEventListener('pointermove', e => {
@@ -706,7 +698,7 @@ addEventListener('pointermove', e => {
   drag.v = drag.lx - e.clientX; drag.lx = e.clientX;
   tx = clamp(drag.st - (e.clientX - drag.sx));
 });
-addEventListener('pointerup', () => { if (drag) { tx = clamp(tx + drag.v * 14); drag = null; hall.classList.remove('drag'); clearTimeout(settleTimer); settleTimer = setTimeout(settle, 450) } });
+addEventListener('pointerup', () => { if (drag) { tx = clamp(tx + drag.v * 14); drag = null; hall.classList.remove('drag') } });
 track.addEventListener('click', e => {
   const t = e.target.closest('.art, .more');
   if (!t || moved || !t.dataset.id) return;
@@ -760,10 +752,10 @@ const pieces = [...track.querySelectorAll('[data-room]')], where = $('where'), b
       // Speed grows with distance from the anchor, with a small dead zone so it can sit still.
       // Time based, so it moves the same on any refresh rate: about 900px a second at 160px out.
       const now = performance.now(), dt = Math.min(.05, (now - (auto.last || now)) / 1000); auto.last = now;
-      const d = (auto.my - auto.y) + (auto.mx - auto.x), m = Math.max(0, Math.abs(d) - 12);
-      tx = clamp(tx + Math.sign(d) * Math.pow(m, 1.25) * 1.8 * dt);
+      const d = auto.my - auto.y, m = Math.max(0, Math.abs(d) - 18);
+      tx = clamp(tx + Math.sign(d) * Math.pow(m, 1.2) * 2.2 * dt);
     }
-    x += (tx - x) * (reduce ? 1 : .11);
+    x += (tx - x) * (reduce ? 1 : performance.now() < boost ? .16 : .11);
     travelled += Math.abs(x - before);
     track.style.transform = `translate3d(${-x}px,0,0)`;
     bar.style.setProperty('--p', max ? x / max : 0);

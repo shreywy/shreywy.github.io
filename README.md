@@ -2,7 +2,7 @@
 
 My portfolio, built as a small gallery you walk through: **[shreywy.github.io](https://shreywy.github.io)**
 
-![The projects room](assets/og.jpg)
+![The entrance](assets/og.jpg)
 
 I'm a Computer Science student at Toronto Metropolitan University, graduating May 2027. The site hangs my internships at Geotab, AMD, and Bombardier, the projects I'm proudest of, my education, and my resume as pieces in a dark exhibition hall. Scroll or drag to walk through it, and click anything to look closer.
 

@@ -4,7 +4,7 @@
 //   1. Put screenshots in assets/. If the project has a live site, add page:{ url, poster, full } where full is a
 //      full-page capture; the closer look scrolls through it and can switch to the live site. Otherwise add a cropped GitHub capture as gh:'gh-<name>.jpg'.
 //   2. Copy a block and fill it in. hidden:true takes a piece down without deleting it.
-//   Fields: id (also the link, /#id), frame (gilt | walnut | ebony | silver),
+//   Fields: id (also the link, /#id), frame (baroque | softwood | shadowbox | gilt | walnut | ebony | silver),
 //           art [file, shape ls|pt, size L|S] (two S in a row stack into one column),
 //           placard, tag, what / how / nums, map (optional table), extra (detail-only screenshots), links.
 //
@@ -16,7 +16,7 @@
 // Education uses the same shape, plus gpa, honors, coop, coursework, inProgress, and before.
 
 window.PROJECTS = [
-  { id:'forkable', page:{ url:'https://fforkable.vercel.app', poster:'page-forkable.jpg', full:'full-forkable.jpg' }, title:'Forkable', year:'Aug 2026', frame:'gilt',
+  { id:'forkable', page:{ url:'https://fforkable.vercel.app', poster:'page-forkable.jpg', full:'full-forkable.jpg' }, title:'Forkable', year:'Aug 2026', frame:'baroque',
     art:[['forkable-home.png','ls','L'], ['forkable-recipe.png','ls','S'], ['forkable-profile.png','ls','S']],
     tag:'Version control for recipes.', placard:'Fork a recipe, commit tweaks, diff versions by ingredient, and merge Taste Tests.',
     medium:'TypeScript, Next.js 16, PostgreSQL, Prisma, Redis',
@@ -25,7 +25,7 @@ window.PROJECTS = [
     how:'An LCS-based diff engine, per-step and per-ingredient blame, one-click restore, and ranked full-text search in raw SQL over tsvector with a GIN index. Claude API ingredient substitutions sit behind auth and rate limiting, cached in Redis for 24 hours, with a flag so the app still works if the API is down.',
     nums:'21 Prisma models. CI runs lint, typecheck, build, and 83 Vitest tests.',
     map:[['Repository','Recipe'], ['Commit','Tweak'], ['Fork','Remix'], ['Pull request','Taste Test'], ['git log','Tweaks tab']] },
-  { id:'traintriptime', page:{ url:'https://shreywy.github.io/TrainTripTime/', poster:'page-ttt.jpg', full:'full-ttt.jpg' }, title:'TrainTripTime', year:'Sep 2026', frame:'walnut',
+  { id:'traintriptime', page:{ url:'https://shreywy.github.io/TrainTripTime/', poster:'page-ttt.jpg', full:'full-ttt.jpg' }, title:'TrainTripTime', year:'Sep 2026', frame:'softwood',
     art:[['ttt-plan.png','pt','L'], ['ttt-proof.png','pt','L'], ['ttt-setup.png','pt','L']],
     tag:'Tell it when you need to be downtown. It tells you when to wake up.', placard:'A GO Transit commute planner that works backwards from your arrival time.',
     medium:'Python stdlib, HTML, CSS, JS. Runs on a Raspberry Pi.',
@@ -33,7 +33,7 @@ window.PROJECTS = [
     what:'A self-hosted GO Transit planner that works backwards from when you need to arrive. It picks the latest train that gets you there, the bus that lands at the station inside your preferred window, when to leave, and when to wake up.',
     how:'It merges live GTFS-realtime feeds and fails soft when they&rsquo;re down, spots weekend construction short-turns from the timetable, and adds the leave-home time to Google Calendar in one tap. Installs as a PWA.',
     nums:'A 118MB GTFS feed streamed into a 1MB index, with peak memory down from about 160MB to 100MB. systemd socket activation and idle shutdown on the Pi.' },
-  { id:'speckle', title:'Speckle', year:'Sep 2026', frame:'ebony',
+  { id:'speckle', title:'Speckle', year:'Sep 2026', frame:'silver',
     art:[['speckle-search.jpg','ls','L']],
     tag:'A local-first photo and video library.', placard:'Type boats, get boats. Search, faces, and video, all on your own machine.',
     medium:'Rust, axum, SQLite, ONNX Runtime, CLIP, InsightFace',
@@ -41,7 +41,7 @@ window.PROJECTS = [
     what:'Point it at a folder and it indexes every subfolder, builds a thumbnail cache, understands what&rsquo;s in each photo, and groups people. No account, no cloud, no telemetry.',
     how:'CLIP runs locally for semantic search. InsightFace handles face detection and clustering. Video gets buffered-range scrubbing with live transcoding, and editing has 14 WebGL adjustments and 12 filter presets.',
     nums:'About 13 photos a second through CLIP on CPU. The grid stays smooth at hundreds of thousands of items.' },
-  { id:'firefox-tabs', title:'firefox-tabs', year:'Sep 2026', frame:'silver',
+  { id:'firefox-tabs', title:'firefox-tabs', year:'Sep 2026', frame:'shadowbox',
     art:[['fft-newtab.png','ls','L'], ['fft-phone.png','pt','L']],
     tag:'My desktop&rsquo;s open Firefox tabs, on any device.', placard:'Served from a Raspberry Pi over Tailscale. No extension, no pip installs.',
     medium:'Python stdlib, SQLite, systemd, Tailscale',

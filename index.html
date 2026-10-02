@@ -493,7 +493,7 @@
 const GUESTBOOK_URL = 'https://script.google.com/macros/s/AKfycby7GUXekrNdq14cuBK8Gye6sLbpgpy92DeFtFXu9eBBZ1A4-lx9SP_EdN2m2NTDhPfg/exec';
 
 // A light visit log through the same script: one ping per browsing session, then what gets opened.
-// No IP addresses or cookies. Skipped for local copies, automated browsers, and any device that
+// Rough location only (city, region, country, network); no IP addresses, no cookies. Skipped for local copies, automated browsers, and any device that
 // has visited with ?notrack (it remembers).
 const visitLog = (() => {
   let on = !navigator.webdriver && !/^(localhost|127\.|\[::1\])/.test(location.hostname);
@@ -510,8 +510,17 @@ const visitLog = (() => {
     const body = new URLSearchParams({ id, ...data });
     if (!(navigator.sendBeacon && navigator.sendBeacon(GUESTBOOK_URL, body))) fetch(GUESTBOOK_URL, { method:'POST', mode:'no-cors', body, keepalive:true }).catch(() => {});
   };
-  if (fresh) send({ kind:'visit', ref:document.referrer, path:location.pathname + location.hash, ua:navigator.userAgent,
-    screen:screen.width + 'x' + screen.height, lang:navigator.language, tz:Intl.DateTimeFormat().resolvedOptions().timeZone });
+  if (fresh) {
+    const base = { kind:'visit', ref:document.referrer, path:location.pathname + location.hash, ua:navigator.userAgent,
+      screen:screen.width + 'x' + screen.height, lang:navigator.language, tz:Intl.DateTimeFormat().resolvedOptions().timeZone };
+    // Rough location (city, region, country, network) from a free IP lookup, done in the background.
+    // Only those fields are logged, never the IP address. If the lookup is slow or blocked, log without it.
+    const lookup = (url, pick) => fetch(url, { signal:AbortSignal.timeout(2500) }).then(r => r.json()).then(pick);
+    lookup('https://get.geojs.io/v1/ip/geo.json', d => ({ city:d.city, region:d.region, country:d.country, net:d.organization_name }))
+      .catch(() => lookup('https://ipapi.co/json/', d => ({ city:d.city, region:d.region, country:d.country_name, net:d.org })))
+      .catch(() => ({}))
+      .then(geo => send({ ...base, ...Object.fromEntries(Object.entries(geo).filter(([, v]) => v)) }));
+  }
   return what => send({ kind:'event', what });
 })();
 document.addEventListener('click', e => {

@@ -51,7 +51,11 @@ Roles and education work the same way in `window.EXPERIENCE` and `window.EDUCATI
 
 ## Visit log
 
-The same Apps Script keeps a light visit log in a Google Sheet: one row per browsing session with the time, where the visitor came from, and their device, plus a tab of what they opened. Guestbook notes are logged there too. No IP addresses or cookies. It skips local copies and automated browsers, and any device that visits `/?notrack` once is left out from then on.
+The same Apps Script keeps a light visit log in a Google Sheet: one row per browsing session with the time, where the visitor came from, their device, and a rough location (city, region, country, and network, looked up from the visitor's browser with a free IP lookup), plus a tab of what they opened. Guestbook notes are logged there too.
+
+No IP addresses are stored and no cookies are set. It skips local copies and automated browsers, and any device that visits `/?notrack` once is left out from then on.
+
+**Disclaimer:** this log is only for my own curiosity about who visits. It isn't shared, sold, or used for advertising, and nothing in it identifies a person.
 
 ## Updating the resume
 

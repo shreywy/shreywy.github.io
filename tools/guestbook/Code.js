@@ -44,8 +44,12 @@ function visit_(p) {
   const cache = CacheService.getScriptCache();
   if (cache.get('v_' + id)) return ok_(); // same session already counted
   cache.put('v_' + id, '1', 21600);
-  tab_('Visits', ['When (Toronto)', 'Visit', 'From', 'Device', 'Screen', 'Language', 'Their timezone', 'Landed on'])
-    .appendRow([stamp_(), id, source_(clean_(p.ref, 300)), device_(clean_(p.ua, 400)), clean_(p.screen, 20), clean_(p.lang, 20), clean_(p.tz, 60), clean_(p.path, 200)]);
+  // Location is coarse (city level), looked up in the visitor's browser. The IP address itself is never sent or stored.
+  const header = ['When (Toronto)', 'Visit', 'From', 'Device', 'Screen', 'Language', 'Their timezone', 'Landed on', 'City', 'Region', 'Country', 'Network'];
+  const sh = tab_('Visits', header);
+  if (sh.getLastColumn() < header.length) sh.getRange(1, 1, 1, header.length).setValues([header]).setFontWeight('bold');
+  sh.appendRow([stamp_(), id, source_(clean_(p.ref, 300)), device_(clean_(p.ua, 400)), clean_(p.screen, 20), clean_(p.lang, 20), clean_(p.tz, 60), clean_(p.path, 200),
+    clean_(p.city, 80), clean_(p.region, 80), clean_(p.country, 80), clean_(p.net, 120)]);
   return ok_();
 }
 

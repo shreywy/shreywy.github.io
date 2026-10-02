@@ -51,7 +51,7 @@ Roles and education work the same way in `window.EXPERIENCE` and `window.EDUCATI
 
 ## Visit log
 
-The same Apps Script keeps a light visit log: one email per browsing session with the time, where the visitor came from, and their device, plus a Sheet of what they opened. No IP addresses or cookies. It skips local copies and automated browsers, and any device that visits `/?notrack` once is left out from then on.
+The same Apps Script keeps a light visit log in a Google Sheet: one row per browsing session with the time, where the visitor came from, and their device, plus a tab of what they opened. Guestbook notes are logged there too. No IP addresses or cookies. It skips local copies and automated browsers, and any device that visits `/?notrack` once is left out from then on.
 
 ## Updating the resume
 
@@ -59,7 +59,7 @@ Drop the new PDF in `resumes/` and update the file name and date in `window.RESU
 
 ## The guestbook
 
-The form posts to a Google Apps Script web app (the same one behind the visit log) that writes each note to a Google Sheet and emails it to me, with a hidden spam field, a one-note-per-minute limit for each email address, and a daily cap. The source is in `tools/guestbook/`. To change it:
+The form posts to a Google Apps Script web app (the same one behind the visit log) that logs each note to a Google Sheet and emails it to me, with a hidden spam field, a one-note-per-minute limit for each email address, and a daily cap. The source is in `tools/guestbook/`. To change it:
 
 ```bash
 cd tools/guestbook

@@ -5,20 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Shrey Mistry</title>
 <meta name="description" content="Shrey Mistry, Computer Science at Toronto Metropolitan University. Internships at Geotab, AMD, and Bombardier, and the things I build on the side.">
-<meta name="theme-color" content="#1c1a17">
+<meta name="theme-color" content="#1a1d21">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Shrey Mistry">
 <meta property="og:description" content="Computer Science at Toronto Metropolitan University. Internships at Geotab, AMD, and Bombardier, and the things I build on the side.">
 <meta property="og:url" content="https://shreywy.github.io/">
 <meta property="og:image" content="https://shreywy.github.io/assets/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231c1a17'/%3E%3Ctext x='32' y='46' text-anchor='middle' font-family='Georgia,serif' font-size='40' fill='%23ece5d6'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231a1d21'/%3E%3Ctext x='32' y='46' text-anchor='middle' font-family='Georgia,serif' font-size='40' fill='%23ece5d6'%3ES%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --wall:#1c1a17; --text:#ece5d6; --soft:#cfc6b4; --mid:#958c7b; --mat:#f1ece0; --brass:#c9a45c; --ivory:#ece5d6;
+    --wall:#1a1d21; --text:#ece5d6; --soft:#cfc6b4; --mid:#958c7b; --mat:#f1ece0; --accent:#7f9cc0; --ivory:#ece5d6;
     --mx:50vw; --my:50vh;
     /* One size system for every piece: a large unit, and a small unit that stacks two-high to match it */
     --L:min(44vh, 440px); --fb:16px; --bd:4px; --mp:18px; --g:22px;
@@ -47,7 +47,7 @@
 
   /* Track light above each bay. The cone starts at the very top of the screen so it never shows an edge. */
   .lamp { position:absolute; top:0; left:-22%; right:-22%; height:100%; pointer-events:none;
-    background:radial-gradient(ellipse 50% 110% at 50% 0%, rgba(255,231,190,.19), rgba(255,231,190,.075) 50%, transparent 82%) }
+    background:radial-gradient(ellipse 50% 110% at 50% 0%, rgba(196,212,255,.34), rgba(196,212,255,.135) 50%, transparent 82%) }
 
   /* Entrance: fills the screen on its own (padding 10vw + 80vw + gap 10vw) */
   .bay:first-child { width:80vw }
@@ -137,10 +137,10 @@
   .tl { position:absolute; left:0; right:0; top:var(--tl-top, 20vh); height:0; --w:100% }
   .tl .rail { position:absolute; left:-10vw; right:0; top:0; border-top:1px dashed rgba(236,229,214,.22) }
   .tl .gap { position:absolute; left:-10vw; width:10vw; top:8px; text-align:center; font-style:italic; font-size:14px; color:var(--mid) }
-  .tl .span { position:absolute; left:0; top:-1px; width:var(--w); height:2px; background:var(--brass) }
+  .tl .span { position:absolute; left:0; top:-1px; width:var(--w); height:2px; background:var(--accent) }
   .tl.first .rail { left:0 }
-  .tl .span::before { content:""; position:absolute; top:-4px; left:-8px; border:5px solid transparent; border-right:8px solid var(--brass); border-left:0 }
-  .tl .span::after { content:""; position:absolute; top:-4px; right:-5px; width:10px; height:10px; border-radius:50%; background:var(--brass); box-shadow:0 0 0 3px var(--wall) }
+  .tl .span::before { content:""; position:absolute; top:-4px; left:-8px; border:5px solid transparent; border-right:8px solid var(--accent); border-left:0 }
+  .tl .span::after { content:""; position:absolute; top:-4px; right:-5px; width:10px; height:10px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 3px var(--wall) }
   .tl .s, .tl .e { position:absolute; bottom:12px; font:700 12px/1 'Cormorant Garamond'; letter-spacing:.16em; text-transform:uppercase; color:var(--text); white-space:nowrap }
   .tl .e { left:0 } .tl .s { right:0 }
   .tl small { position:absolute; top:10px; left:0; right:0; text-align:center; font-style:italic; font-size:14px; color:var(--soft) }
@@ -214,7 +214,6 @@
     background:radial-gradient(circle at 35% 30%, #c2463a, #7d1f18 70%); box-shadow:inset 0 -4px 8px rgba(0,0,0,.35), 0 4px 10px rgba(0,0,0,.25) }
   .elsewhere { margin-top:22px; font-size:18px; color:var(--soft) }
   .elsewhere a { text-decoration:none; border-bottom:1px solid rgba(236,229,214,.35); margin-right:18px }
-  .offclock { margin-top:14px; font-style:italic; font-size:17px; color:var(--mid); max-width:40ch }
 
   /* Spotlight on the cursor */
   .beam { position:fixed; inset:0; pointer-events:none; z-index:5; background:radial-gradient(circle 44vmax at var(--mx) var(--my), transparent 0%, rgba(8,7,6,.1) 38%, rgba(8,7,6,.55) 100%) }
@@ -256,7 +255,7 @@
   .detail.on { pointer-events:auto }
   .detail .backdrop { position:absolute; inset:0; background:rgba(10,9,8,.86); backdrop-filter:blur(6px); opacity:0; transition:opacity .5s }
   .detail.on .backdrop { opacity:1 }
-  .panel { position:absolute; inset:6vh 5vw; background:#24211d; box-shadow:inset 0 0 0 1px rgba(236,229,214,.08), inset 0 30px 60px -30px rgba(0,0,0,.6), 0 40px 80px rgba(0,0,0,.5);
+  .panel { position:absolute; inset:6vh 5vw; background:#212429; box-shadow:inset 0 0 0 1px rgba(236,229,214,.08), inset 0 30px 60px -30px rgba(0,0,0,.6), 0 40px 80px rgba(0,0,0,.5);
     display:grid; grid-template-columns:minmax(320px, 0.85fr) 1.15fr; gap:4vw; padding:84px 4vw 5vh; visibility:hidden; overflow:hidden }
   .panel, .panel .info, .panel .aside, .thumbs { scrollbar-width:thin; scrollbar-color:rgba(236,229,214,.25) transparent }
   .glimpse .win { scrollbar-width:thin; scrollbar-color:#c9c3b6 #f4f2ee }
@@ -270,17 +269,17 @@
   .courses { display:grid; grid-template-columns:1fr 1fr; gap:2px 22px; font-size:15.5px }
   .courses span { padding:5px 0; border-bottom:1px solid rgba(236,229,214,.08) }
   .courses b { font:600 12px/1 'Cormorant Garamond'; letter-spacing:.08em; color:var(--mid); margin-right:6px }
-  .courses em { display:none; font:700 11px/1 'Cormorant Garamond'; font-style:normal; color:#1d1408; background:var(--brass); padding:2px 5px 1px; margin-left:6px; vertical-align:2px }
+  .courses em { display:none; font:700 11px/1 'Cormorant Garamond'; font-style:normal; color:#1d1408; background:var(--accent); padding:2px 5px 1px; margin-left:6px; vertical-align:2px }
   .glimpse .win.pdf { overflow:hidden; background:#525659 }
   .glimpse .win.pdf iframe { width:100%; height:100%; transform:none; opacity:1 }
   .panel .kick { font:500 12px/1 'Cormorant Garamond'; letter-spacing:.26em; text-transform:uppercase; color:var(--mid) }
   .panel h2 { font:400 clamp(44px, 4.6vw, 76px)/1 'Cormorant Garamond'; color:var(--text); margin:12px 0 8px }
   .panel .tag { font:italic 400 24px/1.3 'Cormorant Garamond'; color:var(--soft) }
   .panel .where { font:600 13px/1 'Cormorant Garamond'; letter-spacing:.18em; text-transform:uppercase; color:var(--mid); margin:12px 0 4px }
-  .panel h3 { font:600 12px/1 'Cormorant Garamond'; letter-spacing:.24em; text-transform:uppercase; color:var(--brass); margin:24px 0 10px }
+  .panel h3 { font:600 12px/1 'Cormorant Garamond'; letter-spacing:.24em; text-transform:uppercase; color:var(--accent); margin:24px 0 10px }
   .panel ul { list-style:none }
   .panel li { position:relative; padding-left:20px; margin-bottom:10px }
-  .panel li::before { content:""; position:absolute; left:0; top:.78em; width:8px; height:1px; background:var(--brass) }
+  .panel li::before { content:""; position:absolute; left:0; top:.78em; width:8px; height:1px; background:var(--accent) }
   .panel table { border-collapse:collapse; font-size:15.5px; width:100% }
   .panel td { padding:5px 0; border-bottom:1px solid rgba(236,229,214,.1) }
   .panel td:first-child { color:var(--mid); width:42% }
@@ -290,8 +289,8 @@
   .panel blockquote { font:italic 400 24px/1.3 'Cormorant Garamond'; color:var(--text) }
   .panel blockquote + p { font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:var(--mid); margin-top:8px }
   .links { display:flex; gap:12px; flex-wrap:wrap; margin-top:26px }
-  .links a { text-decoration:none; padding:10px 16px; font:600 13px/1 'Cormorant Garamond'; letter-spacing:.18em; text-transform:uppercase; border:1px solid rgba(201,164,92,.6); color:var(--text); transition:background .25s, color .25s }
-  .links a:hover { background:var(--brass); color:#1c1a17 }
+  .links a { text-decoration:none; padding:10px 16px; font:600 13px/1 'Cormorant Garamond'; letter-spacing:.18em; text-transform:uppercase; border:1px solid rgba(127,156,192,.6); color:var(--text); transition:background .25s, color .25s }
+  .links a:hover { background:var(--accent); color:#1c1a17 }
   .close { position:absolute; top:18px; right:22px; z-index:3; display:inline-flex; align-items:center; gap:10px; padding:13px 22px 12px; border:0; border-radius:999px; cursor:pointer;
     background:var(--ivory); color:#1c1a17; font:700 13.5px/1 'Cormorant Garamond'; letter-spacing:.18em; text-transform:uppercase; box-shadow:0 8px 20px rgba(0,0,0,.45); transition:background .2s, transform .2s }
   .close:hover { background:#fff; transform:translateX(-3px) }
@@ -313,7 +312,7 @@
   .thumbs { display:flex; gap:12px; overflow-x:auto; padding-bottom:4px }
   .thumbs button { flex:none; border:0; padding:4px; background:#14120f; cursor:pointer; opacity:.6; transition:opacity .25s; box-shadow:0 0 0 1px rgba(236,229,214,.15) }
   .thumbs button.on, .thumbs button:hover { opacity:1 }
-  .thumbs button.on { box-shadow:0 0 0 2px var(--brass) }
+  .thumbs button.on { box-shadow:0 0 0 2px var(--accent) }
   .thumbs img { display:block; height:58px; width:auto }
   .thumbs .word { height:58px; padding:0 16px; display:grid; place-items:center; font:700 12px/1 'Cormorant Garamond'; letter-spacing:.18em; text-transform:uppercase; color:var(--text) }
   .ghost { position:fixed; z-index:45; margin:0; pointer-events:none; transform-origin:0 0 }
@@ -326,14 +325,14 @@
     body { overflow-x:hidden; overflow-y:auto }
     /* On phones the header blurs whatever scrolls beneath it */
     header { padding:16px 16px 24px; font-size:12px }
-    header::before { content:""; position:absolute; inset:0; z-index:-1; backdrop-filter:blur(14px) saturate(1.1); -webkit-backdrop-filter:blur(14px); background:rgba(28,26,23,.35);
+    header::before { content:""; position:absolute; inset:0; z-index:-1; backdrop-filter:blur(14px) saturate(1.1); -webkit-backdrop-filter:blur(14px); background:rgba(26,29,33,.35);
       -webkit-mask:linear-gradient(#000 55%, transparent); mask:linear-gradient(#000 55%, transparent) }
     header nav { gap:16px } header .room { display:none }
     .hall { position:relative; inset:auto; cursor:auto; overflow:visible }
     .scene { position:relative; inset:auto }
     .track { position:relative; flex-direction:column; align-items:center; gap:0; padding:0 16px 140px; transform:none !important }
     .bay, .bay.xp { height:auto; min-height:auto; width:100%; padding:16vh 0 4vh; justify-content:center; flex-direction:column; align-items:center }
-    .lamp { left:-16px; right:-16px; background:radial-gradient(ellipse closest-side at 50% 30%, rgba(255,231,190,.12), transparent) }
+    .lamp { left:-16px; right:-16px; background:radial-gradient(ellipse closest-side at 50% 30%, rgba(196,212,255,.216), transparent) }
     .bay:first-child { width:100%; min-height:100svh; padding:0; justify-content:center }
     .entrance, .vinyl, .quote, .guest { width:100%; text-align:center }
     .entrance p { margin-left:auto; margin-right:auto }
@@ -346,7 +345,7 @@
     .tl.first .rail { top:calc(16vh + 20px) }
     .tl .gap { display:none }
     .tl .span { left:-1px; top:calc(16vh + 20px); bottom:calc(4vh + 20px); width:2px; height:auto; transform:none }
-    .tl .span::before { left:-4px; top:-8px; border:5px solid transparent; border-bottom:8px solid var(--brass); border-top:0 }
+    .tl .span::before { left:-4px; top:-8px; border:5px solid transparent; border-bottom:8px solid var(--accent); border-top:0 }
     .tl .span::after { left:-4px; right:auto; top:auto; bottom:-5px }
     .tl .e, .tl .s { left:7px; right:auto; font-size:10px; letter-spacing:.12em; writing-mode:vertical-rl; transform:rotate(180deg) }
     .tl .e { top:6px; bottom:auto } .tl .s { bottom:8px; top:auto }
@@ -434,7 +433,6 @@
       <div class="seal" id="seal"><div><div class="wax">S</div><p style="font-size:22px">Thanks, it&rsquo;s in the book.</p><p id="sealNote" style="font-size:14px; color:#857c6b; margin-top:6px"></p></div></div>
     </form>
     <p class="elsewhere"><a href="https://github.com/shreywy">GitHub</a><a href="https://linkedin.com/in/shreymistry">LinkedIn</a></p>
-    <p class="offclock">Off the clock: F1 and all things cars, 3D printing functional parts, and self-hosting on Raspberry Pis.</p>
   </div></section>
 </div></div></div>
 

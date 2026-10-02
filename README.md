@@ -20,6 +20,7 @@ Getting around:
 - Scroll or drag. The arrow keys jump straight to the next or previous piece.
 - Hold the mouse wheel and move right or down to go forward, left or up to go back; let go to stop. Or click the wheel once to lock it on, and click again or press Esc to stop.
 - Page Down, Page Up, and Space jump between rooms. Home and End go to either end.
+- Press on any text to select it instead of dragging; a Copy button appears under the selection.
 - Hover the progress bar at the bottom to see where each room starts. Click a dot or drag the bar to skip ahead.
 
 On phones the hall becomes a vertical walk.
@@ -51,7 +52,7 @@ Roles and education work the same way in `window.EXPERIENCE` and `window.EDUCATI
 
 ## Visit log
 
-The same Apps Script keeps a light visit log in a Google Sheet: one row per browsing session with the time, where the visitor came from, their device, and a rough location (city, region, country, and network, looked up from the visitor's browser with a free IP lookup), plus a tab of what they opened. Guestbook notes are logged there too.
+The same Apps Script keeps a light visit log in a Google Sheet: one row per browsing session with the time, where the visitor came from, their device, and a rough location (city, region, country, and network, looked up from the visitor's browser with a free IP lookup), plus a tab of what they opened and any text they copied. Guestbook notes are logged there too.
 
 No IP addresses are stored and no cookies are set. It skips local copies and automated browsers, and any device that visits `/?notrack` once is left out from then on.
 

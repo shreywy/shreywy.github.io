@@ -422,6 +422,20 @@
     .glimpse { height:66vh; flex:none }
   }
   @media (prefers-reduced-motion: reduce) { .hint i::after { animation:none } }
+  /* Text selection: the native highlight is hidden and drawn instead as soft rounded marks, with a Copy pill */
+  ::selection { background:transparent; color:inherit }
+  input::selection, textarea::selection { background:rgba(127,156,192,.45) }
+  .native-sel ::selection { background:rgba(127,156,192,.4) }
+  .selecting #panel { overflow:hidden !important }
+  header, .hint, .progress, .copypill, .autoscroll, button, .more { -webkit-user-select:none; user-select:none }
+  .sel { position:fixed; inset:0; z-index:45; pointer-events:none }
+  .sel i { position:absolute; border-radius:6px; background:rgba(127,156,192,.32); box-shadow:inset 0 0 0 1px rgba(127,156,192,.35) }
+  .copypill { position:fixed; z-index:60; display:flex; align-items:center; gap:7px; padding:7px 13px 6px; border:0; border-radius:999px; cursor:pointer;
+    background:var(--ivory); color:#1c1a17; font-size:12px; letter-spacing:.16em; text-transform:uppercase; box-shadow:0 6px 18px rgba(0,0,0,.45);
+    opacity:0; transform:translate(-50%, 6px) scale(.96); pointer-events:none; transition:opacity .16s, transform .16s cubic-bezier(.2,.8,.1,1) }
+  .copypill.on { opacity:1; transform:translate(-50%, 0); pointer-events:auto }
+  .copypill:hover { background:#fff }
+  .copypill svg { width:13px; height:13px }
 </style>
 </head>
 <body>
@@ -527,6 +541,101 @@ document.addEventListener('click', e => {
   const a = e.target.closest('a[href]'); if (!a) return;
   visitLog(a.hasAttribute('download') ? 'downloaded the resume' : 'followed a link to ' + a.href);
 }, true);
+
+// Text selection. The browser's own highlight is hidden in CSS and drawn here as rounded marks,
+// with a small Copy pill above the end of the selection. Copies are logged, by the pill or the keyboard.
+// Touch screens keep their native selection and copy menu (the class brings the tint back).
+const selLayer = document.createElement('div'), copyPill = document.createElement('button');
+selLayer.className = 'sel'; copyPill.className = 'copypill'; copyPill.type = 'button';
+copyPill.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="2"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg><span>Copy</span>';
+document.body.append(selLayer, copyPill);
+const coarse = matchMedia('(pointer: coarse)').matches;
+if (coarse) document.documentElement.classList.add('native-sel');
+let selShown = false, selKey = '', pillQuiet = false, pillCopying = false;
+const selText = () => String(getSelection()).replace(/\s+/g, ' ').trim();
+const inField = () => !!document.activeElement?.closest?.('input, textarea');
+// One rectangle per line of text, joined where pieces of the same line touch.
+function selRects() {
+  const sel = getSelection();
+  if (!sel.rangeCount || sel.isCollapsed) return [];
+  const range = sel.getRangeAt(0), out = [], anc = range.commonAncestorContainer;
+  const walk = document.createTreeWalker(anc.nodeType === 3 ? anc.parentNode : anc, NodeFilter.SHOW_TEXT);
+  for (let n = walk.nextNode(); n; n = walk.nextNode()) {
+    if (!range.intersectsNode(n) || !n.data.trim()) continue;
+    if (n.parentElement.checkVisibility?.({ opacityProperty:true, visibilityProperty:true }) === false) continue; // hidden text gets no mark
+    const r = document.createRange();
+    r.setStart(n, n === range.startContainer ? range.startOffset : 0);
+    r.setEnd(n, n === range.endContainer ? range.endOffset : n.length);
+    for (const b of r.getClientRects()) {
+      if (b.width < 1) continue;
+      const last = out[out.length - 1];
+      if (last && Math.abs(last.top - b.top) < 4 && b.left - last.right < 8) {
+        last.right = Math.max(last.right, b.right); last.top = Math.min(last.top, b.top); last.bottom = Math.max(last.bottom, b.bottom);
+      } else out.push({ left:b.left, right:b.right, top:b.top, bottom:b.bottom });
+    }
+  }
+  return out;
+}
+function drawSel() {
+  const rects = coarse || inField() ? [] : selRects();
+  const key = rects.map(r => [r.left, r.top, r.right, r.bottom].map(Math.round).join()).join(';') + pillQuiet;
+  if (key === selKey) return;
+  selKey = key; selShown = rects.length > 0;
+  selLayer.innerHTML = rects.map(r => `<i style="left:${r.left - 3}px;top:${r.top}px;width:${r.right - r.left + 6}px;height:${r.bottom - r.top}px"></i>`).join('');
+  if (!selShown || pillQuiet) { copyPill.classList.remove('on'); return }
+  // Just under the end of the selection; beside it when there's no room underneath.
+  const end = rects[rects.length - 1], below = end.bottom + 50 < innerHeight;
+  copyPill.style.left = Math.min(innerWidth - 60, Math.max(60, below ? end.right : end.right + 56)) + 'px';
+  copyPill.style.top = (below ? end.bottom + 8 : (end.top + end.bottom) / 2 - 15) + 'px';
+  copyPill.classList.add('on');
+}
+document.addEventListener('selectionchange', () => {
+  if (pillCopying) return;
+  pillQuiet = false; copyPill.lastChild.textContent = 'Copy'; drawSel();
+});
+addEventListener('scroll', () => selShown && drawSel(), { capture:true, passive:true });
+addEventListener('resize', () => selShown && drawSel());
+// Where on the site the text came from, for the log.
+function copiedFrom() {
+  if (detailOpen() && current) return current;
+  const n = getSelection().anchorNode, el = n && (n.nodeType === 3 ? n.parentElement : n);
+  return el?.closest?.('[data-room]')?.dataset.room || 'the page';
+}
+// The same text copied again within a few seconds (the pill, then Ctrl+C) is logged once.
+let lastCopy = '', lastCopyAt = 0;
+function logCopy(text) {
+  if (!text || (text === lastCopy && performance.now() - lastCopyAt < 5000)) return;
+  lastCopy = text; lastCopyAt = performance.now();
+  visitLog('copied from ' + copiedFrom() + ': "' + text.slice(0, 150) + '"');
+}
+document.addEventListener('copy', () => { if (!pillCopying && !inField()) logCopy(selText()) });
+copyPill.addEventListener('pointerdown', e => e.preventDefault()); // keep the selection alive
+copyPill.addEventListener('click', async () => {
+  const text = selText(); if (!text) return;
+  pillCopying = true;
+  try { await navigator.clipboard.writeText(String(getSelection())) } catch { document.execCommand('copy') }
+  pillCopying = false;
+  logCopy(text);
+  copyPill.lastChild.textContent = 'Copied';
+  setTimeout(() => { if (copyPill.lastChild.textContent === 'Copied') { pillQuiet = true; drawSel() } }, 900);
+});
+// While a selection is being dragged out, nothing scrolls: the hall stops where it is and the wheel is ignored.
+let selecting = false;
+addEventListener('pointerdown', e => {
+  if (e.button !== 0 || coarse || !onText(e)) return;
+  selecting = true; tx = x; root.classList.add('selecting');
+}, true);
+addEventListener('pointerup', () => { selecting = false; root.classList.remove('selecting') }, true);
+addEventListener('wheel', e => { if (selecting) { e.preventDefault(); e.stopImmediatePropagation() } }, { capture:true, passive:false });
+// Pressing on a line of text selects it instead of dragging the hall.
+function onText(e) {
+  if (e.target.closest('.art, .doc, button, a, input, textarea, label')) return false;
+  const pos = document.caretPositionFromPoint?.(e.clientX, e.clientY), cr = !pos && document.caretRangeFromPoint?.(e.clientX, e.clientY);
+  const node = pos ? pos.offsetNode : cr?.startContainer;
+  if (!node || node.nodeType !== 3 || !node.data.trim()) return false;
+  const r = document.createRange(); r.selectNodeContents(node);
+  return [...r.getClientRects()].some(b => e.clientX >= b.left - 2 && e.clientX <= b.right + 2 && e.clientY >= b.top - 2 && e.clientY <= b.bottom + 2);
+}
 
 const A = 'assets/';
 const P = window.PROJECTS.filter(p => !p.hidden), X = window.EXPERIENCE, E = window.EDUCATION;
@@ -646,7 +755,7 @@ addEventListener('wheel', e => {
   if (mobile() || detailOpen()) return;
   e.preventDefault();
   const unit = e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? innerHeight : 1;
-  tx = clamp(tx + (Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * unit * 1.8);
+  tx = clamp(tx + (Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * unit * 2.3);
 }, { passive:false });
 
 // Middle button autoscroll, like Windows.
@@ -696,7 +805,7 @@ let drag = null, moved = false, userMoved = false;
 ['wheel', 'pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, () => { userMoved = true }, { capture:true, passive:true }));
 addEventListener('pointerdown', () => { moved = false }, true);
 hall.addEventListener('pointerdown', e => {
-  if (e.button !== 0 || auto || mobile() || e.target.closest('input, textarea, button, a, label')) return;
+  if (e.button !== 0 || auto || mobile() || e.target.closest('input, textarea, button, a, label') || onText(e)) return;
   drag = { sx:e.clientX, st:tx, lx:e.clientX, v:0 }; moved = false; hall.classList.add('drag');
 });
 addEventListener('pointermove', e => {
@@ -768,6 +877,7 @@ const pieces = [...track.querySelectorAll('[data-room]')], where = $('where'), b
     x += (tx - x) * (reduce ? 1 : performance.now() < boost ? .16 : .11);
     travelled += Math.abs(x - before);
     track.style.transform = `translate3d(${-x}px,0,0)`;
+    if (selShown && Math.abs(x - before) > .05) drawSel();
     bar.style.setProperty('--p', max ? x / max : 0);
     const here = pieces.filter(p => p.getBoundingClientRect().left < innerWidth * .5).pop();
     if (here && where.textContent !== here.dataset.room) where.textContent = here.dataset.room;

@@ -10,7 +10,7 @@
 //
 // Experience (oldest first here; the wall shows newest on the left)
 //   Fields: id, company, role, team, city, mode, start, end, months, summary (the wall text),
-//           award (optional plaque), about (the company in a sentence or two), did (bullets), skills, quote (optional).
+//           award (optional plaque on the wall), recognition (detail page only), about (the company in a sentence or two), did (bullets), skills, quote (optional).
 //
 // look picks the object the wall text is printed on: certificate | notebook | report | diploma.
 // Education uses the same shape, plus gpa, honors, coop, coursework, inProgress, and before.
@@ -93,8 +93,8 @@ window.EXPERIENCE = [
     skills:['Python', 'pytest', 'C', 'C++', 'Arduino', 'Java', 'SQL'] },
   { id:'geotab', look:'certificate', logo:'geotab.svg', company:'Geotab', role:'Software Engineering Intern', team:'Solutions Delivery Management',
     city:'Oakville', mode:'Hybrid', start:'May 2025', end:'Aug 2026', months:16,
-    summary:'Sixteen months on telematics. I took one device from PRD to launch in six months, built BigQuery dashboards for 1,000+ IoT units used by 40 to 50 staff, and wrote Chrome extensions that cut manual firmware verification by 80%.',
-    award:'Intern of the Month, Jan 2026',
+    summary:'Sixteen months on telematics. I took one device from PRD to launch in six months, built BigQuery dashboards for 1,000+ IoT units, and cut manual firmware verification by 80%.',
+    recognition:'Intern of the Month, Jan 2026',
     about:'Geotab makes telematics devices and the software around them for connected vehicles and fleets. I worked on three flagship devices: GO Anywhere (internally 90k), GO10 (trinity), and GO Anywhere Lite.',
     did:[
       'Built full-stack telemetry dashboards and live web maps on BigQuery for 1,000+ IoT units, used by 40 to 50 staff including executives, then moved them from Apps Script to GCP containers with a GitLab CI pipeline.',

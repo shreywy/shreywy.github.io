@@ -68,6 +68,9 @@
   .vinyl .where { font-size:13px; letter-spacing:.18em; text-transform:uppercase; color:var(--mid); margin:8px 0 18px }
   .vinyl .sum { font-size:20px; color:#ddd5c4 }
   .actions { display:flex; flex-direction:column; align-items:center; gap:16px; margin-top:24px }
+  /* Role pieces share one height, with their buttons on a common line */
+  .has-tl .doc { display:flex; flex-direction:column }
+  .has-tl .doc .actions { margin-top:auto; padding-top:24px }
   .plaque { display:inline-block; padding:9px 18px 8px; font:700 13.5px/1.2 'Cormorant Garamond'; letter-spacing:.16em; text-transform:uppercase; color:#1d1408;
     background:linear-gradient(135deg, #efd592, #c49a4e 55%, #e7cb86); box-shadow:inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(0,0,0,.2), 0 6px 14px rgba(0,0,0,.45) }
   .vinyl .more { display:inline-flex; gap:10px; align-items:center; padding:11px 18px 10px; background:none; border:1px solid rgba(236,229,214,.45); cursor:pointer;
@@ -89,13 +92,14 @@
   .look-certificate { background:#f5efe1; border:12px solid; border-color:#ecd38c #d2ae5e #94702e #76561f; text-align:center;
     box-shadow:inset 0 0 0 10px #f5efe1, inset 0 0 0 11px #b8975a, inset 0 0 0 14px #f5efe1, inset 0 0 0 15px #b8975a, 0 30px 50px -18px rgba(0,0,0,.78), 0 6px 14px rgba(0,0,0,.42) }
   .look-certificate .sum { text-align:left }
+  .look-certificate { padding:22px 24px 18px } /* the 12px gilt border makes up the difference */
   /* AMD: a page of graph paper held by a binder clip */
   .look-notebook { background-color:#f6f6f1; transform:rotate(.7deg);
     background-image:linear-gradient(rgba(70,110,160,.14) 1px, transparent 1px), linear-gradient(90deg, rgba(70,110,160,.14) 1px, transparent 1px); background-size:18px 18px; background-position:-1px -1px }
   .look-notebook::before { content:""; position:absolute; top:-14px; left:50%; width:74px; height:26px; margin-left:-37px; border-radius:3px 3px 6px 6px; background:linear-gradient(#2c2c2c, #111); box-shadow:0 3px 6px rgba(0,0,0,.4) }
   .look-notebook::after { content:""; position:absolute; top:-30px; left:50%; width:50px; height:22px; margin-left:-25px; border:3px solid #a7a9ac; border-bottom:0; border-radius:12px 12px 0 0 }
   /* Bombardier: a manila report folder with a labelled tab and a paper clip */
-  .look-report { background:linear-gradient(160deg, #ead8ad, #dcc58f); transform:rotate(-.5deg); margin-top:22px }
+  .look-report { background:linear-gradient(160deg, #ead8ad, #dcc58f); transform:rotate(-.5deg) }
   .look-report::before { content:attr(data-tab); position:absolute; top:-26px; left:22px; height:27px; padding:0 18px; border-radius:6px 6px 0 0; background:#ead8ad;
     font:700 11px/27px 'Cormorant Garamond', serif; letter-spacing:.18em; text-transform:uppercase; color:#6b5a35 }
   .look-report::after { content:""; position:absolute; top:-16px; right:36px; width:15px; height:50px; border:2.5px solid #9ea3a8; border-radius:9px; transform:rotate(8deg) }
@@ -493,7 +497,10 @@ const measure = () => {
   max = Math.max(0, track.scrollWidth - innerWidth);
   // Keep the timeline one straight line, just clear of the tallest role piece.
   const docs = [...track.querySelectorAll('.has-tl .doc')];
+  docs.forEach(d => d.style.minHeight = '');
   if (docs.length && !mobile()) {
+    const h = Math.max(...docs.map(d => d.offsetHeight));
+    docs.forEach(d => d.style.minHeight = h + 'px');
     const tallest = Math.max(...docs.map(d => d.offsetHeight));
     track.style.setProperty('--tl-top', Math.max(84, (innerHeight - tallest) / 2 + innerHeight * .02 - 64) + 'px');
   }
@@ -673,7 +680,7 @@ function fillText(d, kind) {
     ${d.logo ? `<div class="logo"><img src="${A}logos/${d.logo}" alt="${d.company} logo"></div>` : ''}
     <h3>${kind === 'xp' ? 'About ' + d.company : 'The program'}</h3><p>${d.about}</p>
     ${d.team ? `<h3>Team</h3><p>${d.team}</p>` : ''}
-    ${d.award && kind === 'xp' ? `<h3>Recognition</h3><p>${d.award}</p>` : ''}
+    ${(d.recognition || d.award) && kind === 'xp' ? `<h3>Recognition</h3><p>${d.recognition || d.award}</p>` : ''}
     ${d.quote ? `<h3>Recommendation</h3><blockquote>&ldquo;${d.quote[0]}&rdquo;</blockquote><p>${d.quote[1]}</p>` : ''}
     ${d.skills ? `<h3>Tools</h3>${chips(d.skills)}` : ''}
     ${d.before ? `<h3>Before TMU</h3><p>${d.before[0]}<br>${d.before[1]}</p>` : ''}</div>`;

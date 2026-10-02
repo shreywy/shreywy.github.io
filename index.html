@@ -625,7 +625,7 @@ copyPill.addEventListener('click', async () => {
 let selecting = false;
 addEventListener('pointerdown', e => {
   if (e.button !== 0 || coarse || !onText(e)) return;
-  selecting = true; tx = x; root.classList.add('selecting');
+  selecting = true; tx = x; vx = 0; root.classList.add('selecting');
 }, true);
 addEventListener('pointerup', () => { selecting = false; root.classList.remove('selecting') }, true);
 addEventListener('wheel', e => { if (selecting) { e.preventDefault(); e.stopImmediatePropagation() } }, { capture:true, passive:false });
@@ -700,7 +700,7 @@ track.insertBefore(bayEl('Projects', `<div class="lamp"></div><div class="vinyl"
   <p class="role">Smaller things, school work, and experiments</p><p class="sum" style="margin-top:14px"><a href="https://github.com/shreywy" target="_blank" rel="noopener" style="text-decoration:none; border-bottom:1px solid rgba(236,229,214,.35)">github.com/shreywy &#8599;</a></p></div>`), $('eduSign'));
 
 /* ---------- Walking the hall (desktop) ---------- */
-let x = 0, tx = 0, max = 0, travelled = 0, introRunning = false, nudging = false;
+let x = 0, vx = 0, lastFrame = 0, tx = 0, max = 0, travelled = 0, introRunning = false, nudging = false;
 const measure = () => {
   max = Math.max(0, track.scrollWidth - innerWidth);
   // Keep the timeline one straight line, just clear of the tallest role piece.
@@ -876,7 +876,15 @@ const pieces = [...track.querySelectorAll('[data-room]')], where = $('where'), b
       const dx = auto.mx - auto.x, dy = auto.my - auto.y, d = Math.abs(dx) > Math.abs(dy) ? dx : dy, m = Math.max(0, Math.abs(d) - 18);
       tx = clamp(tx + Math.sign(d) * Math.pow(m, 1.2) * 2.2 * dt);
     }
-    x += (tx - x) * (reduce ? 1 : performance.now() < boost ? .16 : .11);
+    // The hall follows its target on a critically damped spring: speed builds and fades smoothly,
+    // so wheel notches blend into one glide and it comes to rest exactly where the scrolling stopped.
+    const now = performance.now(), dt = Math.min(1 / 30, (now - (lastFrame || now)) / 1000) || 1 / 60; lastFrame = now;
+    if (reduce) { x = tx; vx = 0 }
+    else {
+      const w = drag ? 30 : now < boost ? 16 : 12; // stiffer while dragging so the hall stays under the hand
+      vx += (w * w * (tx - x) - 2 * w * vx) * dt; x += vx * dt;
+      if (Math.abs(tx - x) < .2 && Math.abs(vx) < 2) { x = tx; vx = 0 }
+    }
     travelled += Math.abs(x - before);
     track.style.transform = `translate3d(${-x}px,0,0)`;
     if (selShown && Math.abs(x - before) > .05) drawSel();

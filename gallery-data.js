@@ -2,9 +2,9 @@
 //
 // Projects
 //   1. Put screenshots in assets/. If the project has a live site, add page:{ url, poster, full } where full is a
-//      full-page capture; the closer look scrolls through it and can switch to the live site. Otherwise add a cropped GitHub capture as gh:'gh-<name>.jpg'.
+//      full-page capture; the closer look scrolls through it and can switch to the live site (live:false if the site can't be embedded). Otherwise add a cropped GitHub capture as gh:'gh-<name>.jpg'.
 //   2. Copy a block and fill it in. hidden:true takes a piece down without deleting it.
-//   Fields: id (also the link, /#id), frame (baroque | softwood | shadowbox | gilt | walnut | ebony | silver),
+//   Fields: id (also the link, /#id), frame (baroque | softwood | shadowbox | gilt | walnut | ebony | silver | verdant),
 //           art [file, shape ls|pt, size L|S, 'desktop' to hide it on phones] (two S in a row stack into one column),
 //           placard, tag, what / how / nums, map (optional table), extra (detail-only screenshots), links.
 //
@@ -16,6 +16,15 @@
 // Education uses the same shape, plus gpa, honors, coop, coursework, inProgress, and before.
 
 window.PROJECTS = [
+  { id:'mneme', page:{ url:'https://mnemee.pages.dev/about', poster:'page-mneme.jpg', full:'full-mneme.jpg', live:false }, title:'Mneme', year:'Oct 2026', frame:'verdant',
+    art:[['mneme-page.jpg','ls','L'], ['mneme-library.jpg','ls','S'], ['mneme-learn.jpg','ls','S']],
+    tag:'Your course material, turned into decks, notes and pages.', placard:'Spaced repetition decks made with any AI chat, readable notes, and an endless page with maths, plots and a pen.',
+    medium:'TypeScript, React 19, Supabase (Postgres, Auth, Realtime), IndexedDB, TipTap',
+    repo:'github.com/shreywy/Mneme', links:[['GitHub', 'https://github.com/shreywy/Mneme'], ['Open the app', 'https://mnemee.pages.dev'], ['Introduction', 'https://mnemee.pages.dev/about']],
+    extra:['mneme-notes.jpg', 'mneme-dark.jpg', 'mneme-insert.jpg', 'mneme-prompt.jpg', 'mneme-phone.jpg'],
+    what:'A local-first study app for the courses I&rsquo;m taking. Mneme writes a prompt; you paste it into ChatGPT, Claude or Gemini with your slides and import the deck it sends back, with no API key. Learn schedules every card with FSRS, the model Anki uses. The same prompt writes readable notes, and Pages is an endless sheet for your own writing with equations, plots, tables, code and a pen.',
+    how:'The UI only ever talks to IndexedDB. A sync engine pushes deletions first, pulls by per-table cursors, and reaches your other devices within seconds through Supabase Realtime. Every table has forced, owner-only row-level security, tested by a SQL suite that signs in as two users and tries to read, change and forge each other&rsquo;s rows. The ink engine does pressure strokes, hold-to-shape recognition, partial erasing and palm rejection.',
+    nums:'276 Vitest tests across 41 files. A 20 MB quota per account enforced by database triggers. A strict Content Security Policy with no inline scripts, card demos sandboxed on an opaque origin, CodeQL and a secret scan in CI.' },
   { id:'forkable', page:{ url:'https://fforkable.vercel.app', poster:'page-forkable.jpg', full:'full-forkable.jpg' }, title:'Forkable', year:'Aug 2026', frame:'baroque',
     art:[['forkable-home.png','ls','L'], ['forkable-recipe.png','ls','S'], ['forkable-profile.png','ls','S']],
     tag:'Version control for recipes.', placard:'Fork a recipe, commit tweaks, diff versions by ingredient, and merge Taste Tests.',

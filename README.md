@@ -10,7 +10,7 @@ I'm a Computer Science student at Toronto Metropolitan University, graduating Ma
 
 - **Entrance.** Just my name, and a short walk into the room.
 - **Internships.** Each role is a paper object on the wall: a framed certificate, a page of graph paper, a report folder. A timeline above runs newest to oldest. Click a role for what I did, the team, and the tools.
-- **Projects.** Screenshots hang in gilt, walnut, ebony, and silver frames on one size system. Hover a frame and the cursor becomes a loupe that magnifies it. Click one and the frame slides away on a rail to show the story, a scrolling preview of the project's own site or its repo, and links.
+- **Projects.** Screenshots hang in gilt, walnut, ebony, silver, and green lacquer frames on one size system. Hover a frame and the cursor becomes a loupe that magnifies it. Click one and the frame slides away on a rail to show the story, a scrolling preview of the project's own site or its repo, and links.
 - **Education.** A diploma, with honors and coursework behind it.
 - **Resume.** A stack of pages that opens the current PDF.
 - **Guestbook.** Leave a note and it lands in my inbox.

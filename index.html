@@ -173,6 +173,9 @@
   .ebony .bead { background:linear-gradient(#d9bb72, #9d7b37); padding:2px; margin:2px 0; box-shadow:0 0 0 2px #121110 }
   .silver { border-color:#e2e2df #c3c3bf #87877f #6c6c66 }
   .silver .bead { background:radial-gradient(circle, #f4f4f1 0 1.4px, #66665f 1.9px) 0 0 / 5px 5px }
+  /* Green lacquer with square corners and a pale slip */
+  .verdant { border-color:#5a8a4e #47733e #2a4625 #1d331a }
+  .verdant .bead { background:linear-gradient(135deg, #ece3c8, #b8a777); box-shadow:inset 0 0 0 1px rgba(20,36,16,.55) }
 
   /* Frames drawn with backgrounds instead of mitred borders, so they can round off. Same thickness, same outer size. */
   .frame.baroque, .frame.softwood, .frame.shadowbox { border:0; padding:var(--fb) }
@@ -287,7 +290,7 @@
   .detail .backdrop { position:absolute; inset:0; background:rgba(10,9,8,.86); backdrop-filter:blur(6px); opacity:0; transition:opacity .5s }
   .detail.on .backdrop { opacity:1 }
   .panel { position:absolute; inset:6vh 5vw; background:#212429; box-shadow:inset 0 0 0 1px rgba(236,229,214,.08), inset 0 30px 60px -30px rgba(0,0,0,.6), 0 40px 80px rgba(0,0,0,.5);
-    display:grid; grid-template-columns:minmax(320px, 0.85fr) 1.15fr; gap:4vw; padding:84px 4vw 5vh; visibility:hidden; overflow:hidden }
+    display:grid; grid-template-columns:minmax(320px, 0.85fr) minmax(0, 1.15fr); gap:4vw; padding:84px 4vw 5vh; visibility:hidden; overflow:hidden }
   .panel, .panel .info, .panel .aside, .thumbs { scrollbar-width:thin; scrollbar-color:rgba(236,229,214,.25) transparent }
   .glimpse .win { scrollbar-width:thin; scrollbar-color:#c9c3b6 #f4f2ee }
   .panel .info, .panel .aside { overflow:auto; padding-right:14px; font:400 17.5px/1.6 'EB Garamond', serif; color:#ddd5c4 }
@@ -987,7 +990,7 @@ function show(p, src) {
   win.classList.toggle('dark', !live && !scrolls);
   img.style.display = live ? 'none' : 'block';
   frameEl.style.display = live ? 'block' : 'none';
-  $('dLive').style.display = p.page ? '' : 'none';
+  $('dLive').style.display = p.page && p.page.live !== false ? '' : 'none';
   $('dLive').classList.toggle('on', live);
   $('dLive').textContent = live ? 'Back to the preview' : 'Use it live';
   if (live) {

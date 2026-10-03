@@ -17,11 +17,11 @@
 
 window.PROJECTS = [
   { id:'mneme', page:{ url:'https://mnemee.pages.dev/about', poster:'page-mneme.jpg', full:'full-mneme.jpg', live:false }, title:'Mneme', year:'Oct 2026', frame:'verdant',
-    art:[['mneme-page.jpg','ls','L'], ['mneme-library.jpg','ls','S'], ['mneme-learn.jpg','ls','S']],
-    tag:'Your course material, turned into decks, notes and pages.', placard:'Spaced repetition decks made with any AI chat, readable notes, and an endless page with maths, plots and a pen.',
-    medium:'TypeScript, React 19, Supabase (Postgres, Auth, Realtime), IndexedDB, TipTap',
+    art:[['mneme-about.jpg','ls','L'], ['mneme-library.jpg','ls','S'], ['mneme-learn.jpg','ls','S']],
+    tag:'Your course material, turned into decks, notes and pages.', placard:'Spaced repetition decks, readable notes, and an endless page with maths and a pen.',
+    medium:'TypeScript, React 19, Supabase, IndexedDB, TipTap',
     repo:'github.com/shreywy/Mneme', links:[['GitHub', 'https://github.com/shreywy/Mneme'], ['Open the app', 'https://mnemee.pages.dev'], ['Introduction', 'https://mnemee.pages.dev/about']],
-    extra:['mneme-notes.jpg', 'mneme-dark.jpg', 'mneme-insert.jpg', 'mneme-prompt.jpg', 'mneme-phone.jpg'],
+    extra:['mneme-page.jpg', 'mneme-notes.jpg', 'mneme-dark.jpg', 'mneme-insert.jpg', 'mneme-prompt.jpg', 'mneme-phone.jpg'],
     what:'A local-first study app for the courses I&rsquo;m taking. Mneme writes a prompt; you paste it into ChatGPT, Claude or Gemini with your slides and import the deck it sends back, with no API key. Learn schedules every card with FSRS, the model Anki uses. The same prompt writes readable notes, and Pages is an endless sheet for your own writing with equations, plots, tables, code and a pen.',
     how:'The UI only ever talks to IndexedDB. A sync engine pushes deletions first, pulls by per-table cursors, and reaches your other devices within seconds through Supabase Realtime. Every table has forced, owner-only row-level security, tested by a SQL suite that signs in as two users and tries to read, change and forge each other&rsquo;s rows. The ink engine does pressure strokes, hold-to-shape recognition, partial erasing and palm rejection.',
     nums:'276 Vitest tests across 41 files. A 20 MB quota per account enforced by database triggers. A strict Content Security Policy with no inline scripts, card demos sandboxed on an opaque origin, CodeQL and a secret scan in CI.' },

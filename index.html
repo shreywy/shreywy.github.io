@@ -151,6 +151,8 @@
 
   /* Exhibits */
   .exhibit { display:flex; flex-direction:column; align-items:center; gap:30px; padding-top:2vh }
+  /* Every placard takes the same room, so the frames in neighbouring bays share one top line */
+  .exhibit .placard { height:190px }
   .art { display:flex; align-items:flex-end; gap:var(--g); cursor:none }
   .col { display:flex; flex-direction:column; gap:var(--g) }
   .frame { position:relative; border:var(--fb) solid; transform-style:preserve-3d; will-change:transform;
@@ -402,6 +404,7 @@
     .courses { grid-template-columns:1fr }
     .panel.resume .glimpse { display:none }
     .exhibit { flex-direction:column; align-items:center; gap:22px; width:100% }
+    .exhibit .placard { height:auto }
     /* Phones: the lead piece spans the width, the rest pair up beneath it */
     .art { display:grid; grid-template-columns:1fr 1fr; gap:var(--g); width:100%; align-items:start; cursor:pointer }
     .col { display:contents }
